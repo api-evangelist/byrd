@@ -1,0 +1,31 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.getbyrd.com/docs/authentication
+docs: https://developers.getbyrd.com/docs/authentication
+summary:
+  types: [http]
+  http_scheme: bearer
+  bearer_format: JWT
+  api_key_in: []
+  oauth2_flows: []
+schemes:
+  - name: bearerAuth
+    type: http
+    scheme: bearer
+    bearer_format: JWT
+    description: >-
+      All byrd API calls require an Authorization header carrying a JWT bearer
+      token: `Authorization: Bearer <JWT TOKEN>`. Tokens are obtained by posting
+      credentials to the login endpoint and are valid for up to 7 days by default
+      (configurable via the `validity` parameter, in seconds). Tokens should be
+      cached and reused until expiry rather than re-fetched per request.
+    sources: [https://developers.getbyrd.com/docs/authentication]
+token_endpoints:
+  login: https://api.getbyrd.com/v2/login          # POST — exchange credentials for JWT
+  refresh: https://api.getbyrd.com/v2/refresh_token # POST — mint a fresh access token
+notes:
+  - >-
+    A required User-Agent header must identify the caller in the form
+    "<company-registered-in-byrd> (tech-contact-email) - <optional integration version>".
+  - Login endpoint is rate limited to 5 calls per minute per IP or User-Agent.
+  - HTTPS with TLS v1.2 or above is required on every endpoint.
