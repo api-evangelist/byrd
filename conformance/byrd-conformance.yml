@@ -1,0 +1,28 @@
+generated: '2026-07-18'
+method: derived
+source: https://developers.getbyrd.com/docs
+standards:
+  - id: oauth2
+    conforms: false
+    evidence: Auth is JWT bearer obtained via a credentials login endpoint, not OAuth 2.0.
+  - id: jwt-bearer
+    conforms: true
+    evidence: Authorization header carries a JWT bearer token (docs/authentication).
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: Errors use a custom application/json envelope { code, message, errors[] }, not application/problem+json.
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: No Sunset/Deprecation header support documented.
+  - id: rfc9116-security-txt
+    conforms: false
+    evidence: No /.well-known/security.txt served (probed 404) despite a published vulnerability disclosure program.
+  - id: tls-1.2-plus
+    conforms: true
+    evidence: Docs require HTTPS with TLS v1.2 or above on every endpoint.
+  - id: json-content-type
+    conforms: true
+    evidence: Requests and responses use application/json.
+  - id: uri-path-versioning
+    conforms: true
+    evidence: Resources versioned in the URL path (/v2, /v3).

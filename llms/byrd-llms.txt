@@ -1,0 +1,63 @@
+# byrd developer docs and guides Documentation
+
+> Create and manage your shipments, products, deliveries and returns using byrd APIs.  byrd is an e-commerce logistics partner with 25+ fulfillment warehouses in Europe.
+
+## Guides
+- [Authentication](https://developers.getbyrd.com/docs/authentication.md): To call the byrd APIs an Authorization header with a token is needed. This is how you can get the token and refresh it.
+- [How to call the APIs](https://developers.getbyrd.com/docs/how-to-call-bryd-apis.md)
+- [Frequency of calls to the API](https://developers.getbyrd.com/docs/frequency-of-calls-to-the-api.md)
+- [Integration Overview](https://developers.getbyrd.com/docs/integration-overview.md)
+- [Getting the details of a product](https://developers.getbyrd.com/docs/getting-product-details.md): API reference [ProductAPI](ref:productapi_get)
+- [Listing products](https://developers.getbyrd.com/docs/listing-products.md): API reference [ProductAPI](ref:productapi_get)
+- [Listing bundle ingredients](https://developers.getbyrd.com/docs/listing-bundle-ingredients.md)
+- [Listing products lots](https://developers.getbyrd.com/docs/listing-products-lots.md): API reference [LotListAPI](ref:lotlistapi_get)
+- [Getting stock movements](https://developers.getbyrd.com/docs/stock-movements.md): API reference [ProductAPI](ref:productapi_get)
+- [Listing deliveries](https://developers.getbyrd.com/docs/listing-deliveries.md): API reference [DeliveriesAPI](ref:deliveriesapi_get)
+- [Creating a shipment](https://developers.getbyrd.com/docs/creating-a-shipment.md): API reference [ShipmentListAPIV3](ref:shipmentlistapiv3_post)
+- [Pickup points for Mondial Relay France](https://developers.getbyrd.com/docs/pickup-points-for-mondial-relay-fr.md)
+- [Pickup points for Sendcloud](https://developers.getbyrd.com/docs/pickup-points-for-sendcloud.md)
+- [Listing shipments](https://developers.getbyrd.com/docs/listing-shipments.md): API reference [ShipmentListAPIV3](ref:shipmentlistapiv3_get)
+- [Announcing returns](https://developers.getbyrd.com/docs/announcing-returns.md): API reference [ReturnShipmentAnnouncedAPI](ref:returnshipmentannouncedapi_post)
+- [Listing returns](https://developers.getbyrd.com/docs/listing-returns.md): API reference [ReturnShipmentListAPI](ref:returnshipmentlistapi_get)
+
+## API Reference
+- [Get details of your own user.](https://developers.getbyrd.com/reference/authapiv2_get.md)
+- [Endpoint for returning a list of B2BConfigTemplate instances.](https://developers.getbyrd.com/reference/b2bconfigtemplateapi_get.md): This endpoint will fetch and return all available b2b templates.
+- [Log in User into system.](https://developers.getbyrd.com/reference/loginapiv2_post.md)
+- [Prepare a new access token for a User.](https://developers.getbyrd.com/reference/refreshtokenapi_post.md)
+- [Get CSV Shipment Report.](https://developers.getbyrd.com/reference/shipmentexportapi_get.md)
+- [Update user account's details.](https://developers.getbyrd.com/reference/userapiv2_patch.md)
+- [Create a new Delivery.](https://developers.getbyrd.com/reference/deliveriesapi_post.md)
+- [List Deliveries.](https://developers.getbyrd.com/reference/deliveriesapi_get.md)
+- [Perform a full update of the given delivery.](https://developers.getbyrd.com/reference/deliveryapi_put.md)
+- [Update the status on the matching Delivery.](https://developers.getbyrd.com/reference/deliveryapi_patch.md)
+- [Delete a Delivery.](https://developers.getbyrd.com/reference/deliveryapi_delete.md)
+- [Get details of a Delivery.](https://developers.getbyrd.com/reference/deliveryapi_get.md)
+- [Get CSV Inventory Report.](https://developers.getbyrd.com/reference/inventoryexportapi_get.md)
+- [Get details of a specific Lot.](https://developers.getbyrd.com/reference/lotdetailapi_get.md)
+- [List Lots](https://developers.getbyrd.com/reference/lotlistapi_get.md)
+- [Update details of a Product.](https://developers.getbyrd.com/reference/productapi_put.md)
+- [Update details of a Product.](https://developers.getbyrd.com/reference/productapi_patch.md)
+- [Delete a Product.](https://developers.getbyrd.com/reference/productapi_delete.md)
+- [Get details of a Product.](https://developers.getbyrd.com/reference/productapi_get.md)
+- [Create a new Product.](https://developers.getbyrd.com/reference/productsapi_post.md)
+- [List Products.](https://developers.getbyrd.com/reference/productsapi_get.md)
+- [Update details of a Shipment.](https://developers.getbyrd.com/reference/shipmentapiv3_patch.md)
+- [Soft delete a Shipment instance.](https://developers.getbyrd.com/reference/shipmentapiv3_delete.md)
+- [Detail endpoint for a v3 Shipment.](https://developers.getbyrd.com/reference/shipmentapiv3_get.md)
+- [Resource for scheduling shipments for release.](https://developers.getbyrd.com/reference/shipmentbatchreleaseapiv3_post.md)
+- [/v3/shipments/{shipment_id}/documents/{document_id}/file](https://developers.getbyrd.com/reference/shipmentdocumentfileapiv3_get.md)
+- [Upload document(s) for a shipment.](https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_post.md)
+- [List endpoint for shipment documents.](https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_get.md)
+- [Resource for creating a shipment.](https://developers.getbyrd.com/reference/shipmentlistapiv3_post.md)
+- [List endpoint for V3 Shipments.](https://developers.getbyrd.com/reference/shipmentlistapiv3_get.md)
+- [List endpoint for fetching a shipment's picks.](https://developers.getbyrd.com/reference/shipmentpicklistapiv3_get.md)
+- [Resource for recalling a shipment and deleting its fulfillment.](https://developers.getbyrd.com/reference/shipmentrecallapiv3_post.md)
+- [Get available carrier options.](https://developers.getbyrd.com/reference/carrierapi_get.md): Available carrier options.
+
+## Changelog
+- [Added listing bundle ingredients](https://developers.getbyrd.com/changelog/added_listing_bundle_ingredients.md)
+- [Added filter deliveries by date](https://developers.getbyrd.com/changelog/added_filter_deliveries_by_date.md)
+- [Added Sendcloud pickup points](https://developers.getbyrd.com/changelog/added_sendcloud_pickup_points.md)
+- [Added details about call rate limits](https://developers.getbyrd.com/changelog/added-details-about-call-rate-limits.md)
+- [Added create announced returns](https://developers.getbyrd.com/changelog/added_create_announced_returns.md)

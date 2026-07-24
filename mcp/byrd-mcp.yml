@@ -1,0 +1,89 @@
+generated: '2026-07-18'
+method: derived
+status: candidate
+source: https://developers.getbyrd.com/reference
+notes: >-
+  byrd publishes no official hosted/remote MCP server (checked docs, npm
+  @modelcontextprotocol, MCP registries). This is a DERIVED candidate tool list,
+  one tool per documented API reference operation, so a follow-up can stand up an
+  MCP server over the byrd fulfillment API. operationIds are the ReadMe reference
+  slugs from developers.getbyrd.com/reference.
+server:
+  name: byrd
+  transport: http
+tools:
+  - name: get_current_user
+    description: Get details of your own user.
+    source_operation: authapiv2_get
+  - name: list_b2b_config_templates
+    description: List available B2B config templates.
+    source_operation: b2bconfigtemplateapi_get
+  - name: list_products
+    description: List products.
+    source_operation: productsapi_get
+  - name: create_product
+    description: Create a new product.
+    source_operation: productsapi_post
+  - name: get_product
+    description: Get details of a product.
+    source_operation: productapi_get
+  - name: update_product
+    description: Update details of a product.
+    source_operation: productapi_patch
+  - name: delete_product
+    description: Delete a product.
+    source_operation: productapi_delete
+  - name: list_lots
+    description: List product lots.
+    source_operation: lotlistapi_get
+  - name: get_lot
+    description: Get details of a specific lot.
+    source_operation: lotdetailapi_get
+  - name: get_inventory_report
+    description: Get a CSV inventory report.
+    source_operation: inventoryexportapi_get
+  - name: list_deliveries
+    description: List deliveries.
+    source_operation: deliveriesapi_get
+  - name: create_delivery
+    description: Create a new delivery.
+    source_operation: deliveriesapi_post
+  - name: get_delivery
+    description: Get details of a delivery.
+    source_operation: deliveryapi_get
+  - name: update_delivery
+    description: Update the status on a delivery.
+    source_operation: deliveryapi_patch
+  - name: list_shipments
+    description: List v3 shipments.
+    source_operation: shipmentlistapiv3_get
+  - name: create_shipment
+    description: Create a shipment.
+    source_operation: shipmentlistapiv3_post
+  - name: get_shipment
+    description: Get details of a v3 shipment.
+    source_operation: shipmentapiv3_get
+  - name: update_shipment
+    description: Update details of a shipment.
+    source_operation: shipmentapiv3_patch
+  - name: release_shipments
+    description: Schedule shipments for release.
+    source_operation: shipmentbatchreleaseapiv3_post
+  - name: recall_shipment
+    description: Recall a shipment and delete its fulfillment.
+    source_operation: shipmentrecallapiv3_post
+  - name: list_shipment_picks
+    description: List a shipment's picks.
+    source_operation: shipmentpicklistapiv3_get
+  - name: get_shipment_report
+    description: Get a CSV shipment report.
+    source_operation: shipmentexportapi_get
+  - name: list_carriers
+    description: Get available carrier options.
+    source_operation: carrierapi_get
+  - name: announce_return
+    description: Announce a return shipment.
+    source_operation: returnshipmentannouncedapi_post
+  - name: list_returns
+    description: List return shipments.
+    source_operation: returnshipmentlistapi_get

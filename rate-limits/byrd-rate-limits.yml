@@ -1,0 +1,18 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.getbyrd.com/docs/frequency-of-calls-to-the-api
+docs: https://developers.getbyrd.com/docs/frequency-of-calls-to-the-api
+rate_limits:
+  - scope: login
+    limit_count: 5
+    window: 1m
+    per: IP or User-Agent
+    endpoint: POST https://api.getbyrd.com/v2/login
+    notes: Cache and reuse JWTs rather than re-authenticating per request.
+  - scope: write (products/deliveries/shipments)
+    guidance: One call per entity is sufficient for most scenarios; contact byrd if you anticipate sustained volumes above ~10 calls/second.
+  - scope: polling (tracking data, stocks, delivery/return updates)
+    guidance: Download once per hour; poll no more frequently than every 5 minutes.
+headers:
+  documented: false
+  notes: byrd does not document rate-limit response headers or explicit 429 handling.

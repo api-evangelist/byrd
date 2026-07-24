@@ -1,0 +1,55 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.getbyrd.com/reference/shipmentlistapiv3_post
+docs: https://developers.getbyrd.com/docs/how-to-call-bryd-apis
+format: custom-json
+content_type: application/json
+envelope:
+  shape: '{ code, message, errors: [ { code, message, errors, extra } ] }'
+  notes: >-
+    byrd returns a structured JSON error (NOT RFC 9457 problem+json). The top
+    level carries an enum `code` and a human `message`; the `errors[]` array
+    holds field-level validation detail with the same recursive shape.
+error_codes:
+  - code: Authentication.AuthenticationRequired
+    http_status: 403
+    meaning: No credentials/token supplied on a protected endpoint.
+  - code: Authentication.ExpiredJWTToken
+    http_status: 403
+    meaning: The JWT bearer token has expired; refresh it.
+  - code: Authentication.InvalidCredentials
+    http_status: 403
+    meaning: Username/password supplied to login are invalid.
+  - code: Authentication.InvalidJWTToken
+    http_status: 403
+    meaning: The supplied JWT is malformed or not valid.
+  - code: Authentication.LocalityRequired
+    http_status: 403
+    meaning: A required locality/context is missing from the request.
+  - code: Authentication.RoleNotAllowed
+    http_status: 403
+    meaning: The authenticated user's role is not permitted for this operation.
+  - code: Authentication.UserLocked
+    http_status: 403
+    meaning: The user account is locked.
+  - code: Exception.404
+    http_status: 404
+    meaning: Generic not-found exception.
+  - code: Exception.500
+    http_status: 500
+    meaning: Generic internal server error.
+  - code: Request.InvalidPagination
+    http_status: 400
+    meaning: Pagination parameters are invalid.
+  - code: Request.InvalidQuery
+    http_status: 400
+    meaning: A query-string parameter is invalid.
+  - code: Request.InvalidSchema
+    http_status: 400
+    meaning: The request body does not match the expected schema (e.g. malformed JSON).
+  - code: Request.NoInput
+    http_status: 400
+    meaning: Required input was not provided.
+  - code: Request.ResourceNotFound
+    http_status: 400
+    meaning: A referenced resource could not be found.

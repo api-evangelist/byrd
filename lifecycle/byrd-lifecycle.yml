@@ -1,0 +1,26 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.getbyrd.com/changelog
+versioning:
+  scheme: uri-path
+  current: v3.1
+  notes: >-
+    Resources are versioned in the URL path; the shipment surface is on v3 while
+    auth/user endpoints remain on v2. The developer portal reports API version 3.1.
+changelog:
+  url: https://developers.getbyrd.com/changelog
+  artifact: changelog/byrd-changelog.yml
+deprecation:
+  policy_url: null
+  sunset_header: false
+  notes: No formal deprecation policy or RFC 8594 Sunset/Deprecation header support is documented.
+status_page: null
+status_page_notes: >-
+  byrd.statuspage.io resolves but 302-redirects to statuspage.io marketing; no
+  dedicated public byrd status page was found.
+sla:
+  url: null
+  notes: >-
+    byrd advertises operational metrics (99.4% on-time delivery, 99.9% fulfillment
+    accuracy) on its marketing site but publishes no developer-facing API SLA.
+deprecated_operations: []

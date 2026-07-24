@@ -1,0 +1,17 @@
+generated: '2026-07-18'
+method: generated
+source: https://developers.getbyrd.com/reference
+api: byrd fulfillment API (https://api.getbyrd.com)
+skills:
+  - file: byrd-create-and-fulfill-shipment.md
+    name: Create and fulfill an outbound shipment
+    api: https://api.getbyrd.com
+    operations: [loginapiv2_post, productsapi_get, shipmentlistapiv3_post, shipmentbatchreleaseapiv3_post, shipmentapiv3_get]
+  - file: byrd-restock-inbound-delivery.md
+    name: Announce an inbound delivery to restock inventory
+    api: https://api.getbyrd.com
+    operations: [loginapiv2_post, productsapi_post, deliveriesapi_post, deliveriesapi_get]
+  - file: byrd-handle-return.md
+    name: Announce and track a customer return
+    api: https://api.getbyrd.com
+    operations: [loginapiv2_post, returnshipmentannouncedapi_post, returnshipmentlistapi_get]

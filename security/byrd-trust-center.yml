@@ -1,0 +1,17 @@
+generated: '2026-07-18'
+method: searched
+source: https://www.getbyrd.com/en/security-startpage
+url: https://www.getbyrd.com/en/security-startpage
+title: byrd Security and Trust Center
+sections:
+  - byrd's Security (Digital Workplace, Infrastructure & Applications, Data)
+  - Vulnerability Disclosure Program
+  - Security FAQs
+certifications: []
+certifications_notes: >-
+  No named certifications (SOC 2, ISO 27001, PCI DSS, HIPAA, FedRAMP) are listed
+  on the public trust-center landing page. byrd's marketing site references
+  Climate Partner certification for its sustainable-fulfillment program (an
+  environmental certification, not an infosec one).
+evidence:
+  - {source: https://www.getbyrd.com/en/security-startpage, keywords: [security, trust center, vulnerability disclosure, data privacy]}

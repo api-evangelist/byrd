@@ -1,0 +1,27 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.getbyrd.com/changelog
+url: https://developers.getbyrd.com/changelog
+scheme: dated-entries
+current_version: v3.1
+entries:
+  - title: Added listing bundle ingredients
+    url: https://developers.getbyrd.com/changelog/added_listing_bundle_ingredients
+    type: addition
+    highlights: New endpoint/capability to list the ingredients that make up a bundle product.
+  - title: Added filter deliveries by date
+    url: https://developers.getbyrd.com/changelog/added_filter_deliveries_by_date
+    type: addition
+    highlights: The Listing deliveries endpoint can now be filtered by date.
+  - title: Added Sendcloud pickup points
+    url: https://developers.getbyrd.com/changelog/added_sendcloud_pickup_points
+    type: addition
+    highlights: Support for retrieving Sendcloud pickup points.
+  - title: Added details about call rate limits
+    url: https://developers.getbyrd.com/changelog/added-details-about-call-rate-limits
+    type: documentation
+    highlights: Documentation clarifying API call rate limits.
+  - title: Added create announced returns
+    url: https://developers.getbyrd.com/changelog/added_create_announced_returns
+    type: addition
+    highlights: New endpoint to announce/create returns.
