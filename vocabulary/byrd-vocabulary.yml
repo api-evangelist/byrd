@@ -1,0 +1,438 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/byrd-apis-openapi.yml
+vocabulary:
+  name: Byrd Domain Vocabulary
+  description: 'Terms declared by Byrd''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions. Derived,
+    not authored.'
+  version: '2026-10-14'
+  terms:
+  - term: Authentication
+    definition: Log in with your API key to get an access token, refresh it, and read or update your account.
+    tags:
+    - Resource Group
+    source: openapi/byrd-apis-openapi.yml
+  - term: Catalog
+    definition: Products and bundles, their lots, serial numbers and stock, and the dangerous goods limits that apply to them.
+    tags:
+    - Resource Group
+    source: openapi/byrd-apis-openapi.yml
+  - term: Inbound
+    definition: 'Deliveries of your stock to a warehouse: announce them, follow them in, and manage their documents.'
+    tags:
+    - Resource Group
+    source: openapi/byrd-apis-openapi.yml
+  - term: Shipments
+    definition: 'Orders shipped to your customers: create and release them, follow their units and picks, and handle their returns.'
+    tags:
+    - Resource Group
+    source: openapi/byrd-apis-openapi.yml
+  - term: Account
+    definition: The warehouses and B2B templates available to your account, and CSV exports of your shipments, returns and inventory.
+    tags:
+    - Resource Group
+    source: openapi/byrd-apis-openapi.yml
+  - term: Error
+    definition: 'Object declared by the contract with fields: code, message, errors.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Error
+  - term: Login payload
+    definition: 'Object declared by the contract with fields: aud, iss, jti, role, sub, loc, fpk, exp, iat, nbf, scp, imp. (2 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/LoginPayload
+  - term: Login response
+    definition: 'Object declared by the contract with fields: token, payload.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/LoginResponse
+  - term: Post login
+    definition: 'Object declared by the contract with fields: username, password, validity.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/PostLogin
+  - term: Post refresh token
+    definition: 'Object declared by the contract with fields: token.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/PostRefreshToken
+  - term: Address
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, thoroughfare, subThoroughfare, subSubThoroughfare, locality,
+      subLocality, adminArea, subAdminArea, postalCode, countryCode. (3 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Address
+  - term: Total price
+    definition: 'Object declared by the contract with fields: value, currency, taxFactor.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/TotalPrice
+  - term: User
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, firstName, lastName, companyName, senderName, vatNumber,
+      eoriNumber, phone, email, billingEmail. (38 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/User
+  - term: User locality
+    definition: 'Object declared by the contract with fields: localityID.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/UserLocality
+  - term: User update
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, firstName, lastName, companyName, senderName, vatNumber,
+      eoriNumber, phone, email, billingEmail. (38 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/UserUpdate
+  - term: Barcode
+    definition: 'Object declared by the contract with fields: value, barcodeType, isPrimary.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Barcode
+  - term: Bundle
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, ingredient, ingredientID, quantity.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Bundle
+  - term: Lot included in product
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, productID, lotNumber, expiryDate, notBefore, notAfter,
+      activated.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/LotIncludedInProduct
+  - term: Pagination fields
+    definition: 'Object declared by the contract with fields: page, per_page, page_count, total_count.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/PaginationFields
+  - term: Product
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, active, barcode, barcodeType, barcodes, customsTariffNumber,
+      customsValue, description, ean, isbn. (43 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Product
+  - term: Product change request
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, info, status.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ProductChangeRequest
+  - term: Product dangerous goods
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, UNNumber, quantity, productID, dangerousGoodsClass, unit,
+      limit, dangerousGoodsType, description.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ProductDangerousGoods
+  - term: Product packaging unit
+    definition: 'Object declared by the contract with fields: quantity, active, barcodeType, barcodeValue, shippable, dimensions.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ProductPackagingUnit
+  - term: Product storage
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, reservedStock, product, warehouse, locationID, user, lot,
+      deleted, blockedAt, blockReason. (7 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ProductStorage
+  - term: Product storage lot
+    definition: 'Object declared by the contract with fields: id, lotNumber, expiryDate, notBefore, notAfter, activated.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ProductStorageLot
+  - term: Storage product
+    definition: 'Object declared by the contract with fields: id, name, sku, bsku, ean, fragile, barcode, barcodes, skipBarcodePick, organic,
+      grs, packagingUnitEnabled. (2 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/StorageProduct
+  - term: Storage warehouse
+    definition: 'Object declared by the contract with fields: id, countryCode.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/StorageWarehouse
+  - term: Product stats
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, lastPick, lastRestock, preInboundedStock.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ProductStats
+  - term: Delivery address
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, adminArea, subAdminArea, countryCode, countryName, locality,
+      subLocality, postalCode, thoroughfare, subThoroughfare. (4 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryAddress
+  - term: Product stock by warehouse
+    definition: 'Object declared by the contract with fields: id, created_at, updated_at, warehouse, physicalStock, reservedStock, unavailableStock.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ProductStockByWarehouse
+  - term: Warehouse
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, code, displayName, name, legalName, countryCode, deliveryAddress,
+      disallowedShipmentOptions, openingHours.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Warehouse
+  - term: Serial number inventory
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, serialNumber, warehouseID, productID, inboundedAt.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/SerialNumberInventory
+  - term: Lot
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, productID, lotNumber, expiryDate, notBefore, notAfter,
+      activated, physicalStock, reservedStock, warehouses.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Lot
+  - term: Lot warehouse details
+    definition: 'Object declared by the contract with fields: physicalStock, reservedStock, warehouse.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/LotWarehouseDetails
+  - term: Lot warehouse details warehouse
+    definition: 'Object declared by the contract with fields: id, code, name, legalName, displayName, countryCode.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/LotWarehouseDetailsWarehouse
+  - term: Lot update
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, productID, lotNumber, expiryDate, notBefore, notAfter,
+      activated, physicalStock, reservedStock, warehouses.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/LotUpdate
+  - term: Dangerous goods limits
+    definition: 'Object declared by the contract with fields: limits.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DangerousGoodsLimits
+  - term: Acceptance fee
+    definition: 'Object declared by the contract with fields: value, currency, taxFactor.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/AcceptanceFee
+  - term: Delivery container
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, sequenceNumber, type, exchangeablePallet, carrier, unknownCarrierName,
+      trackingNumber, trackingURL, arrived, status. (1 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryContainer
+  - term: Delivery item
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, sequenceNumber, amount, amountArrivedDamaged, amountArrivedFinished,
+      boxcode, hasExistingStorage, newSKU, receivedAmount, product. (1 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryItem
+  - term: Delivery item product
+    definition: 'Object declared by the contract with fields: id, bsku, sku, name, description, organic, grs, productType, lotsEnabled, barcode,
+      barcodes.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryItemProduct
+  - term: Delivery standard
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, deliveryID, label, isFulfilled.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryStandard
+  - term: Delivery with metrics
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, customsMRN, description, expectedDeliveryDateFrom, expectedDeliveryDateTo,
+      expressInbounding, isInternational, referenceNumber, requiresCounting, requiresSampling. (51 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryWithMetrics
+  - term: Inbounding deadline
+    definition: 'Object declared by the contract with fields: id, created_at, updated_at, date, type.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/InboundingDeadline
+  - term: Delivery create
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, customsMRN, description, expectedDeliveryDateFrom, expectedDeliveryDateTo,
+      expressInbounding, isInternational, referenceNumber, requiresCounting, requiresSampling. (45 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryCreate
+  - term: Delivery create request
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, customsMRN, description, expectedDeliveryDateFrom, expectedDeliveryDateTo,
+      expressInbounding, isInternational, referenceNumber, requiresCounting, requiresSampling. (45 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryCreateRequest
+  - term: Document create
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, name, documentType, fileType, url, readOnly, userID.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DocumentCreate
+  - term: Delivery count
+    definition: 'Object declared by the contract with fields: count.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryCount
+  - term: Delivery
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, customsMRN, description, expectedDeliveryDateFrom, expectedDeliveryDateTo,
+      expressInbounding, isInternational, referenceNumber, requiresCounting, requiresSampling. (44 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Delivery
+  - term: Delivery replace request
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, customsMRN, description, expectedDeliveryDateFrom, expectedDeliveryDateTo,
+      expressInbounding, isInternational, referenceNumber, requiresCounting, requiresSampling. (24 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryReplaceRequest
+  - term: Delivery base
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, customsMRN, description, expectedDeliveryDateFrom, expectedDeliveryDateTo,
+      expressInbounding, isInternational, referenceNumber, requiresCounting, requiresSampling. (23 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryBase
+  - term: Undefined response
+    definition: Generic (expected) response when endpoint doesn't explicitly define one
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/UndefinedResponse
+  - term: Delivery received lot
+    definition: 'Object declared by the contract with fields: productID, sku, lotID, lotNumber, expiryDate, amountReceived.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryReceivedLot
+  - term: Delivery document
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, deliveryID, name, documentType, fileType, url, readOnly,
+      userID.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryDocument
+  - term: Delivery document input
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, deliveryID, name, documentType, fileType, url, readOnly.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryDocumentInput
+  - term: Delivery document update
+    definition: 'Object declared by the contract with fields: id, createdAt, updatedAt, deliveryID, name, documentType, readOnly, userID.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DeliveryDocumentUpdate
+  - term: B2B config
+    definition: 'Object declared by the contract with fields: id, created_at, updated_at, template_key, exchanged_pallets, template_id, customer_input,
+      is_pallet.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/B2BConfig
+  - term: Carrier
+    definition: 'Object declared by the contract with fields: name, tracking_number, tracking_url, is_tracked, shipment_id, shipping_rate, byrd_shipping_rate,
+      fuel_surcharge_rate, peak_surcharge_rate, decarbonization_surcharge_rate, pddp_surcharge_rate, remote_area_surcharge_rate. (5 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Carrier
+  - term: Carrier shipping rate
+    definition: 'Object declared by the contract with fields: value, currency, tax_factor.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/CarrierShippingRate
+  - term: Cash on delivery
+    definition: 'Object declared by the contract with fields: price.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/CashOnDelivery
+  - term: Cash on delivery price
+    definition: 'Object declared by the contract with fields: value, currency, tax_factor.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/CashOnDeliveryPrice
+  - term: Checkpoints
+    definition: 'Object declared by the contract with fields: release_error_at, released_at, picked_at, assigned_at, allocated_at, packaging_started_at,
+      packaged_at, accepted_at, sent_at, delivered_at, returned_at.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Checkpoints
+  - term: Customs
+    definition: 'Object declared by the contract with fields: invoice_number, goods_type, export_mrn, has_electronic_export_notification.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Customs
+  - term: DG details
+    definition: 'Object declared by the contract with fields: limited_quantity_weight.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DGDetails
+  - term: Decarbonization surcharge
+    definition: 'Object declared by the contract with fields: currency, tax_factor, actual_carrier, value.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/DecarbonizationSurcharge
+  - term: Dimensions
+    definition: 'Object declared by the contract with fields: height, width, length, weight.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Dimensions
+  - term: Document
+    definition: 'Object declared by the contract with fields: id, created_at, updated_at, data_type, print_copies, format, internal, last_printed_at,
+      url, name, meta, type. (1 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Document
+  - term: Fuel surcharge
+    definition: 'Object declared by the contract with fields: currency, tax_factor, actual_carrier, value.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/FuelSurcharge
+  - term: Insurance
+    definition: 'Object declared by the contract with fields: value, currency.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Insurance
+  - term: Island surcharge
+    definition: 'Object declared by the contract with fields: currency, tax_factor, actual_carrier, value.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/IslandSurcharge
+  - term: Item
+    definition: 'Object declared by the contract with fields: id, created_at, updated_at, product_id, quantity, name, price, dimensions, customs,
+      lot_number, serial_number_tracked, dangerous_goods. (9 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Item
+  - term: Item base
+    definition: 'Object declared by the contract with fields: id, product_id, quantity, name, price, dimensions, customs, lot_number, serial_number_tracked,
+      dangerous_goods, type, fragile. (5 more)'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ItemBase
+  - term: Item base dangerous goods
+    definition: 'Object declared by the contract with fields: un_number, quantity, limit_type.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ItemBaseDangerousGoods
+  - term: Item customs
+    definition: 'Object declared by the contract with fields: origin_country_code, hs_tariff_number.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ItemCustoms
+  - term: Minimal pagination fields
+    definition: 'Object declared by the contract with fields: page, per_page, last_page.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/MinimalPaginationFields
+  - term: Notes
+    definition: 'Object declared by the contract with fields: customer_note, label_error_note.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/Notes
+  - term: Packaging materials
+    definition: 'Object declared by the contract with fields: id, created_at, updated_at, code, quantity, type, required, size.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/PackagingMaterials
+  - term: Pddp surcharge
+    definition: 'Object declared by the contract with fields: currency, tax_factor, actual_carrier, value.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/PddpSurcharge
+  - term: Peak surcharge
+    definition: 'Object declared by the contract with fields: currency, tax_factor, actual_carrier, value.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/PeakSurcharge
+  - term: Product barcode
+    definition: 'Object declared by the contract with fields: value, barcode_type, is_primary.'
+    tags:
+    - Object
+    source: openapi/byrd-apis-openapi.yml#/components/schemas/ProductBarcode

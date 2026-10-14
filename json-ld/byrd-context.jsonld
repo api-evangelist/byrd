@@ -1,0 +1,1893 @@
+{
+  "@context": {
+    "@vocab": "https://getbyrd.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "byrd": "https://getbyrd.com/schema#",
+    "Error": "byrd:Error",
+    "code": {
+      "@id": "byrd:code",
+      "@type": "xsd:string"
+    },
+    "message": {
+      "@id": "byrd:message",
+      "@type": "xsd:string"
+    },
+    "errors": {
+      "@id": "byrd:errors",
+      "@container": "@list"
+    },
+    "LoginPayload": "byrd:LoginPayload",
+    "aud": {
+      "@id": "byrd:aud",
+      "@type": "xsd:string"
+    },
+    "iss": {
+      "@id": "byrd:iss",
+      "@type": "xsd:string"
+    },
+    "jti": {
+      "@id": "byrd:jti",
+      "@type": "xsd:string"
+    },
+    "role": {
+      "@id": "byrd:role",
+      "@type": "xsd:string"
+    },
+    "sub": {
+      "@id": "byrd:sub",
+      "@type": "xsd:string"
+    },
+    "loc": {
+      "@id": "byrd:loc",
+      "@container": "@list"
+    },
+    "fpk": {
+      "@id": "byrd:fpk",
+      "@type": "xsd:string"
+    },
+    "exp": {
+      "@id": "byrd:exp",
+      "@type": "xsd:integer"
+    },
+    "iat": {
+      "@id": "byrd:iat",
+      "@type": "xsd:integer"
+    },
+    "nbf": {
+      "@id": "byrd:nbf",
+      "@type": "xsd:integer"
+    },
+    "scp": {
+      "@id": "byrd:scp",
+      "@container": "@list"
+    },
+    "imp": {
+      "@id": "byrd:imp",
+      "@type": "xsd:string"
+    },
+    "ron": {
+      "@id": "byrd:ron",
+      "@type": "xsd:boolean"
+    },
+    "authMethod": {
+      "@id": "byrd:authMethod",
+      "@type": "xsd:string"
+    },
+    "LoginResponse": "byrd:LoginResponse",
+    "token": {
+      "@id": "byrd:token",
+      "@type": "xsd:string"
+    },
+    "payload": {
+      "@id": "byrd:payload"
+    },
+    "PostLogin": "byrd:PostLogin",
+    "username": {
+      "@id": "byrd:username",
+      "@type": "xsd:string"
+    },
+    "password": {
+      "@id": "byrd:password",
+      "@type": "xsd:string"
+    },
+    "validity": {
+      "@id": "byrd:validity",
+      "@type": "xsd:integer"
+    },
+    "PostRefreshToken": "byrd:PostRefreshToken",
+    "Address": "byrd:Address",
+    "id": {
+      "@id": "byrd:id",
+      "@type": "xsd:string"
+    },
+    "createdAt": {
+      "@id": "byrd:createdAt",
+      "@type": "xsd:dateTime"
+    },
+    "updatedAt": {
+      "@id": "byrd:updatedAt",
+      "@type": "xsd:dateTime"
+    },
+    "thoroughfare": {
+      "@id": "byrd:thoroughfare",
+      "@type": "xsd:string"
+    },
+    "subThoroughfare": {
+      "@id": "byrd:subThoroughfare",
+      "@type": "xsd:string"
+    },
+    "subSubThoroughfare": {
+      "@id": "byrd:subSubThoroughfare",
+      "@type": "xsd:string"
+    },
+    "locality": {
+      "@id": "byrd:locality",
+      "@type": "xsd:string"
+    },
+    "subLocality": {
+      "@id": "byrd:subLocality",
+      "@type": "xsd:string"
+    },
+    "adminArea": {
+      "@id": "byrd:adminArea",
+      "@type": "xsd:string"
+    },
+    "subAdminArea": {
+      "@id": "byrd:subAdminArea",
+      "@type": "xsd:string"
+    },
+    "postalCode": {
+      "@id": "byrd:postalCode",
+      "@type": "xsd:string"
+    },
+    "countryCode": {
+      "@id": "byrd:countryCode",
+      "@type": "xsd:string"
+    },
+    "latitude": {
+      "@id": "byrd:latitude",
+      "@type": "xsd:decimal"
+    },
+    "longitude": {
+      "@id": "byrd:longitude",
+      "@type": "xsd:decimal"
+    },
+    "validated": {
+      "@id": "byrd:validated",
+      "@type": "xsd:boolean"
+    },
+    "TotalPrice": "byrd:TotalPrice",
+    "value": {
+      "@id": "byrd:value",
+      "@type": "xsd:decimal"
+    },
+    "currency": {
+      "@id": "byrd:currency",
+      "@type": "xsd:string"
+    },
+    "taxFactor": {
+      "@id": "byrd:taxFactor",
+      "@type": "xsd:decimal"
+    },
+    "User": "byrd:User",
+    "firstName": {
+      "@id": "byrd:firstName",
+      "@type": "xsd:string"
+    },
+    "lastName": {
+      "@id": "byrd:lastName",
+      "@type": "xsd:string"
+    },
+    "companyName": {
+      "@id": "byrd:companyName",
+      "@type": "xsd:string"
+    },
+    "senderName": {
+      "@id": "byrd:senderName",
+      "@type": "xsd:string"
+    },
+    "vatNumber": {
+      "@id": "byrd:vatNumber",
+      "@type": "xsd:string"
+    },
+    "eoriNumber": {
+      "@id": "byrd:eoriNumber",
+      "@type": "xsd:string"
+    },
+    "phone": {
+      "@id": "byrd:phone",
+      "@type": "xsd:string"
+    },
+    "email": {
+      "@id": "byrd:email",
+      "@type": "xsd:string"
+    },
+    "billingEmail": {
+      "@id": "byrd:billingEmail",
+      "@type": "xsd:string"
+    },
+    "sendTrackingEmails": {
+      "@id": "byrd:sendTrackingEmails",
+      "@type": "xsd:boolean"
+    },
+    "billingAddress": {
+      "@id": "byrd:billingAddress"
+    },
+    "codIBAN": {
+      "@id": "byrd:codIBAN",
+      "@type": "xsd:string"
+    },
+    "codBIC": {
+      "@id": "byrd:codBIC",
+      "@type": "xsd:string"
+    },
+    "userDefaults": {
+      "@id": "byrd:userDefaults"
+    },
+    "language": {
+      "@id": "byrd:language",
+      "@type": "xsd:string"
+    },
+    "addressValidationEnabled": {
+      "@id": "byrd:addressValidationEnabled",
+      "@type": "xsd:boolean"
+    },
+    "economyFallbackEnabled": {
+      "@id": "byrd:economyFallbackEnabled",
+      "@type": "xsd:boolean"
+    },
+    "defaultShipmentService": {
+      "@id": "byrd:defaultShipmentService",
+      "@type": "xsd:string"
+    },
+    "partialFulfillmentEnabled": {
+      "@id": "byrd:partialFulfillmentEnabled",
+      "@type": "xsd:boolean"
+    },
+    "b2bPalletEnabled": {
+      "@id": "byrd:b2bPalletEnabled",
+      "@type": "xsd:boolean"
+    },
+    "fallbackPhoneEnabled": {
+      "@id": "byrd:fallbackPhoneEnabled",
+      "@type": "xsd:boolean"
+    },
+    "blockedShipmentRetryEnabled": {
+      "@id": "byrd:blockedShipmentRetryEnabled",
+      "@type": "xsd:boolean"
+    },
+    "ioss": {
+      "@id": "byrd:ioss",
+      "@type": "xsd:string"
+    },
+    "ukims": {
+      "@id": "byrd:ukims",
+      "@type": "xsd:string"
+    },
+    "fulfillmentProviderKey": {
+      "@id": "byrd:fulfillmentProviderKey",
+      "@type": "xsd:string"
+    },
+    "referralPromotionCode": {
+      "@id": "byrd:referralPromotionCode",
+      "@type": "xsd:string"
+    },
+    "warehousingEnabled": {
+      "@id": "byrd:warehousingEnabled",
+      "@type": "xsd:boolean"
+    },
+    "enabledServices": {
+      "@id": "byrd:enabledServices"
+    },
+    "directComplete": {
+      "@id": "byrd:directComplete",
+      "@type": "xsd:boolean"
+    },
+    "brandingEnabled": {
+      "@id": "byrd:brandingEnabled",
+      "@type": "xsd:boolean"
+    },
+    "localities": {
+      "@id": "byrd:localities",
+      "@container": "@list"
+    },
+    "notificationConfig": {
+      "@id": "byrd:notificationConfig"
+    },
+    "inventoryInsurance": {
+      "@id": "byrd:inventoryInsurance",
+      "@type": "xsd:boolean"
+    },
+    "euleEnabled": {
+      "@id": "byrd:euleEnabled",
+      "@type": "xsd:boolean"
+    },
+    "returnsPortalTabVisible": {
+      "@id": "byrd:returnsPortalTabVisible",
+      "@type": "xsd:boolean"
+    },
+    "returnsPortalEnabled": {
+      "@id": "byrd:returnsPortalEnabled",
+      "@type": "xsd:boolean"
+    },
+    "shippingLabelName": {
+      "@id": "byrd:shippingLabelName",
+      "@type": "xsd:string"
+    },
+    "invoiceAllowed": {
+      "@id": "byrd:invoiceAllowed",
+      "@type": "xsd:boolean"
+    },
+    "credit": {
+      "@id": "byrd:credit"
+    },
+    "passwordRequiresChange": {
+      "@id": "byrd:passwordRequiresChange",
+      "@type": "xsd:boolean"
+    },
+    "warehouseInstructions": {
+      "@id": "byrd:warehouseInstructions",
+      "@type": "xsd:string"
+    },
+    "skipBarcodePick": {
+      "@id": "byrd:skipBarcodePick",
+      "@type": "xsd:boolean"
+    },
+    "isStaff": {
+      "@id": "byrd:isStaff",
+      "@type": "xsd:boolean"
+    },
+    "unpaidBalance": {
+      "@id": "byrd:unpaidBalance",
+      "@type": "xsd:boolean"
+    },
+    "fulfillmentLock": {
+      "@id": "byrd:fulfillmentLock",
+      "@type": "xsd:boolean"
+    },
+    "UserLocality": "byrd:UserLocality",
+    "localityID": {
+      "@id": "byrd:localityID",
+      "@type": "xsd:string"
+    },
+    "UserUpdate": "byrd:UserUpdate",
+    "Barcode": "byrd:Barcode",
+    "barcodeType": {
+      "@id": "byrd:barcodeType",
+      "@type": "xsd:string"
+    },
+    "isPrimary": {
+      "@id": "byrd:isPrimary",
+      "@type": "xsd:boolean"
+    },
+    "Bundle": "byrd:Bundle",
+    "ingredient": {
+      "@id": "byrd:ingredient"
+    },
+    "ingredientID": {
+      "@id": "byrd:ingredientID",
+      "@type": "xsd:string"
+    },
+    "quantity": {
+      "@id": "byrd:quantity",
+      "@type": "xsd:integer"
+    },
+    "LotIncludedInProduct": "byrd:LotIncludedInProduct",
+    "productID": {
+      "@id": "byrd:productID",
+      "@type": "xsd:string"
+    },
+    "lotNumber": {
+      "@id": "byrd:lotNumber",
+      "@type": "xsd:string"
+    },
+    "expiryDate": {
+      "@id": "byrd:expiryDate",
+      "@type": "xsd:date"
+    },
+    "notBefore": {
+      "@id": "byrd:notBefore",
+      "@type": "xsd:dateTime"
+    },
+    "notAfter": {
+      "@id": "byrd:notAfter",
+      "@type": "xsd:dateTime"
+    },
+    "activated": {
+      "@id": "byrd:activated",
+      "@type": "xsd:boolean"
+    },
+    "PaginationFields": "byrd:PaginationFields",
+    "page": {
+      "@id": "byrd:page",
+      "@type": "xsd:integer"
+    },
+    "per_page": {
+      "@id": "byrd:per_page",
+      "@type": "xsd:integer"
+    },
+    "page_count": {
+      "@id": "byrd:page_count",
+      "@type": "xsd:integer"
+    },
+    "total_count": {
+      "@id": "byrd:total_count",
+      "@type": "xsd:integer"
+    },
+    "Product": "byrd:Product",
+    "active": {
+      "@id": "byrd:active",
+      "@type": "xsd:boolean"
+    },
+    "barcode": {
+      "@id": "byrd:barcode",
+      "@type": "xsd:string"
+    },
+    "barcodes": {
+      "@id": "byrd:barcodes",
+      "@container": "@list"
+    },
+    "customsTariffNumber": {
+      "@id": "byrd:customsTariffNumber",
+      "@type": "xsd:string"
+    },
+    "customsValue": {
+      "@id": "byrd:customsValue"
+    },
+    "description": {
+      "@id": "byrd:description",
+      "@type": "xsd:string"
+    },
+    "ean": {
+      "@id": "byrd:ean",
+      "@type": "xsd:string"
+    },
+    "isbn": {
+      "@id": "byrd:isbn",
+      "@type": "xsd:string"
+    },
+    "lotsEnabled": {
+      "@id": "byrd:lotsEnabled",
+      "@type": "xsd:boolean"
+    },
+    "packagingUnitEnabled": {
+      "@id": "byrd:packagingUnitEnabled",
+      "@type": "xsd:boolean"
+    },
+    "serialNumberEnabled": {
+      "@id": "byrd:serialNumberEnabled",
+      "@type": "xsd:boolean"
+    },
+    "serialNumberRegex": {
+      "@id": "byrd:serialNumberRegex",
+      "@type": "xsd:string"
+    },
+    "inventorySerialNumberEnabled": {
+      "@id": "byrd:inventorySerialNumberEnabled",
+      "@type": "xsd:boolean"
+    },
+    "name": {
+      "@id": "byrd:name",
+      "@type": "xsd:string"
+    },
+    "originCountryCode": {
+      "@id": "byrd:originCountryCode",
+      "@type": "xsd:string"
+    },
+    "organic": {
+      "@id": "byrd:organic",
+      "@type": "xsd:boolean"
+    },
+    "grs": {
+      "@id": "byrd:grs",
+      "@type": "xsd:boolean"
+    },
+    "fragile": {
+      "@id": "byrd:fragile",
+      "@type": "xsd:boolean"
+    },
+    "productType": {
+      "@id": "byrd:productType",
+      "@type": "xsd:string"
+    },
+    "purchasePrice": {
+      "@id": "byrd:purchasePrice"
+    },
+    "purchasePriceEvidenceURL": {
+      "@id": "byrd:purchasePriceEvidenceURL",
+      "@type": "xsd:string"
+    },
+    "reorderPoint": {
+      "@id": "byrd:reorderPoint",
+      "@type": "xsd:integer"
+    },
+    "retailPrice": {
+      "@id": "byrd:retailPrice",
+      "@type": "xsd:decimal"
+    },
+    "sku": {
+      "@id": "byrd:sku",
+      "@type": "xsd:string"
+    },
+    "upc": {
+      "@id": "byrd:upc",
+      "@type": "xsd:string"
+    },
+    "variantID": {
+      "@id": "byrd:variantID",
+      "@type": "xsd:string"
+    },
+    "deleted": {
+      "@id": "byrd:deleted",
+      "@type": "xsd:boolean"
+    },
+    "deletedDate": {
+      "@id": "byrd:deletedDate",
+      "@type": "xsd:dateTime"
+    },
+    "physicalStock": {
+      "@id": "byrd:physicalStock",
+      "@type": "xsd:integer"
+    },
+    "reservedStock": {
+      "@id": "byrd:reservedStock",
+      "@type": "xsd:integer"
+    },
+    "availableStock": {
+      "@id": "byrd:availableStock",
+      "@type": "xsd:integer"
+    },
+    "unavailableStock": {
+      "@id": "byrd:unavailableStock",
+      "@type": "xsd:integer"
+    },
+    "stocksByWarehouse": {
+      "@id": "byrd:stocksByWarehouse"
+    },
+    "unreleasedReservations": {
+      "@id": "byrd:unreleasedReservations",
+      "@type": "xsd:integer"
+    },
+    "bundleIngredients": {
+      "@id": "byrd:bundleIngredients",
+      "@container": "@list"
+    },
+    "user": {
+      "@id": "byrd:user"
+    },
+    "userID": {
+      "@id": "byrd:userID",
+      "@type": "xsd:string"
+    },
+    "shop": {
+      "@id": "byrd:shop"
+    },
+    "shopID": {
+      "@id": "byrd:shopID",
+      "@type": "xsd:string"
+    },
+    "storages": {
+      "@id": "byrd:storages",
+      "@container": "@list"
+    },
+    "lots": {
+      "@id": "byrd:lots",
+      "@container": "@list"
+    },
+    "packagingUnits": {
+      "@id": "byrd:packagingUnits",
+      "@container": "@list"
+    },
+    "dangerousGoods": {
+      "@id": "byrd:dangerousGoods",
+      "@container": "@list"
+    },
+    "dangerousGoodsMSDSURL": {
+      "@id": "byrd:dangerousGoodsMSDSURL",
+      "@type": "xsd:string"
+    },
+    "isDangerousGoods": {
+      "@id": "byrd:isDangerousGoods",
+      "@type": "xsd:boolean"
+    },
+    "bsku": {
+      "@id": "byrd:bsku",
+      "@type": "xsd:string"
+    },
+    "dimensions": {
+      "@id": "byrd:dimensions"
+    },
+    "changeRequests": {
+      "@id": "byrd:changeRequests",
+      "@container": "@list"
+    },
+    "dimensionsPhotoURLs": {
+      "@id": "byrd:dimensionsPhotoURLs",
+      "@container": "@list"
+    },
+    "ProductChangeRequest": "byrd:ProductChangeRequest",
+    "info": {
+      "@id": "byrd:info",
+      "@type": "xsd:string"
+    },
+    "status": {
+      "@id": "byrd:status",
+      "@type": "xsd:string"
+    },
+    "ProductDangerousGoods": "byrd:ProductDangerousGoods",
+    "UNNumber": {
+      "@id": "byrd:UNNumber",
+      "@type": "xsd:string"
+    },
+    "dangerousGoodsClass": {
+      "@id": "byrd:dangerousGoodsClass",
+      "@type": "xsd:string"
+    },
+    "unit": {
+      "@id": "byrd:unit",
+      "@type": "xsd:string"
+    },
+    "limit": {
+      "@id": "byrd:limit",
+      "@type": "xsd:integer"
+    },
+    "dangerousGoodsType": {
+      "@id": "byrd:dangerousGoodsType",
+      "@type": "xsd:string"
+    },
+    "ProductPackagingUnit": "byrd:ProductPackagingUnit",
+    "barcodeValue": {
+      "@id": "byrd:barcodeValue",
+      "@type": "xsd:string"
+    },
+    "shippable": {
+      "@id": "byrd:shippable",
+      "@type": "xsd:boolean"
+    },
+    "ProductStorage": "byrd:ProductStorage",
+    "product": {
+      "@id": "byrd:product"
+    },
+    "warehouse": {
+      "@id": "byrd:warehouse"
+    },
+    "locationID": {
+      "@id": "byrd:locationID",
+      "@type": "xsd:string"
+    },
+    "lot": {
+      "@id": "byrd:lot"
+    },
+    "blockedAt": {
+      "@id": "byrd:blockedAt",
+      "@type": "xsd:dateTime"
+    },
+    "blockReason": {
+      "@id": "byrd:blockReason",
+      "@type": "xsd:string"
+    },
+    "bsid": {
+      "@id": "byrd:bsid",
+      "@type": "xsd:string"
+    },
+    "pu": {
+      "@id": "byrd:pu",
+      "@type": "xsd:integer"
+    },
+    "shelfIdentifier": {
+      "@id": "byrd:shelfIdentifier",
+      "@type": "xsd:string"
+    },
+    "stock": {
+      "@id": "byrd:stock",
+      "@type": "xsd:integer"
+    },
+    "stockCounted": {
+      "@id": "byrd:stockCounted",
+      "@type": "xsd:boolean"
+    },
+    "type": {
+      "@id": "byrd:type",
+      "@type": "xsd:integer"
+    },
+    "ProductStorageLot": "byrd:ProductStorageLot",
+    "StorageProduct": "byrd:StorageProduct",
+    "StorageWarehouse": "byrd:StorageWarehouse",
+    "ProductStats": "byrd:ProductStats",
+    "lastPick": {
+      "@id": "byrd:lastPick",
+      "@type": "xsd:dateTime"
+    },
+    "lastRestock": {
+      "@id": "byrd:lastRestock",
+      "@type": "xsd:dateTime"
+    },
+    "preInboundedStock": {
+      "@id": "byrd:preInboundedStock",
+      "@type": "xsd:integer"
+    },
+    "DeliveryAddress": "byrd:DeliveryAddress",
+    "countryName": {
+      "@id": "byrd:countryName",
+      "@type": "xsd:string"
+    },
+    "ProductStockByWarehouse": "byrd:ProductStockByWarehouse",
+    "created_at": {
+      "@id": "byrd:created_at",
+      "@type": "xsd:dateTime"
+    },
+    "updated_at": {
+      "@id": "byrd:updated_at",
+      "@type": "xsd:dateTime"
+    },
+    "Warehouse": "byrd:Warehouse",
+    "displayName": {
+      "@id": "byrd:displayName",
+      "@type": "xsd:string"
+    },
+    "legalName": {
+      "@id": "byrd:legalName",
+      "@type": "xsd:string"
+    },
+    "deliveryAddress": {
+      "@id": "byrd:deliveryAddress"
+    },
+    "disallowedShipmentOptions": {
+      "@id": "byrd:disallowedShipmentOptions",
+      "@type": "xsd:string"
+    },
+    "openingHours": {
+      "@id": "byrd:openingHours",
+      "@type": "xsd:string"
+    },
+    "SerialNumberInventory": "byrd:SerialNumberInventory",
+    "serialNumber": {
+      "@id": "byrd:serialNumber",
+      "@type": "xsd:string"
+    },
+    "warehouseID": {
+      "@id": "byrd:warehouseID",
+      "@type": "xsd:string"
+    },
+    "inboundedAt": {
+      "@id": "byrd:inboundedAt",
+      "@type": "xsd:dateTime"
+    },
+    "Lot": "byrd:Lot",
+    "warehouses": {
+      "@id": "byrd:warehouses",
+      "@container": "@list"
+    },
+    "LotWarehouseDetails": "byrd:LotWarehouseDetails",
+    "LotWarehouseDetailsWarehouse": "byrd:LotWarehouseDetailsWarehouse",
+    "LotUpdate": "byrd:LotUpdate",
+    "DangerousGoodsLimits": "byrd:DangerousGoodsLimits",
+    "limits": {
+      "@id": "byrd:limits"
+    },
+    "AcceptanceFee": "byrd:AcceptanceFee",
+    "DeliveryContainer": "byrd:DeliveryContainer",
+    "sequenceNumber": {
+      "@id": "byrd:sequenceNumber",
+      "@type": "xsd:integer"
+    },
+    "exchangeablePallet": {
+      "@id": "byrd:exchangeablePallet",
+      "@type": "xsd:boolean"
+    },
+    "carrier": {
+      "@id": "byrd:carrier",
+      "@type": "xsd:string"
+    },
+    "unknownCarrierName": {
+      "@id": "byrd:unknownCarrierName",
+      "@type": "xsd:string"
+    },
+    "trackingNumber": {
+      "@id": "byrd:trackingNumber",
+      "@type": "xsd:string"
+    },
+    "trackingURL": {
+      "@id": "byrd:trackingURL",
+      "@type": "xsd:string"
+    },
+    "arrived": {
+      "@id": "byrd:arrived",
+      "@type": "xsd:boolean"
+    },
+    "deliveredAt": {
+      "@id": "byrd:deliveredAt",
+      "@type": "xsd:dateTime"
+    },
+    "DeliveryItem": "byrd:DeliveryItem",
+    "amount": {
+      "@id": "byrd:amount",
+      "@type": "xsd:integer"
+    },
+    "amountArrivedDamaged": {
+      "@id": "byrd:amountArrivedDamaged",
+      "@type": "xsd:integer"
+    },
+    "amountArrivedFinished": {
+      "@id": "byrd:amountArrivedFinished",
+      "@type": "xsd:integer"
+    },
+    "boxcode": {
+      "@id": "byrd:boxcode",
+      "@type": "xsd:string"
+    },
+    "hasExistingStorage": {
+      "@id": "byrd:hasExistingStorage",
+      "@type": "xsd:boolean"
+    },
+    "newSKU": {
+      "@id": "byrd:newSKU",
+      "@type": "xsd:boolean"
+    },
+    "receivedAmount": {
+      "@id": "byrd:receivedAmount",
+      "@type": "xsd:integer"
+    },
+    "DeliveryItemProduct": "byrd:DeliveryItemProduct",
+    "DeliveryStandard": "byrd:DeliveryStandard",
+    "deliveryID": {
+      "@id": "byrd:deliveryID",
+      "@type": "xsd:string"
+    },
+    "label": {
+      "@id": "byrd:label",
+      "@type": "xsd:string"
+    },
+    "isFulfilled": {
+      "@id": "byrd:isFulfilled",
+      "@type": "xsd:boolean"
+    },
+    "DeliveryWithMetrics": "byrd:DeliveryWithMetrics",
+    "customsMRN": {
+      "@id": "byrd:customsMRN",
+      "@type": "xsd:string"
+    },
+    "expectedDeliveryDateFrom": {
+      "@id": "byrd:expectedDeliveryDateFrom",
+      "@type": "xsd:dateTime"
+    },
+    "expectedDeliveryDateTo": {
+      "@id": "byrd:expectedDeliveryDateTo",
+      "@type": "xsd:dateTime"
+    },
+    "expressInbounding": {
+      "@id": "byrd:expressInbounding",
+      "@type": "xsd:boolean"
+    },
+    "isInternational": {
+      "@id": "byrd:isInternational",
+      "@type": "xsd:boolean"
+    },
+    "referenceNumber": {
+      "@id": "byrd:referenceNumber",
+      "@type": "xsd:string"
+    },
+    "requiresCounting": {
+      "@id": "byrd:requiresCounting",
+      "@type": "xsd:boolean"
+    },
+    "requiresSampling": {
+      "@id": "byrd:requiresSampling",
+      "@type": "xsd:boolean"
+    },
+    "senderAddress": {
+      "@id": "byrd:senderAddress",
+      "@type": "xsd:string"
+    },
+    "stocktaking": {
+      "@id": "byrd:stocktaking",
+      "@type": "xsd:boolean"
+    },
+    "unmixedDelivery": {
+      "@id": "byrd:unmixedDelivery",
+      "@type": "xsd:boolean"
+    },
+    "containerSizeAnnounced": {
+      "@id": "byrd:containerSizeAnnounced",
+      "@type": "xsd:string"
+    },
+    "isPalletizedAnnounced": {
+      "@id": "byrd:isPalletizedAnnounced",
+      "@type": "xsd:boolean"
+    },
+    "identifier": {
+      "@id": "byrd:identifier",
+      "@type": "xsd:string"
+    },
+    "statusUpdatedAt": {
+      "@id": "byrd:statusUpdatedAt",
+      "@type": "xsd:dateTime"
+    },
+    "inboundedDateTime": {
+      "@id": "byrd:inboundedDateTime",
+      "@type": "xsd:dateTime"
+    },
+    "inProcessingDateTime": {
+      "@id": "byrd:inProcessingDateTime",
+      "@type": "xsd:dateTime"
+    },
+    "atWarehouseDateTime": {
+      "@id": "byrd:atWarehouseDateTime",
+      "@type": "xsd:dateTime"
+    },
+    "aggregatedContainerStatus": {
+      "@id": "byrd:aggregatedContainerStatus",
+      "@type": "xsd:string"
+    },
+    "customsMRNProvidedAt": {
+      "@id": "byrd:customsMRNProvidedAt",
+      "@type": "xsd:dateTime"
+    },
+    "subStatus": {
+      "@id": "byrd:subStatus",
+      "@type": "xsd:string"
+    },
+    "originConfirmedAt": {
+      "@id": "byrd:originConfirmedAt",
+      "@type": "xsd:dateTime"
+    },
+    "deliveryContainers": {
+      "@id": "byrd:deliveryContainers",
+      "@container": "@list"
+    },
+    "deliveryStandards": {
+      "@id": "byrd:deliveryStandards",
+      "@container": "@list"
+    },
+    "deviation": {
+      "@id": "byrd:deviation",
+      "@type": "xsd:boolean"
+    },
+    "deliverDate": {
+      "@id": "byrd:deliverDate",
+      "@type": "xsd:dateTime"
+    },
+    "acceptanceFee": {
+      "@id": "byrd:acceptanceFee"
+    },
+    "customsPaid": {
+      "@id": "byrd:customsPaid"
+    },
+    "damages": {
+      "@id": "byrd:damages",
+      "@type": "xsd:string"
+    },
+    "deliveryCostsPaid": {
+      "@id": "byrd:deliveryCostsPaid"
+    },
+    "deliveryNotes": {
+      "@id": "byrd:deliveryNotes",
+      "@type": "xsd:string"
+    },
+    "putawayFee": {
+      "@id": "byrd:putawayFee"
+    },
+    "deliveredBoxes": {
+      "@id": "byrd:deliveredBoxes",
+      "@type": "xsd:integer"
+    },
+    "deliveredPallets": {
+      "@id": "byrd:deliveredPallets",
+      "@type": "xsd:integer"
+    },
+    "containerSizeConfirmed": {
+      "@id": "byrd:containerSizeConfirmed",
+      "@type": "xsd:string"
+    },
+    "isPalletizedConfirmed": {
+      "@id": "byrd:isPalletizedConfirmed",
+      "@type": "xsd:boolean"
+    },
+    "palletizationMinutes": {
+      "@id": "byrd:palletizationMinutes",
+      "@type": "xsd:integer"
+    },
+    "meetsEUOrganicRequirements": {
+      "@id": "byrd:meetsEUOrganicRequirements",
+      "@type": "xsd:boolean"
+    },
+    "warehouseOriginIsUK": {
+      "@id": "byrd:warehouseOriginIsUK",
+      "@type": "xsd:boolean"
+    },
+    "standardsCompliance": {
+      "@id": "byrd:standardsCompliance",
+      "@type": "xsd:string"
+    },
+    "sortedBoxesCount": {
+      "@id": "byrd:sortedBoxesCount",
+      "@type": "xsd:integer"
+    },
+    "sortedItemsCount": {
+      "@id": "byrd:sortedItemsCount",
+      "@type": "xsd:integer"
+    },
+    "deliveryItems": {
+      "@id": "byrd:deliveryItems",
+      "@container": "@list"
+    },
+    "inboundingDeadline": {
+      "@id": "byrd:inboundingDeadline"
+    },
+    "totalItems": {
+      "@id": "byrd:totalItems",
+      "@type": "xsd:string"
+    },
+    "totalSKUs": {
+      "@id": "byrd:totalSKUs",
+      "@type": "xsd:string"
+    },
+    "totalContainers": {
+      "@id": "byrd:totalContainers",
+      "@type": "xsd:string"
+    },
+    "newSKUCount": {
+      "@id": "byrd:newSKUCount",
+      "@type": "xsd:string"
+    },
+    "totalDocuments": {
+      "@id": "byrd:totalDocuments",
+      "@type": "xsd:string"
+    },
+    "totalCustomerDocuments": {
+      "@id": "byrd:totalCustomerDocuments",
+      "@type": "xsd:string"
+    },
+    "containerType": {
+      "@id": "byrd:containerType",
+      "@type": "xsd:string"
+    },
+    "InboundingDeadline": "byrd:InboundingDeadline",
+    "date": {
+      "@id": "byrd:date",
+      "@type": "xsd:date"
+    },
+    "DeliveryCreate": "byrd:DeliveryCreate",
+    "documents": {
+      "@id": "byrd:documents",
+      "@container": "@list"
+    },
+    "DeliveryCreateRequest": "byrd:DeliveryCreateRequest",
+    "DocumentCreate": "byrd:DocumentCreate",
+    "documentType": {
+      "@id": "byrd:documentType",
+      "@type": "xsd:string"
+    },
+    "fileType": {
+      "@id": "byrd:fileType",
+      "@type": "xsd:string"
+    },
+    "url": {
+      "@id": "byrd:url",
+      "@type": "xsd:string"
+    },
+    "readOnly": {
+      "@id": "byrd:readOnly",
+      "@type": "xsd:boolean"
+    },
+    "DeliveryCount": "byrd:DeliveryCount",
+    "count": {
+      "@id": "byrd:count",
+      "@type": "xsd:integer"
+    },
+    "Delivery": "byrd:Delivery",
+    "DeliveryReplaceRequest": "byrd:DeliveryReplaceRequest",
+    "DeliveryBase": "byrd:DeliveryBase",
+    "UndefinedResponse": "byrd:UndefinedResponse",
+    "data": {
+      "@id": "byrd:data"
+    },
+    "DeliveryReceivedLot": "byrd:DeliveryReceivedLot",
+    "lotID": {
+      "@id": "byrd:lotID",
+      "@type": "xsd:string"
+    },
+    "amountReceived": {
+      "@id": "byrd:amountReceived",
+      "@type": "xsd:integer"
+    },
+    "DeliveryDocument": "byrd:DeliveryDocument",
+    "DeliveryDocumentInput": "byrd:DeliveryDocumentInput",
+    "DeliveryDocumentUpdate": "byrd:DeliveryDocumentUpdate",
+    "B2BConfig": "byrd:B2BConfig",
+    "template_key": {
+      "@id": "byrd:template_key",
+      "@type": "xsd:string"
+    },
+    "exchanged_pallets": {
+      "@id": "byrd:exchanged_pallets",
+      "@type": "xsd:integer"
+    },
+    "template_id": {
+      "@id": "byrd:template_id",
+      "@type": "xsd:string"
+    },
+    "customer_input": {
+      "@id": "byrd:customer_input",
+      "@type": "xsd:string"
+    },
+    "is_pallet": {
+      "@id": "byrd:is_pallet",
+      "@type": "xsd:boolean"
+    },
+    "Carrier": "byrd:Carrier",
+    "tracking_number": {
+      "@id": "byrd:tracking_number",
+      "@type": "xsd:string"
+    },
+    "tracking_url": {
+      "@id": "byrd:tracking_url",
+      "@type": "xsd:string"
+    },
+    "is_tracked": {
+      "@id": "byrd:is_tracked",
+      "@type": "xsd:boolean"
+    },
+    "shipment_id": {
+      "@id": "byrd:shipment_id",
+      "@type": "xsd:string"
+    },
+    "shipping_rate": {
+      "@id": "byrd:shipping_rate",
+      "@type": "@id"
+    },
+    "byrd_shipping_rate": {
+      "@id": "byrd:byrd_shipping_rate",
+      "@type": "@id"
+    },
+    "fuel_surcharge_rate": {
+      "@id": "byrd:fuel_surcharge_rate",
+      "@type": "@id"
+    },
+    "peak_surcharge_rate": {
+      "@id": "byrd:peak_surcharge_rate",
+      "@type": "@id"
+    },
+    "decarbonization_surcharge_rate": {
+      "@id": "byrd:decarbonization_surcharge_rate",
+      "@type": "@id"
+    },
+    "pddp_surcharge_rate": {
+      "@id": "byrd:pddp_surcharge_rate",
+      "@type": "@id"
+    },
+    "remote_area_surcharge_rate": {
+      "@id": "byrd:remote_area_surcharge_rate",
+      "@type": "@id"
+    },
+    "island_surcharge_rate": {
+      "@id": "byrd:island_surcharge_rate",
+      "@type": "@id"
+    },
+    "sub_carrier_name": {
+      "@id": "byrd:sub_carrier_name",
+      "@type": "xsd:string"
+    },
+    "sub_carrier_tracking_number": {
+      "@id": "byrd:sub_carrier_tracking_number",
+      "@type": "xsd:string"
+    },
+    "sub_carrier_tracking_url": {
+      "@id": "byrd:sub_carrier_tracking_url",
+      "@type": "xsd:string"
+    },
+    "sub_carrier_shipment_id": {
+      "@id": "byrd:sub_carrier_shipment_id",
+      "@type": "xsd:string"
+    },
+    "CarrierShippingRate": "byrd:CarrierShippingRate",
+    "tax_factor": {
+      "@id": "byrd:tax_factor",
+      "@type": "xsd:decimal"
+    },
+    "CashOnDelivery": "byrd:CashOnDelivery",
+    "price": {
+      "@id": "byrd:price"
+    },
+    "CashOnDeliveryPrice": "byrd:CashOnDeliveryPrice",
+    "Checkpoints": "byrd:Checkpoints",
+    "release_error_at": {
+      "@id": "byrd:release_error_at",
+      "@type": "xsd:dateTime"
+    },
+    "released_at": {
+      "@id": "byrd:released_at",
+      "@type": "xsd:dateTime"
+    },
+    "picked_at": {
+      "@id": "byrd:picked_at",
+      "@type": "xsd:dateTime"
+    },
+    "assigned_at": {
+      "@id": "byrd:assigned_at",
+      "@type": "xsd:dateTime"
+    },
+    "allocated_at": {
+      "@id": "byrd:allocated_at",
+      "@type": "xsd:dateTime"
+    },
+    "packaging_started_at": {
+      "@id": "byrd:packaging_started_at",
+      "@type": "xsd:dateTime"
+    },
+    "packaged_at": {
+      "@id": "byrd:packaged_at",
+      "@type": "xsd:dateTime"
+    },
+    "accepted_at": {
+      "@id": "byrd:accepted_at",
+      "@type": "xsd:dateTime"
+    },
+    "sent_at": {
+      "@id": "byrd:sent_at",
+      "@type": "xsd:dateTime"
+    },
+    "delivered_at": {
+      "@id": "byrd:delivered_at",
+      "@type": "xsd:dateTime"
+    },
+    "returned_at": {
+      "@id": "byrd:returned_at",
+      "@type": "xsd:dateTime"
+    },
+    "Customs": "byrd:Customs",
+    "invoice_number": {
+      "@id": "byrd:invoice_number",
+      "@type": "xsd:string"
+    },
+    "goods_type": {
+      "@id": "byrd:goods_type",
+      "@type": "xsd:string"
+    },
+    "export_mrn": {
+      "@id": "byrd:export_mrn",
+      "@type": "xsd:string"
+    },
+    "has_electronic_export_notification": {
+      "@id": "byrd:has_electronic_export_notification",
+      "@type": "xsd:boolean"
+    },
+    "DGDetails": "byrd:DGDetails",
+    "limited_quantity_weight": {
+      "@id": "byrd:limited_quantity_weight",
+      "@type": "xsd:decimal"
+    },
+    "DecarbonizationSurcharge": "byrd:DecarbonizationSurcharge",
+    "actual_carrier": {
+      "@id": "byrd:actual_carrier",
+      "@type": "xsd:string"
+    },
+    "Dimensions": "byrd:Dimensions",
+    "height": {
+      "@id": "byrd:height",
+      "@type": "xsd:decimal"
+    },
+    "width": {
+      "@id": "byrd:width",
+      "@type": "xsd:decimal"
+    },
+    "length": {
+      "@id": "byrd:length",
+      "@type": "xsd:decimal"
+    },
+    "weight": {
+      "@id": "byrd:weight",
+      "@type": "xsd:decimal"
+    },
+    "Document": "byrd:Document",
+    "data_type": {
+      "@id": "byrd:data_type",
+      "@type": "xsd:string"
+    },
+    "print_copies": {
+      "@id": "byrd:print_copies",
+      "@type": "xsd:integer"
+    },
+    "format": {
+      "@id": "byrd:format",
+      "@type": "xsd:string"
+    },
+    "internal": {
+      "@id": "byrd:internal",
+      "@type": "xsd:boolean"
+    },
+    "last_printed_at": {
+      "@id": "byrd:last_printed_at",
+      "@type": "xsd:dateTime"
+    },
+    "meta": {
+      "@id": "byrd:meta"
+    },
+    "unit_id": {
+      "@id": "byrd:unit_id",
+      "@type": "xsd:string"
+    },
+    "FuelSurcharge": "byrd:FuelSurcharge",
+    "Insurance": "byrd:Insurance",
+    "IslandSurcharge": "byrd:IslandSurcharge",
+    "Item": "byrd:Item",
+    "product_id": {
+      "@id": "byrd:product_id",
+      "@type": "xsd:string"
+    },
+    "customs": {
+      "@id": "byrd:customs"
+    },
+    "lot_number": {
+      "@id": "byrd:lot_number",
+      "@type": "xsd:string"
+    },
+    "serial_number_tracked": {
+      "@id": "byrd:serial_number_tracked",
+      "@type": "xsd:boolean"
+    },
+    "dangerous_goods": {
+      "@id": "byrd:dangerous_goods",
+      "@container": "@list"
+    },
+    "required": {
+      "@id": "byrd:required",
+      "@type": "xsd:boolean"
+    },
+    "children": {
+      "@id": "byrd:children"
+    },
+    "shop_product_id": {
+      "@id": "byrd:shop_product_id",
+      "@type": "xsd:string"
+    },
+    "ItemBase": "byrd:ItemBase",
+    "ItemBaseDangerousGoods": "byrd:ItemBaseDangerousGoods",
+    "un_number": {
+      "@id": "byrd:un_number",
+      "@type": "xsd:string"
+    },
+    "limit_type": {
+      "@id": "byrd:limit_type",
+      "@type": "xsd:string"
+    },
+    "ItemCustoms": "byrd:ItemCustoms",
+    "origin_country_code": {
+      "@id": "byrd:origin_country_code",
+      "@type": "xsd:string"
+    },
+    "hs_tariff_number": {
+      "@id": "byrd:hs_tariff_number",
+      "@type": "xsd:string"
+    },
+    "MinimalPaginationFields": "byrd:MinimalPaginationFields",
+    "last_page": {
+      "@id": "byrd:last_page",
+      "@type": "xsd:boolean"
+    },
+    "Notes": "byrd:Notes",
+    "customer_note": {
+      "@id": "byrd:customer_note",
+      "@type": "xsd:string"
+    },
+    "label_error_note": {
+      "@id": "byrd:label_error_note",
+      "@type": "xsd:string"
+    },
+    "PackagingMaterials": "byrd:PackagingMaterials",
+    "size": {
+      "@id": "byrd:size",
+      "@type": "xsd:string"
+    },
+    "PddpSurcharge": "byrd:PddpSurcharge",
+    "PeakSurcharge": "byrd:PeakSurcharge",
+    "ProductBarcode": "byrd:ProductBarcode",
+    "barcode_type": {
+      "@id": "byrd:barcode_type",
+      "@type": "xsd:string"
+    },
+    "is_primary": {
+      "@id": "byrd:is_primary",
+      "@type": "xsd:boolean"
+    },
+    "RemoteAreaSurcharge": "byrd:RemoteAreaSurcharge",
+    "ReturnAddress": "byrd:ReturnAddress",
+    "street_name": {
+      "@id": "byrd:street_name",
+      "@type": "xsd:string"
+    },
+    "city": {
+      "@id": "byrd:city",
+      "@type": "xsd:string"
+    },
+    "country_code": {
+      "@id": "byrd:country_code",
+      "@type": "xsd:string"
+    },
+    "street_number": {
+      "@id": "byrd:street_number",
+      "@type": "xsd:string"
+    },
+    "address_addition": {
+      "@id": "byrd:address_addition",
+      "@type": "xsd:string"
+    },
+    "postal_code": {
+      "@id": "byrd:postal_code",
+      "@type": "xsd:string"
+    },
+    "state": {
+      "@id": "byrd:state",
+      "@type": "xsd:string"
+    },
+    "ShipmentDestinationAddress": "byrd:ShipmentDestinationAddress",
+    "company_name": {
+      "@id": "byrd:company_name",
+      "@type": "xsd:string"
+    },
+    "ShipmentList": "byrd:ShipmentList",
+    "b2b_config": {
+      "@id": "byrd:b2b_config"
+    },
+    "checkpoints": {
+      "@id": "byrd:checkpoints"
+    },
+    "container_code": {
+      "@id": "byrd:container_code",
+      "@type": "xsd:string"
+    },
+    "destination_address": {
+      "@id": "byrd:destination_address"
+    },
+    "insurance": {
+      "@id": "byrd:insurance"
+    },
+    "metrics": {
+      "@id": "byrd:metrics"
+    },
+    "notes": {
+      "@id": "byrd:notes"
+    },
+    "options": {
+      "@id": "byrd:options"
+    },
+    "origin": {
+      "@id": "byrd:origin",
+      "@type": "xsd:string"
+    },
+    "byrd_id": {
+      "@id": "byrd:byrd_id",
+      "@type": "xsd:string"
+    },
+    "priority": {
+      "@id": "byrd:priority",
+      "@type": "xsd:integer"
+    },
+    "return_address": {
+      "@id": "byrd:return_address"
+    },
+    "service": {
+      "@id": "byrd:service",
+      "@type": "xsd:string"
+    },
+    "sub_status": {
+      "@id": "byrd:sub_status",
+      "@type": "xsd:string"
+    },
+    "units": {
+      "@id": "byrd:units",
+      "@container": "@list"
+    },
+    "warnings": {
+      "@id": "byrd:warnings",
+      "@container": "@list"
+    },
+    "cash_on_delivery": {
+      "@id": "byrd:cash_on_delivery"
+    },
+    "total_value": {
+      "@id": "byrd:total_value"
+    },
+    "packaging_materials": {
+      "@id": "byrd:packaging_materials",
+      "@container": "@list"
+    },
+    "user_id": {
+      "@id": "byrd:user_id",
+      "@type": "xsd:string"
+    },
+    "warehouse_id": {
+      "@id": "byrd:warehouse_id",
+      "@type": "xsd:string"
+    },
+    "warehouse_user_id": {
+      "@id": "byrd:warehouse_user_id",
+      "@type": "xsd:string"
+    },
+    "pickup_point": {
+      "@id": "byrd:pickup_point"
+    },
+    "items": {
+      "@id": "byrd:items",
+      "@container": "@list"
+    },
+    "ShipmentListMetrics": "byrd:ShipmentListMetrics",
+    "total_picks": {
+      "@id": "byrd:total_picks",
+      "@type": "xsd:string"
+    },
+    "total_packaging_units": {
+      "@id": "byrd:total_packaging_units",
+      "@type": "xsd:string"
+    },
+    "total_items": {
+      "@id": "byrd:total_items",
+      "@type": "xsd:string"
+    },
+    "total_non_branding_items": {
+      "@id": "byrd:total_non_branding_items",
+      "@type": "xsd:string"
+    },
+    "total_skus": {
+      "@id": "byrd:total_skus",
+      "@type": "xsd:string"
+    },
+    "total_pick_items": {
+      "@id": "byrd:total_pick_items",
+      "@type": "xsd:string"
+    },
+    "ShipmentListOptions": "byrd:ShipmentListOptions",
+    "branding": {
+      "@id": "byrd:branding",
+      "@type": "xsd:boolean"
+    },
+    "packaging": {
+      "@id": "byrd:packaging",
+      "@type": "xsd:boolean"
+    },
+    "custom_handling": {
+      "@id": "byrd:custom_handling",
+      "@type": "xsd:boolean"
+    },
+    "auto_release": {
+      "@id": "byrd:auto_release",
+      "@type": "xsd:boolean"
+    },
+    "preferred_carrier": {
+      "@id": "byrd:preferred_carrier",
+      "@type": "xsd:string"
+    },
+    "incoterm": {
+      "@id": "byrd:incoterm",
+      "@type": "xsd:string"
+    },
+    "charge": {
+      "@id": "byrd:charge",
+      "@type": "xsd:string"
+    },
+    "create_return_label": {
+      "@id": "byrd:create_return_label",
+      "@type": "xsd:boolean"
+    },
+    "print_return_label": {
+      "@id": "byrd:print_return_label",
+      "@type": "xsd:boolean"
+    },
+    "economy_fallback": {
+      "@id": "byrd:economy_fallback",
+      "@type": "xsd:boolean"
+    },
+    "not_before_date": {
+      "@id": "byrd:not_before_date",
+      "@type": "xsd:dateTime"
+    },
+    "not_later_date": {
+      "@id": "byrd:not_later_date",
+      "@type": "xsd:dateTime"
+    },
+    "pickup_date": {
+      "@id": "byrd:pickup_date",
+      "@type": "xsd:date"
+    },
+    "international": {
+      "@id": "byrd:international",
+      "@type": "xsd:boolean"
+    },
+    "has_dangerous_goods": {
+      "@id": "byrd:has_dangerous_goods",
+      "@type": "xsd:boolean"
+    },
+    "v3_packaging": {
+      "@id": "byrd:v3_packaging",
+      "@type": "xsd:boolean"
+    },
+    "requires_export_declaration": {
+      "@id": "byrd:requires_export_declaration",
+      "@type": "xsd:string"
+    },
+    "slam_compatible": {
+      "@id": "byrd:slam_compatible",
+      "@type": "xsd:string"
+    },
+    "autobag_compatible": {
+      "@id": "byrd:autobag_compatible",
+      "@type": "xsd:string"
+    },
+    "expired_stock_allowed": {
+      "@id": "byrd:expired_stock_allowed",
+      "@type": "xsd:boolean"
+    },
+    "pickup_date_from": {
+      "@id": "byrd:pickup_date_from",
+      "@type": "xsd:date"
+    },
+    "pickup_date_to": {
+      "@id": "byrd:pickup_date_to",
+      "@type": "xsd:date"
+    },
+    "self_pickup_by_customer": {
+      "@id": "byrd:self_pickup_by_customer",
+      "@type": "xsd:boolean"
+    },
+    "shipping_label_mode": {
+      "@id": "byrd:shipping_label_mode",
+      "@type": "xsd:string"
+    },
+    "ShipmentListUnit": "byrd:ShipmentListUnit",
+    "parcel_id": {
+      "@id": "byrd:parcel_id",
+      "@type": "xsd:string"
+    },
+    "label_error_status": {
+      "@id": "byrd:label_error_status",
+      "@type": "xsd:string"
+    },
+    "error_code": {
+      "@id": "byrd:error_code",
+      "@type": "xsd:string"
+    },
+    "slam": {
+      "@id": "byrd:slam",
+      "@type": "xsd:boolean"
+    },
+    "autobag": {
+      "@id": "byrd:autobag",
+      "@type": "xsd:boolean"
+    },
+    "pregenerated": {
+      "@id": "byrd:pregenerated",
+      "@type": "xsd:boolean"
+    },
+    "group_number": {
+      "@id": "byrd:group_number",
+      "@type": "xsd:integer"
+    },
+    "sequence_number": {
+      "@id": "byrd:sequence_number",
+      "@type": "xsd:string"
+    },
+    "ShipmentShop": "byrd:ShipmentShop",
+    "order_number": {
+      "@id": "byrd:order_number",
+      "@type": "xsd:string"
+    },
+    "order_id": {
+      "@id": "byrd:order_id",
+      "@type": "xsd:string"
+    },
+    "marketplace_order_number": {
+      "@id": "byrd:marketplace_order_number",
+      "@type": "xsd:string"
+    },
+    "marketplace": {
+      "@id": "byrd:marketplace",
+      "@type": "xsd:string"
+    },
+    "ShipmentUnitCheckpoint": "byrd:ShipmentUnitCheckpoint",
+    "ShipmentUnitDetailError": "byrd:ShipmentUnitDetailError",
+    "extra": {
+      "@id": "byrd:extra"
+    },
+    "ShipmentUser": "byrd:ShipmentUser",
+    "first_name": {
+      "@id": "byrd:first_name",
+      "@type": "xsd:string"
+    },
+    "last_name": {
+      "@id": "byrd:last_name",
+      "@type": "xsd:string"
+    },
+    "sender_name": {
+      "@id": "byrd:sender_name",
+      "@type": "xsd:string"
+    },
+    "ShipmentWarehouse": "byrd:ShipmentWarehouse",
+    "UnitDimensions": "byrd:UnitDimensions",
+    "UnitItem": "byrd:UnitItem",
+    "packaging_unit_id": {
+      "@id": "byrd:packaging_unit_id",
+      "@type": "xsd:string"
+    },
+    "custom_bundle_id": {
+      "@id": "byrd:custom_bundle_id",
+      "@type": "xsd:string"
+    },
+    "serial_numbers": {
+      "@id": "byrd:serial_numbers",
+      "@container": "@list"
+    },
+    "UnitMetrics": "byrd:UnitMetrics",
+    "total_multi_picks": {
+      "@id": "byrd:total_multi_picks",
+      "@type": "xsd:integer"
+    },
+    "total_single_picks": {
+      "@id": "byrd:total_single_picks",
+      "@type": "xsd:integer"
+    },
+    "total_organic_picks": {
+      "@id": "byrd:total_organic_picks",
+      "@type": "xsd:integer"
+    },
+    "total_grs_picks": {
+      "@id": "byrd:total_grs_picks",
+      "@type": "xsd:integer"
+    },
+    "total_fragile_picks": {
+      "@id": "byrd:total_fragile_picks",
+      "@type": "xsd:integer"
+    },
+    "total_branding_picks": {
+      "@id": "byrd:total_branding_picks",
+      "@type": "xsd:integer"
+    },
+    "total_serial_numbers": {
+      "@id": "byrd:total_serial_numbers",
+      "@type": "xsd:integer"
+    },
+    "total_dangerous_goods": {
+      "@id": "byrd:total_dangerous_goods",
+      "@type": "xsd:integer"
+    },
+    "UnitProduct": "byrd:UnitProduct",
+    "serial_number_enabled": {
+      "@id": "byrd:serial_number_enabled",
+      "@type": "xsd:boolean"
+    },
+    "Child": "byrd:Child",
+    "ItemInput": "byrd:ItemInput",
+    "Metrics": "byrd:Metrics",
+    "total_unread_notifications": {
+      "@id": "byrd:total_unread_notifications",
+      "@type": "xsd:string"
+    },
+    "PackagingMaterialsInput": "byrd:PackagingMaterialsInput",
+    "override_reason_code": {
+      "@id": "byrd:override_reason_code",
+      "@type": "xsd:string"
+    },
+    "override_reason_text": {
+      "@id": "byrd:override_reason_text",
+      "@type": "xsd:string"
+    },
+    "Shipment": "byrd:Shipment",
+    "ShipmentInput": "byrd:ShipmentInput",
+    "ShipmentInputShop": "byrd:ShipmentInputShop",
+    "ShipmentUnitDetail": "byrd:ShipmentUnitDetail",
+    "ShipmentUnitDetailCheckpoint": "byrd:ShipmentUnitDetailCheckpoint",
+    "label_error_occurred_at": {
+      "@id": "byrd:label_error_occurred_at",
+      "@type": "xsd:dateTime"
+    },
+    "label_error_resolved_at": {
+      "@id": "byrd:label_error_resolved_at",
+      "@type": "xsd:dateTime"
+    },
+    "slam_prepared_at": {
+      "@id": "byrd:slam_prepared_at",
+      "@type": "xsd:dateTime"
+    },
+    "ShipmentUpdateDestinationAddress": "byrd:ShipmentUpdateDestinationAddress",
+    "ShipmentUpdateDocument": "byrd:ShipmentUpdateDocument",
+    "ShipmentUpdateOptions": "byrd:ShipmentUpdateOptions",
+    "ShipmentCount": "byrd:ShipmentCount",
+    "capped": {
+      "@id": "byrd:capped",
+      "@type": "xsd:boolean"
+    },
+    "ShipmentUpdate": "byrd:ShipmentUpdate",
+    "ShipmentUpdateShop": "byrd:ShipmentUpdateShop",
+    "ShipmentBatchRelease": "byrd:ShipmentBatchRelease",
+    "shipment_ids": {
+      "@id": "byrd:shipment_ids",
+      "@container": "@list"
+    },
+    "ShipmentBatch": "byrd:ShipmentBatch",
+    "ShipmentRecall": "byrd:ShipmentRecall",
+    "reason": {
+      "@id": "byrd:reason",
+      "@type": "xsd:string"
+    },
+    "reset": {
+      "@id": "byrd:reset",
+      "@type": "xsd:boolean"
+    },
+    "SchedulePickup": "byrd:SchedulePickup",
+    "self_pickup": {
+      "@id": "byrd:self_pickup",
+      "@type": "xsd:boolean"
+    },
+    "carrier_tracking_url": {
+      "@id": "byrd:carrier_tracking_url",
+      "@type": "@id"
+    },
+    "carrier_tracking_number": {
+      "@id": "byrd:carrier_tracking_number",
+      "@type": "xsd:string"
+    },
+    "Customer": "byrd:Customer",
+    "ShipmentUnitList": "byrd:ShipmentUnitList",
+    "customer": {
+      "@id": "byrd:customer"
+    },
+    "ShipmentUnitListWarehouse": "byrd:ShipmentUnitListWarehouse",
+    "ShipmentUnitCount": "byrd:ShipmentUnitCount",
+    "ShipmentUnit": "byrd:ShipmentUnit",
+    "Pick": "byrd:Pick",
+    "storage": {
+      "@id": "byrd:storage"
+    },
+    "packaging_unit": {
+      "@id": "byrd:packaging_unit"
+    },
+    "reservation": {
+      "@id": "byrd:reservation",
+      "@type": "xsd:boolean"
+    },
+    "zones": {
+      "@id": "byrd:zones",
+      "@container": "@list"
+    },
+    "PickPackagingUnit": "byrd:PickPackagingUnit",
+    "barcode_value": {
+      "@id": "byrd:barcode_value",
+      "@type": "xsd:string"
+    },
+    "PickProduct": "byrd:PickProduct",
+    "serial_number_regex": {
+      "@id": "byrd:serial_number_regex",
+      "@type": "xsd:string"
+    },
+    "inventory_serial_number_enabled": {
+      "@id": "byrd:inventory_serial_number_enabled",
+      "@type": "xsd:boolean"
+    },
+    "PickStorage": "byrd:PickStorage",
+    "shelf_identifier": {
+      "@id": "byrd:shelf_identifier",
+      "@type": "xsd:string"
+    },
+    "location_id": {
+      "@id": "byrd:location_id",
+      "@type": "xsd:string"
+    },
+    "blocked_at": {
+      "@id": "byrd:blocked_at",
+      "@type": "xsd:dateTime"
+    },
+    "PickStorageLot": "byrd:PickStorageLot",
+    "expiry_date": {
+      "@id": "byrd:expiry_date",
+      "@type": "xsd:string"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Byrd API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Byrd's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-14) from openapi/byrd-apis-openapi.yml.",
+  "dcterms:created": "2026-10-14",
+  "dcterms:source": [
+    "openapi/byrd-apis-openapi.yml"
+  ]
+}

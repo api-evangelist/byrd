@@ -1,4 +1,5 @@
 aid: byrd
+
 deliveryModel:
   model: saas
   open_source: false
@@ -10,6 +11,7 @@ deliveryModel:
   - pricing
   generated: '2026-08-28'
   method: derived
+
 accessModel:
   pricing: unknown
   onboarding: unknown
@@ -24,31 +26,42 @@ accessModel:
   - security
   generated: '2026-09-03'
   method: derived
+
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/byrd.png
+
 name: Byrd
-description: >-
-  byrd is a European e-commerce fulfillment and third-party logistics (3PL)
-  provider operating a network of 25+ fulfillment warehouses across Europe and
-  the UK. It offers multichannel order fulfillment with integrations to the major
-  shop and marketplace platforms (Shopify, Amazon, eBay, WooCommerce, Shopware,
-  PlentyONE, Mirakl and more), inventory and warehouse management, carrier
-  shipping, returns handling, and analytics. byrd exposes a developer REST API
-  (developers.getbyrd.com) for programmatically managing products, deliveries,
-  shipments, and returns, secured with JWT bearer authentication. byrd is a
-  Speedinvest portfolio company.
+
+description: byrd is a European e-commerce fulfillment and third-party logistics (3PL) provider operating a network of 25+ fulfillment warehouses
+  across Europe and the UK. It offers multichannel order fulfillment with integrations to the major shop and marketplace platforms (Shopify, Amazon,
+  eBay, WooCommerce, Shopware, PlentyONE, Mirakl and more), inventory and warehouse management, carrier shipping, returns handling, and analytics.
+  byrd exposes a developer REST API (developers.getbyrd.com) for programmatically managing products, deliveries, shipments, and returns, secured
+  with JWT bearer authentication. byrd is a Speedinvest portfolio company.
+
 url: https://raw.githubusercontent.com/api-evangelist/byrd/refs/heads/main/apis.yml
+
 x-type: company
+
 x-source: vc-portfolio
+
 x-backed-by:
 - speedinvest
+
 x-tier: enriched
+
 x-tier-reason: portfolio-lead
+
 specificationVersion: '0.23'
+
 created: '2026-07-17'
+
 modified: '2026-10-06'
+
 x-docs-platform: readme
+
 x-docs-platform-confidence: high
+
 x-docs-platform-checked: 2026-09-21
+
 tags:
 - Company
 - E-Commerce
@@ -61,35 +74,36 @@ tags:
 - Inventory
 - Returns
 - Supply Chain
-apis:
-- name: byrd Fulfillment API
-  description: >-
-    REST API to create and manage products, deliveries (inbound stock),
-    shipments (outbound orders), and returns across byrd's European fulfillment
-    network. JWT bearer auth; JSON over HTTPS (TLS 1.2+); resources versioned in
-    the URL path (v2 auth/user, v3 shipments; documented API version 3.1).
-  humanURL: https://developers.getbyrd.com
-  baseURL: https://api.getbyrd.com
-  version: '3.1'
-  properties:
-  - type: Authentication
-    url: authentication/byrd-authentication.yml
-  - type: Conventions
-    url: conventions/byrd-conventions.yml
-  - type: ErrorCatalog
-    url: errors/byrd-error-codes.yml
-  - type: RateLimits
-    url: rate-limits/byrd-rate-limits.yml
-  - type: Lifecycle
-    url: lifecycle/byrd-lifecycle.yml
-  - type: ChangeLog
-    url: changelog/byrd-changelog.yml
-  - type: Conformance
-    url: conformance/byrd-conformance.yml
-  - type: X-MCPServerCandidate
-    url: mcp/byrd-mcp.yml
-    note: 'Renamed from MCPServer 2026-09-03 (roadmap#247): the manifest self-describes as status: candidate — a tool list derived from the published API contracts, not an existing server. The scorer already read the manifest and reported mcp_server correctly; the MCPServer type was crediting the artifact-type surfaces with a server that does not exist.'
+
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
+- FN: APIs.json
+  email: info@apis.io
+
 common:
+- type: AgenticAccess
+  url: agentic-access/byrd-agentic-access.yml
+- type: Spectral
+  url: rules/byrd-rules.yml
+- type: JSONLD
+  url: json-ld/byrd-context.jsonld
+- type: Vocabulary
+  url: vocabulary/byrd-vocabulary.yml
+- type: DataModel
+  url: data-model/byrd-data-model.yml
+- type: TrustCenter
+  url: security/byrd-trust-center.yml
+- type: ErrorCatalog
+  url: errors/byrd-problem-types.yml
+- type: Hosts
+  url: hosts/byrd-hosts.yml
+- type: Vendors
+  url: vendors/byrd-vendors.yml
+- type: Newsroom
+  url: https://www.getbyrd.com/press
+- type: Leadership
+  url: https://www.getbyrd.com/team
 - type: RateLimits
   url: rate-limits/byrd-rate-limits.yml
 - url: https://blog.getbyrd.com/rss.xml
@@ -134,13 +148,59 @@ common:
   url: llms/byrd-llms.txt
 - type: AgentSkill
   url: skills/_index.yml
-maintainers:
-- FN: Kin Lane
-  email: kin@apievangelist.com
-- FN: APIs.json
-  email: info@apis.io
+
+apis:
+- name: byrd Fulfillment API
+  description: REST API to create and manage products, deliveries (inbound stock), shipments (outbound orders), and returns across byrd's European
+    fulfillment network. JWT bearer auth; JSON over HTTPS (TLS 1.2+); resources versioned in the URL path (v2 auth/user, v3 shipments; documented
+    API version 3.1).
+  humanURL: https://developers.getbyrd.com
+  baseURL: https://api.getbyrd.com
+  version: '3.1'
+  properties:
+  - url: openapi/byrd-apis-openapi.yml
+    type: OpenAPI
+  - type: Authentication
+    url: authentication/byrd-authentication.yml
+  - type: Conventions
+    url: conventions/byrd-conventions.yml
+  - type: ErrorCatalog
+    url: errors/byrd-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/byrd-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/byrd-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/byrd-changelog.yml
+  - type: Conformance
+    url: conformance/byrd-conformance.yml
+  - type: X-MCPServerCandidate
+    url: mcp/byrd-mcp.yml
+    note: 'Renamed from MCPServer 2026-09-03 (roadmap#247): the manifest self-describes as status: candidate — a tool list derived from the published
+      API contracts, not an existing server. The scorer already read the manifest and reported mcp_server correctly; the MCPServer type was crediting
+      the artifact-type surfaces with a server that does not exist.'
+  - type: JSONSchema
+    url: json-schema/byrd-product-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-with-metrics-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-request-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-shipment-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-schema.json
+  aid: byrd:byrd-fulfillment-api
+
 x-enrichment:
   date: '2026-07-19'
   status: backfilled
   pass: local-v1
   note: backfilled from .gitignore signal + verified work evidence
+
+x-readme-harvest:
+  date: '2026-10-14'
+  ops: 69
+  tool: harvest-readme-openapi.py
+  portal: https://developers.getbyrd.com

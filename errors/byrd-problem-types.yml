@@ -1,0 +1,63 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/byrd-apis-openapi.yml
+format: custom
+envelope:
+  media_type: application/json
+  schema: Error
+coverage:
+  operations: 69
+  statuses_declared: 7
+problems:
+- status: 400
+  title: Bad Request
+  description: Generic error response
+  operations: 62
+  media_types:
+  - application/json
+  schema: Error
+- status: 401
+  title: Unauthorized
+  description: The request changed a field the caller's role may not write - `isStaff`, `v3CarrierSelector` or `status`.
+    The offending field is named in `e
+  operations: 1
+  media_types:
+  - application/json
+  schema: null
+- status: 403
+  title: Forbidden
+  description: Generic error response
+  operations: 67
+  media_types:
+  - application/json
+  schema: Error
+- status: 404
+  title: Not Found
+  description: No return exists for the given id.
+  operations: 1
+  media_types:
+  - application/json
+  schema: null
+- status: 412
+  title: Precondition Failed
+  description: The return cannot have documents regenerated.
+  operations: 1
+  media_types:
+  - application/json
+  schema: null
+- status: 422
+  title: Unprocessable Content
+  description: The request mentioned `isDemo`, which is set when the account is created and cannot be changed afterwards.
+  operations: 2
+  media_types:
+  - application/json
+  schema: null
+- status: default
+  title: null
+  description: Generic success response
+  operations: 6
+  media_types:
+  - application/json
+  schema: UndefinedResponse

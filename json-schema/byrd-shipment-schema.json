@@ -1,0 +1,2046 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/byrd/main/json-schema/byrd-shipment-schema.json",
+  "title": "Shipment",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/byrd-apis-openapi.yml#/components/schemas/Shipment",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "ID of the shipment (UUID)."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "When the record was created (ISO 8601)."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "When the record was last changed (ISO 8601)."
+    },
+    "b2b_config": {
+      "readOnly": true,
+      "description": "B2B configuration of the shipment: the B2B template it uses and your answers to it; `null` for B2C shipments.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/B2BConfig"
+        }
+      ]
+    },
+    "checkpoints": {
+      "readOnly": true,
+      "description": "Timestamps (ISO 8601, UTC) of the milestones the shipment has reached; a milestone not reached yet is `null`.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/Checkpoints"
+        }
+      ]
+    },
+    "container_code": {
+      "type": "string",
+      "description": "Code of the warehouse container the picked items are kept in until the shipment is packed."
+    },
+    "customs": {
+      "description": "Customs details used to generate the export documents; required for international shipments. `null` when none were provided.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/Customs"
+        }
+      ]
+    },
+    "destination_address": {
+      "description": "Address and contact details of the recipient. For deliveries to a carrier pickup point, see the pickup point guides for how to fill it.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ShipmentDestinationAddress"
+        }
+      ]
+    },
+    "errors": {
+      "readOnly": true,
+      "description": "Errors blocking the shipment from progressing, for example a failed address validation or an allocation problem; empty when nothing is blocking it.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ShipmentUnitDetailError"
+      }
+    },
+    "insurance": {
+      "description": "Declared value the shipment is insured for; `null` when the shipment is not insured.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/Insurance"
+        }
+      ]
+    },
+    "metrics": {
+      "readOnly": true,
+      "description": "Item, SKU, pick and packaging-unit counts for the shipment.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/Metrics"
+        }
+      ]
+    },
+    "notes": {
+      "description": "Free-text notes for your own use and packaging instructions for the warehouse.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/Notes"
+        }
+      ]
+    },
+    "options": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "branding": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": null,
+          "description": "Whether the shipment is packed with your branded packaging material; defaults to your account setting."
+        },
+        "packaging": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": null,
+          "description": "Whether the warehouse packs the items in packaging material; defaults to your account setting."
+        },
+        "custom_handling": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": false,
+          "description": "Whether the shipment is held for custom handling at the warehouse; it cannot be packed while this is `true`. Read-only for you."
+        },
+        "auto_release": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": null,
+          "description": "Whether the shipment is released to a warehouse automatically once it is created; if `false` or not sent, it normally stays `new` until you release it."
+        },
+        "preferred_carrier": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "Carrier to send the shipment with, instead of the one byrd selects; see the list of carriers. Use it with caution, as a carrier that cannot serve the shipment leads to shipment errors."
+        },
+        "incoterm": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "Incoterm passed to the carrier for international shipments.\n\n- `DAP`: delivered at place; the recipient pays import duties and taxes (default)\n- `DDP`: delivered duty paid; you pay them"
+        },
+        "charge": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Whether byrd charges you for the shipment."
+        },
+        "fragile": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the shipment contains at least one fragile product."
+        },
+        "organic": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the shipment contains at least one organic product."
+        },
+        "grs": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the shipment contains at least one product that complies with the Global Recycled Standard (GRS)."
+        },
+        "create_return_label": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether a return label is created for each parcel when the shipment is released; send it together with `print_return_label`."
+        },
+        "print_return_label": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the return label is printed and packed with the shipment; requires `create_return_label` to be `true`, and has to be sent together with it."
+        },
+        "economy_fallback": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the shipment is sent with the `standard` service when `economy` is not available for it; set on your account."
+        },
+        "not_before_date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "Earliest date the shipment may be sent (ISO 8601, at midnight); `null` when there is no such date."
+        },
+        "not_later_date": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "Latest date and time the shipment has to be sent by (ISO 8601); `null` when not set."
+        },
+        "pickup_date": {
+          "type": "string",
+          "format": "date",
+          "readOnly": true,
+          "description": "Date the carrier collects the shipment (ISO 8601), for B2B shipments; `null` when not scheduled."
+        },
+        "international": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": null,
+          "description": "Whether the shipment needs a customs declaration because it crosses a customs border; `null` until the shipment is released."
+        },
+        "has_dangerous_goods": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the shipment contains at least one item classified as dangerous goods."
+        },
+        "v3_packaging": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the warehouse packs the shipment with the v3 packing process."
+        },
+        "requires_export_declaration": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Whether the shipment has to carry an export declaration; always `false` before the shipment is released."
+        },
+        "slam_compatible": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Whether the warehouse can pack the shipment on its automated labelling line; `null` until the shipment is released."
+        },
+        "autobag_compatible": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Whether the warehouse can pack the shipment with its automatic bagging machine."
+        },
+        "partial_fulfillment": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Whether the shipment was split off so that part of an order could be sent while the rest waits."
+        },
+        "expired_stock_allowed": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the shipment may be fulfilled with expired stock; defaults to `false`."
+        },
+        "pickup_date_from": {
+          "type": "string",
+          "format": "date",
+          "readOnly": true,
+          "description": "First day of the window in which the shipment will be collected (ISO 8601), for B2B shipments; set with the schedule pickup endpoint."
+        },
+        "pickup_date_to": {
+          "type": "string",
+          "format": "date",
+          "readOnly": true,
+          "description": "Last day of the window in which the shipment will be collected (ISO 8601), for B2B shipments; set with the schedule pickup endpoint."
+        },
+        "self_pickup_by_customer": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether you collect the shipment from the warehouse yourself instead of a carrier, for B2B shipments; set with the schedule pickup endpoint."
+        },
+        "shipping_label_mode": {
+          "type": "string",
+          "readOnly": true,
+          "description": "How the shipping label is obtained.\n\n- `auto`: byrd creates it with the carrier\n- `manual`: byrd uploads it, for example for `pickup` shipments"
+        }
+      },
+      "description": "Fulfilment and shipping options set on the shipment."
+    },
+    "origin": {
+      "type": "string",
+      "readOnly": true,
+      "description": "How the shipment was created; `null` for shipments created before this was recorded.\n\n- `api`: through the API with an API key\n- `manual`: in the byrd dashboard\n- `integration`: by a byrd shop integration"
+    },
+    "byrd_id": {
+      "type": "string",
+      "readOnly": true,
+      "description": "Short human-readable identifier of the shipment, shown in the dashboard and printed on warehouse documents."
+    },
+    "priority": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Picking priority in the warehouse, from 0 (normal) to 40 (highest); rises automatically once the shipping deadline is reached. `null` until the shipment is released."
+    },
+    "return_address": {
+      "readOnly": true,
+      "description": "Address of the fulfilling warehouse that returns are sent to; `null` until the shipment is released.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ReturnAddress"
+        }
+      ]
+    },
+    "service": {
+      "type": "string",
+      "enum": [
+        "economy",
+        "standard",
+        "express",
+        "pickup",
+        "pickup_point"
+      ],
+      "description": "Shipping service the shipment is sent with.\n\n- `standard`: regular delivery\n- `express`: faster delivery, picked with higher priority\n- `economy`: cheapest, slower delivery\n- `pickup_point`: delivery to a carrier pickup point\n- `pickup`: collected from the warehouse, not shipped"
+    },
+    "shop": {
+      "description": "Order references from your shop or order system, such as the order number.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ShipmentShop"
+        }
+      ]
+    },
+    "status": {
+      "type": "string",
+      "readOnly": true,
+      "description": "Current status of the shipment.\n\n- `new`: created and not yet released to a warehouse\n- `releasing`: being released to a warehouse\n- `released`: released and waiting to be picked\n- `picking`: items are being picked\n- `packaging`: being packed\n- `packaged`: packed and labelled\n- `sent`: handed over to the carrier\n- `delivered`: delivered to the recipient\n- `returning`: a return shipment was created\n- `returned`: the return arrived at the warehouse\n- `deleted`: deleted"
+    },
+    "sub_status": {
+      "type": "string",
+      "readOnly": true,
+      "description": "Detail on the current `status`; `null` when there is none.\n\n- `validating_address`, `address_invalid`, `recalled`: while `new`\n- `reserved`, `allocating`, `allocated`, `assigned`, `inbounding`, `inbound_error`: while `released`\n- `label_error`, `error_resolved`, `autobag_failed`: while `packaging`\n- `label_required`, `label_created`, `label_uploaded`, `pickup_details_required`, `pickup_details_uploaded`, `manual_outbound`, `waiting_for_pickup`, `fba_details_required`, `fba_box_label_required`, `fba_pallet_label_required`: while `packaged`, mostly for B2B shipments\n- `pick_up`, `in_transit`, `at_pickup_point`, `out_for_delivery`, `delayed`, `failed_delivery`: carrier tracking events while `sent`\n- `claim_reported`: a support claim is open, while `sent` or `delivered`"
+    },
+    "units": {
+      "readOnly": true,
+      "description": "Physical parcels or pallets the shipment is packed into, each with its own tracking information.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ShipmentUnitDetail"
+      }
+    },
+    "warnings": {
+      "readOnly": true,
+      "description": "Problems that do not block the shipment, for example an address validation error on a shipment released anyway, or the reason it was recalled.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ShipmentUnitDetailError"
+      }
+    },
+    "warehouse": {
+      "readOnly": true,
+      "description": "Warehouse fulfilling the shipment; its fields are `null` until a warehouse is assigned.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ShipmentWarehouse"
+        }
+      ]
+    },
+    "user": {
+      "readOnly": true,
+      "description": "byrd account the shipment belongs to.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ShipmentUser"
+        }
+      ]
+    },
+    "dangerous_goods": {
+      "readOnly": true,
+      "description": "Dangerous goods totals for the shipment.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/DGDetails"
+        }
+      ]
+    },
+    "cash_on_delivery": {
+      "description": "Amount the carrier collects from the recipient on delivery; `null` when the shipment is not cash on delivery.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/CashOnDelivery"
+        }
+      ]
+    },
+    "total_value": {
+      "readOnly": true,
+      "description": "Total value of the items (unit price × quantity), converted to EUR.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/CashOnDeliveryPrice"
+        }
+      ]
+    },
+    "packaging_materials": {
+      "description": "Packaging materials requested or suggested for packing the shipment.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/PackagingMaterials"
+      }
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid",
+      "writeOnly": true,
+      "description": "ID of the byrd account the shipment is created for (UUID); for your requests it is always your own account."
+    },
+    "documents": {
+      "writeOnly": true,
+      "description": "Documents the warehouse prints and packs with the shipment, such as delivery notes or invoices.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Document"
+      }
+    },
+    "warehouse_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "writeOnly": true,
+      "description": "ID of the warehouse that has to fulfil the shipment; if omitted, byrd assigns one automatically."
+    },
+    "warehouse_user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "writeOnly": true,
+      "description": "ID of the warehouse worker assigned to pick the shipment."
+    },
+    "pickup_point": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "default": null,
+      "writeOnly": true,
+      "description": "Carrier pickup point to deliver to, for `pickup_point` shipments; the fields it needs depend on the carrier.",
+      "additionalProperties": {}
+    },
+    "items": {
+      "description": "Products in the shipment and their quantities; at least one.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Item"
+      }
+    }
+  },
+  "required": [
+    "destination_address",
+    "items"
+  ],
+  "$defs": {
+    "B2BConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the B2B configuration (UUID)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "template_key": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Key of the B2B template (processing standard) the shipment uses."
+        },
+        "exchanged_pallets": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Number of pallets exchanged with the carrier at pickup."
+        },
+        "template_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the B2B template to use (UUID); see the list of B2B config templates."
+        },
+        "customer_input": {
+          "type": "string",
+          "description": "Your values for the fields the B2B template asks for, in the structure given by its `customerInputSchema`."
+        },
+        "is_pallet": {
+          "type": "boolean",
+          "description": "Whether the shipment is sent on pallets (`true`) or as parcels (`false`); defaults to `false`."
+        }
+      },
+      "required": [
+        "customer_input",
+        "template_id"
+      ],
+      "title": "B2B config"
+    },
+    "Carrier": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "tracking_number": {
+          "type": "string"
+        },
+        "tracking_url": {
+          "type": "string"
+        },
+        "is_tracked": {
+          "type": "boolean"
+        },
+        "shipment_id": {
+          "type": "string"
+        },
+        "shipping_rate": {
+          "$ref": "#/$defs/CarrierShippingRate"
+        },
+        "byrd_shipping_rate": {
+          "$ref": "#/$defs/CarrierShippingRate"
+        },
+        "fuel_surcharge_rate": {
+          "$ref": "#/$defs/FuelSurcharge"
+        },
+        "peak_surcharge_rate": {
+          "$ref": "#/$defs/PeakSurcharge"
+        },
+        "decarbonization_surcharge_rate": {
+          "$ref": "#/$defs/DecarbonizationSurcharge"
+        },
+        "pddp_surcharge_rate": {
+          "$ref": "#/$defs/PddpSurcharge"
+        },
+        "remote_area_surcharge_rate": {
+          "$ref": "#/$defs/RemoteAreaSurcharge"
+        },
+        "island_surcharge_rate": {
+          "$ref": "#/$defs/IslandSurcharge"
+        },
+        "sub_carrier_name": {
+          "type": "string"
+        },
+        "sub_carrier_tracking_number": {
+          "type": "string"
+        },
+        "sub_carrier_tracking_url": {
+          "type": "string"
+        },
+        "sub_carrier_shipment_id": {
+          "type": "string"
+        }
+      },
+      "title": "Carrier"
+    },
+    "CarrierShippingRate": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Amount in `currency`, with a dot as decimal separator."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "Currency of `value` (ISO 4217), for example `EUR`."
+        },
+        "tax_factor": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Tax factor of the price; `1.0` on item prices and `null` elsewhere. Ignored on input."
+        }
+      },
+      "required": [
+        "currency",
+        "value"
+      ],
+      "title": "Carrier shipping rate"
+    },
+    "CashOnDelivery": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "description": "Total amount the carrier collects from the recipient; only `EUR` is supported.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/CashOnDeliveryPrice"
+            }
+          ]
+        }
+      },
+      "title": "Cash on delivery"
+    },
+    "CashOnDeliveryPrice": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Amount in `currency`, with a dot as decimal separator."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "Currency of `value` (ISO 4217), for example `EUR`."
+        },
+        "tax_factor": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Tax factor of the price; `1.0` on item prices and `null` elsewhere. Ignored on input."
+        }
+      },
+      "required": [
+        "currency",
+        "value"
+      ],
+      "title": "Cash on delivery price"
+    },
+    "Checkpoints": {
+      "type": "object",
+      "properties": {
+        "release_error_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the last attempt to release the shipment failed (ISO 8601, UTC); `null` if releasing never failed."
+        },
+        "released_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the shipment was released to the warehouse (ISO 8601, UTC)."
+        },
+        "picked_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When picking of the shipment's items was completed (ISO 8601, UTC)."
+        },
+        "assigned_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the shipment was assigned to a warehouse worker for picking (ISO 8601, UTC)."
+        },
+        "allocated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When stock was allocated to the shipment for picking (ISO 8601, UTC)."
+        },
+        "packaging_started_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the warehouse started packing the shipment (ISO 8601, UTC)."
+        },
+        "packaged_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the shipment was packed and labelled (ISO 8601, UTC)."
+        },
+        "accepted_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the carrier first scanned the last of the shipment's units (ISO 8601, UTC); `null` until every unit was scanned."
+        },
+        "sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When all of the shipment's units left the warehouse (ISO 8601, UTC)."
+        },
+        "delivered_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the last of the shipment's units was delivered to the recipient (ISO 8601, UTC)."
+        },
+        "returned_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the return of the shipment arrived at the warehouse (ISO 8601, UTC)."
+        }
+      },
+      "title": "Checkpoints"
+    },
+    "Customs": {
+      "type": "object",
+      "properties": {
+        "invoice_number": {
+          "type": "string",
+          "description": "Commercial invoice number of the order, printed on the customs documents."
+        },
+        "goods_type": {
+          "type": "string",
+          "description": "Type of goods in the shipment, declared to customs; defaults to `other`.\n\n- `document`: documents only\n- `gift`: a gift\n- `sample`: commercial samples\n- `remand`: goods sent back\n- `other`: anything else, such as sold goods"
+        },
+        "export_mrn": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Movement Reference Number (MRN) of the export declaration filed for the shipment, passed to the carrier; up to 18 characters."
+        },
+        "has_electronic_export_notification": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether an electronic export declaration was filed for the shipment; passed to the carrier."
+        }
+      },
+      "title": "Customs"
+    },
+    "DGDetails": {
+      "type": "object",
+      "properties": {
+        "limited_quantity_weight": {
+          "type": "number",
+          "readOnly": true,
+          "description": "The total weight of the dangerous goods of type limited quantity (LQ)."
+        }
+      },
+      "title": "DG details"
+    },
+    "DecarbonizationSurcharge": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "tax_factor": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "actual_carrier": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "title": "Decarbonization surcharge"
+    },
+    "Dimensions": {
+      "type": "object",
+      "properties": {
+        "height": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.1,
+          "description": "Height in cm; `null` when unknown."
+        },
+        "width": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.1,
+          "description": "Width in cm; `null` when unknown."
+        },
+        "length": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.1,
+          "description": "Length in cm; `null` when unknown."
+        },
+        "weight": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.001,
+          "description": "Weight in kg; `null` when unknown."
+        }
+      },
+      "title": "Dimensions"
+    },
+    "Document": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the document (UUID). Send it to change an existing document; leave it out to add a new one."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "data_type": {
+          "type": "string",
+          "description": "File format of the document: `pdf`, `pdfb64` (base64-encoded PDF), `pdfurl`, `zpl`, `epl` or `jpeg`. Required for a new document; use `pdf` for documents you upload."
+        },
+        "print_copies": {
+          "type": "integer",
+          "description": "Number of copies the warehouse prints automatically and packs with the shipment, from 0 to 10; defaults to 0 (not printed)."
+        },
+        "format": {
+          "type": "string",
+          "description": "Printer the document is printed on: `document` (A4 paper) or `label` (label printer). Required when `print_copies` is greater than 0."
+        },
+        "internal": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether byrd generated the document (`true`) or it was uploaded (`false`)."
+        },
+        "last_printed_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the document was last printed (ISO 8601); `null` if it has not been printed."
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "url",
+          "writeOnly": true,
+          "description": "URL the document is downloaded from when it is printed, on an HTTP or FTP server without authentication. Required for a new document."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]*$",
+          "description": "Name of the document: 4 to 64 characters, only letters, digits, `_` and `-` (no spaces)."
+        },
+        "meta": {
+          "type": "object",
+          "description": "Additional data about the document, such as the carrier, tracking number and tracking URL of a shipping or return label; the keys depend on `type`.",
+          "additionalProperties": {}
+        },
+        "type": {
+          "description": "Type of document. Documents you upload to be printed use `consignment_note`, `delivery_note`, `export_document`, `proforma_invoice`, `supplement` or `other`; documents byrd creates use other types, such as `shipping_label`, `return_label`, `commercial_invoice` or `customs_cn23`.",
+          "type": "string",
+          "enum": [
+            "amazon_fba",
+            "amazon_fba_box_label",
+            "amazon_fba_pallet_label",
+            "batch_packaging_summary",
+            "customs_cn22",
+            "customs_cn23",
+            "commercial_invoice",
+            "consignment_note",
+            "delivery_note",
+            "dhl_export_declaration_label",
+            "export_document",
+            "generic_large_label",
+            "other",
+            "pickup_confirmation",
+            "pickup_confirmation_template",
+            "proforma_invoice",
+            "proof_of_delivery",
+            "return_label",
+            "shipping_label",
+            "sku_relabelling",
+            "supplement",
+            "byrd_label",
+            "sequence_number_label",
+            "return_slip"
+          ]
+        },
+        "unit_id": {
+          "type": "string",
+          "description": "ID of the unit (parcel) the document belongs to (UUID); `null` for documents that belong to the whole shipment."
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ],
+      "title": "Document"
+    },
+    "FuelSurcharge": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "tax_factor": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "actual_carrier": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "title": "Fuel surcharge"
+    },
+    "Insurance": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Value of the whole shipment it is insured for, in `currency`."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency of `value` (ISO 4217), for example `EUR`."
+        }
+      },
+      "title": "Insurance"
+    },
+    "IslandSurcharge": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "tax_factor": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "actual_carrier": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "title": "Island surcharge"
+    },
+    "Item": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the item line (UUID)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "product_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the byrd product to ship (UUID); send it or `sku`. `null` for custom bundles."
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Number of units to ship; at least 1. For items of a custom bundle, the number per bundle."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the product; replaced by the name stored on the product. Required for custom bundles and their items."
+        },
+        "price": {
+          "description": "Retail price of one unit, used for customs documents and insurance; it is multiplied by `quantity`. Required for custom bundles.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/CarrierShippingRate"
+            }
+          ]
+        },
+        "dimensions": {
+          "description": "Dimensions and weight of one unit of the product; missing values are taken from the product, and the weight stored on the product always replaces the one sent.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Dimensions"
+            }
+          ]
+        },
+        "customs": {
+          "description": "Customs details of the product, needed for shipments leaving the EU or the UK; taken from the product when not sent.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ItemCustoms"
+            }
+          ]
+        },
+        "lot_number": {
+          "type": "string",
+          "description": "Lot the units have to be picked from; if not sent, byrd chooses lots first in, first out (FIFO)."
+        },
+        "serial_number_tracked": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether serial numbers are recorded for the item when it is packed; set from the serial number setting of the product."
+        },
+        "dangerous_goods": {
+          "readOnly": true,
+          "description": "Dangerous goods classifications of the product, taken from the product; empty when it is not dangerous goods.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ItemBaseDangerousGoods"
+          }
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of item.\n\n- `product`: a single product (default)\n- `bundle`: a bundle product set up in byrd\n- `custom_bundle`: products packed together, listed in `children`\n- `supplement`: a supplementary product, such as a flyer, added because it is linked to another product in the shipment"
+        },
+        "fragile": {
+          "type": "boolean",
+          "default": false,
+          "readOnly": true,
+          "description": "Whether the product is fragile, as set on the product."
+        },
+        "organic": {
+          "type": "boolean",
+          "default": false,
+          "readOnly": true,
+          "description": "Whether the product is organic and needs special shipping conditions, as set on the product."
+        },
+        "grs": {
+          "type": "boolean",
+          "default": false,
+          "readOnly": true,
+          "description": "Whether the product complies with the Global Recycled Standard (GRS), as set on the product."
+        },
+        "required": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the item has to be in the shipment for it to be sent; `false` for optional supplementary products, such as flyers, that can be left out."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Description of the product, used on customs documents; taken from the product when not sent."
+        },
+        "sku": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "SKU of the byrd product to ship; send it or `product_id`. Required for custom bundles, where it has to be unique within the shipment."
+        },
+        "children": {
+          "readOnly": true,
+          "description": "Items the bundle consists of; empty for other item types. Required when `type` is `custom_bundle`: list every product to pack together, including the bag or box they go in.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ItemBase"
+            }
+          ]
+        },
+        "shop_product_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "writeOnly": true,
+          "description": "ID of the product in your shop or order system; not necessarily a UUID."
+        }
+      },
+      "required": [
+        "quantity"
+      ],
+      "title": "Item"
+    },
+    "ItemBase": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the item line (UUID)."
+        },
+        "product_id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the byrd product to ship (UUID); send it or `sku`. `null` for custom bundles."
+        },
+        "quantity": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Number of units to ship; at least 1. For items of a custom bundle, the number per bundle."
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Name of the product; replaced by the name stored on the product. Required for custom bundles and their items."
+        },
+        "price": {
+          "readOnly": true,
+          "description": "Retail price of one unit, used for customs documents and insurance; it is multiplied by `quantity`. Required for custom bundles.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/CarrierShippingRate"
+            }
+          ]
+        },
+        "dimensions": {
+          "readOnly": true,
+          "description": "Dimensions and weight of one unit of the product; missing values are taken from the product, and the weight stored on the product always replaces the one sent.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Dimensions"
+            }
+          ]
+        },
+        "customs": {
+          "readOnly": true,
+          "description": "Customs details of the product, needed for shipments leaving the EU or the UK; taken from the product when not sent.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ItemCustoms"
+            }
+          ]
+        },
+        "lot_number": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Lot the units have to be picked from; if not sent, byrd chooses lots first in, first out (FIFO)."
+        },
+        "serial_number_tracked": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether serial numbers are recorded for the item when it is packed; set from the serial number setting of the product."
+        },
+        "dangerous_goods": {
+          "readOnly": true,
+          "description": "Dangerous goods classifications of the product, taken from the product; empty when it is not dangerous goods.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ItemBaseDangerousGoods"
+          }
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of item.\n\n- `product`: a single product (default)\n- `bundle`: a bundle product set up in byrd\n- `custom_bundle`: products packed together, listed in `children`\n- `supplement`: a supplementary product, such as a flyer, added because it is linked to another product in the shipment"
+        },
+        "fragile": {
+          "type": "boolean",
+          "default": false,
+          "readOnly": true,
+          "description": "Whether the product is fragile, as set on the product."
+        },
+        "organic": {
+          "type": "boolean",
+          "default": false,
+          "readOnly": true,
+          "description": "Whether the product is organic and needs special shipping conditions, as set on the product."
+        },
+        "grs": {
+          "type": "boolean",
+          "default": false,
+          "readOnly": true,
+          "description": "Whether the product complies with the Global Recycled Standard (GRS), as set on the product."
+        },
+        "required": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the item has to be in the shipment for it to be sent; `false` for optional supplementary products, such as flyers, that can be left out."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Description of the product, used on customs documents; taken from the product when not sent."
+        },
+        "sku": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "SKU of the byrd product to ship; send it or `product_id`. Required for custom bundles, where it has to be unique within the shipment."
+        }
+      },
+      "title": "Item base"
+    },
+    "ItemBaseDangerousGoods": {
+      "type": "object",
+      "properties": {
+        "un_number": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Four-digit UN number identifying the dangerous substance."
+        },
+        "quantity": {
+          "type": "number",
+          "readOnly": true,
+          "description": "Amount of the dangerous substance in one unit of the product, in the measure its UN number uses (g, l or Wh)."
+        },
+        "limit_type": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Transport regime the dangerous goods are shipped under.\n\n- `LQ`: limited quantity\n- `SV188`: special provision 188 (small lithium cells and batteries)"
+        }
+      },
+      "title": "Item base dangerous goods"
+    },
+    "ItemCustoms": {
+      "type": "object",
+      "properties": {
+        "origin_country_code": {
+          "type": "string",
+          "description": "Country the product was made in (ISO 3166-1 alpha-2), for example `CN`."
+        },
+        "hs_tariff_number": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Harmonized System (HS) tariff number of the product: 6, 8 or 10 digits."
+        }
+      },
+      "title": "Item customs"
+    },
+    "Metrics": {
+      "type": "object",
+      "properties": {
+        "total_picks": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Number of picks, one for each storage location to pick from; 0 until stock is allocated."
+        },
+        "total_packaging_units": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Number of packaging units to pick; 0 until stock is allocated."
+        },
+        "total_items": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Number of physical items in the shipment; the contents of bundles are counted, the bundles themselves are not."
+        },
+        "total_non_branding_items": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Number of physical items in the shipment, not counting branding products such as flyers or stickers."
+        },
+        "total_skus": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Number of distinct products in the shipment, not counting bundles."
+        },
+        "total_unread_notifications": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Number of notifications about the shipment and its units that you have not read yet."
+        }
+      },
+      "title": "Metrics"
+    },
+    "Notes": {
+      "type": "object",
+      "properties": {
+        "customer_note": {
+          "type": "string",
+          "description": "Note for your own use, shown in the dashboard; it is not sent to the recipient or shown to the warehouse."
+        },
+        "label_error_note": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Instructions byrd gave the warehouse when resolving a label error on the shipment; `null` when there are none."
+        }
+      },
+      "title": "Notes"
+    },
+    "PackagingMaterials": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the record (UUID)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "code": {
+          "type": "string",
+          "description": "Unique 7-character code of the packaging material; ask byrd Support for it once the warehouse has validated the material."
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Number of units of the packaging material to use."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the packaging material, filled in by byrd."
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the warehouse has to use the packaging material (`true`, default) or may use a different one (`false`); a different one is used anyway when it is out of stock."
+        },
+        "size": {
+          "type": "string",
+          "description": "Size group of the packaging material, filled in by byrd."
+        }
+      },
+      "title": "Packaging materials"
+    },
+    "PddpSurcharge": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "tax_factor": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "actual_carrier": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "title": "Pddp surcharge"
+    },
+    "PeakSurcharge": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "tax_factor": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "actual_carrier": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "title": "Peak surcharge"
+    },
+    "ProductBarcode": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "Value encoded in the barcode."
+        },
+        "barcode_type": {
+          "description": "Type of the barcode.\n\n- `ean_13`\n- `code_128`\n- `gs1_128`\n- `qr_code`",
+          "type": "string",
+          "enum": [
+            "ean_13",
+            "code_128",
+            "gs1_128",
+            "qr_code"
+          ]
+        },
+        "is_primary": {
+          "type": "boolean",
+          "description": "Whether this is the product's primary barcode."
+        }
+      },
+      "title": "Product barcode"
+    },
+    "RemoteAreaSurcharge": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "tax_factor": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "actual_carrier": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "title": "Remote area surcharge"
+    },
+    "ReturnAddress": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the address (UUID)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the warehouse that returns are sent to."
+        },
+        "street_name": {
+          "type": "string",
+          "description": "Name of the street, without the house number."
+        },
+        "city": {
+          "type": "string",
+          "description": "City."
+        },
+        "country_code": {
+          "type": "string",
+          "description": "Country (ISO 3166-1 alpha-2), for example `DE`."
+        },
+        "street_number": {
+          "type": "string",
+          "description": "House number."
+        },
+        "address_addition": {
+          "type": "string",
+          "description": "Additional address details, such as building or floor."
+        },
+        "postal_code": {
+          "type": "string",
+          "description": "Postal code. For countries with numeric postal codes, anything but digits is removed, such as a `DE-` prefix."
+        },
+        "state": {
+          "type": "string",
+          "description": "State, province or region; `null` when not needed."
+        }
+      },
+      "title": "Return address"
+    },
+    "ShipmentDestinationAddress": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the address (UUID)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "validated": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the address passed byrd address validation; `false` also when it has not been validated."
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Name of the recipient, if the recipient is a person."
+        },
+        "company_name": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Company name of the recipient, if the recipient is a company."
+        },
+        "email": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Email address of the recipient; given to the carrier, which may use it to notify the recipient about the delivery."
+        },
+        "phone": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Phone number, with the country code where possible, for example `+49 1234567890`. For a recipient, it is given to the carrier, and characters other than digits and `+` are removed."
+        },
+        "street_name": {
+          "type": "string",
+          "description": "Name of the street, without the house number."
+        },
+        "street_number": {
+          "type": "string",
+          "description": "House number."
+        },
+        "city": {
+          "type": "string",
+          "description": "City."
+        },
+        "country_code": {
+          "type": "string",
+          "description": "Country (ISO 3166-1 alpha-2), for example `DE`."
+        },
+        "address_addition": {
+          "type": "string",
+          "description": "Additional address details, such as building or floor."
+        },
+        "postal_code": {
+          "type": "string",
+          "description": "Postal code. For countries with numeric postal codes, anything but digits is removed, such as a `DE-` prefix."
+        },
+        "state": {
+          "type": "string",
+          "description": "State, province or region; `null` when not needed."
+        }
+      },
+      "required": [
+        "country_code"
+      ],
+      "title": "Shipment destination address"
+    },
+    "ShipmentShop": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the byrd shop integration the shipment was imported from; `null` for shipments created through the API."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the byrd shop integration the shipment was imported from; `null` for shipments created through the API."
+        },
+        "order_number": {
+          "type": "string",
+          "description": "Order number in your shop or order system, shown in the Order column of the dashboard."
+        },
+        "order_id": {
+          "type": "string",
+          "description": "Any other identifier of the order in your system; not shown in the dashboard."
+        },
+        "marketplace_order_number": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Order number given by the marketplace the order was sold on, when that is not the system sending the shipment, for example the Amazon order number of an order forwarded by a connected shop. Returns are labelled with it, which lets the warehouse match a return to the shipment; send it in addition to `order_number` and `order_id`."
+        },
+        "marketplace": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Marketplace that `marketplace_order_number` belongs to, in lower case, for example `amazon`, `ebay` or `kaufland`. If you cannot tell it reliably, leave it out rather than guess."
+        }
+      },
+      "title": "Shipment shop"
+    },
+    "ShipmentUnitDetail": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the unit (UUID)."
+        },
+        "items": {
+          "description": "Products packed in the unit; empty for units packed before items were recorded per unit.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/UnitItem"
+          }
+        },
+        "service": {
+          "type": "string",
+          "description": "Shipping service the unit is sent with; usually the shipment's `service`, but it can differ when an economy fallback applies.\n\n- `standard`\n- `express`\n- `economy`\n- `pickup_point`\n- `pickup`\n- `amazon_prime`"
+        },
+        "carrier": {
+          "description": "Carrier the unit is sent with and its tracking details; the fields are `null` until a label is created.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Carrier"
+            }
+          ]
+        },
+        "parcel_id": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Unique 10-character alphanumeric identifier of the unit."
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Kind of unit.\n\n- `parcel`: a parcel\n- `pallet`: a pallet"
+        },
+        "status": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Current status of the unit.\n\n- `new`: created and not yet packed and labelled\n- `packaged`: packed and labelled\n- `sent`: handed over to the carrier\n- `delivered`: delivered to the recipient\n- `returning`: being returned to the warehouse\n- `returned`: the return arrived at the warehouse"
+        },
+        "sub_status": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Detail on the current `status`; `null` when there is none.\n\n- `label_error`, `error_resolved`: creating the label failed, or the failure was fixed; while `new` or `packaged`\n- `slam_ready`, `autobag_failed`: waiting for the SLAM machine, or the bagging machine failed; while `new`\n- `label_required`, `label_created`, `label_uploaded`, `pickup_details_required`, `pickup_details_uploaded`, `waiting_for_pickup`, `manual_outbound`, `fba_details_required`, `fba_box_label_required`, `fba_pallet_label_required`: while `packaged`, mostly for B2B shipments\n- `pick_up`, `in_transit`, `at_pickup_point`, `out_for_delivery`, `delayed`, `failed_delivery`: carrier tracking events while `sent`"
+        },
+        "label_error_status": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Who byrd is waiting on to resolve the unit's label error; `null` when there is no error or it has not been looked at yet.\n\n- `waiting_for_customer`: you have to fix or confirm something, such as the address or customs data\n- `waiting_for_warehouse`: the warehouse has to check the parcel\n- `waiting_for_carrier`: the carrier has to respond or fix something\n- `waiting_for_pricing`, `waiting_for_procurement`, `waiting_for_operations`, `waiting_for_engineering`: a byrd team has to act\n- `waiting_for_deletion`: the error will not be fixed and the unit will be deleted"
+        },
+        "checkpoints": {
+          "readOnly": true,
+          "description": "Timestamps (ISO 8601, UTC) of the milestones the unit has reached; a milestone not reached yet is `null`.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ShipmentUnitDetailCheckpoint"
+            }
+          ]
+        },
+        "errors": {
+          "readOnly": true,
+          "description": "Errors blocking the unit, such as a failed label creation; empty when nothing is blocking it.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ShipmentUnitDetailError"
+          }
+        },
+        "error_code": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Code of the error currently blocking the unit, for example `LC00` for a carrier error; `null` when there is none."
+        },
+        "slam": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the unit is measured and labelled by a SLAM (scan, label, apply, manifest) machine."
+        },
+        "autobag": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the unit is packed by an automatic bagging machine."
+        },
+        "dimensions": {
+          "description": "Outer dimensions (cm) and weight (kg) of the packed unit.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/UnitDimensions"
+            }
+          ]
+        },
+        "pregenerated": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the unit and its shipping label were created in advance, before packing."
+        },
+        "packaging_materials": {
+          "description": "Packaging materials the unit was packed with.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/PackagingMaterials"
+          }
+        },
+        "group_number": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Number of the packing station group whose printer printed the unit's label; `null` until the unit is labelled."
+        },
+        "sequence_number": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Position of the unit among the shipment's units, starting at 1."
+        },
+        "metrics": {
+          "readOnly": true,
+          "description": "Item and pick counts for the unit; `null` for units without recorded items.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/UnitMetrics"
+            }
+          ]
+        }
+      },
+      "title": "Shipment unit detail"
+    },
+    "ShipmentUnitDetailCheckpoint": {
+      "type": "object",
+      "properties": {
+        "packaged_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the warehouse packed the unit."
+        },
+        "accepted_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the carrier first scanned the unit."
+        },
+        "delivered_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the carrier delivered the unit to the recipient."
+        },
+        "sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the unit left the warehouse."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the unit was created."
+        },
+        "label_error_occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the unit's last label error occurred (ISO 8601, UTC); `null` when label creation never failed."
+        },
+        "label_error_resolved_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the unit's last label error was resolved; `null` when it never had one or it is not resolved yet."
+        },
+        "slam_prepared_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the packed unit was ready to be labelled by a SLAM machine; `null` for units not labelled by one."
+        }
+      },
+      "title": "Shipment unit detail checkpoint"
+    },
+    "ShipmentUnitDetailError": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the record (UUID)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "code": {
+          "type": "string",
+          "description": "Machine-readable code of the problem, for example `Warehouse.Shipments.Recalled.Warning`."
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable explanation of the problem."
+        },
+        "extra": {
+          "type": "object",
+          "description": "Additional details about the problem, such as the IDs or values involved; the keys depend on `code`.",
+          "additionalProperties": {}
+        },
+        "errors": {
+          "type": "array",
+          "description": "Underlying errors that caused this one, in the same format.",
+          "items": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "title": "Shipment unit detail error"
+    },
+    "ShipmentUser": {
+      "type": "object",
+      "properties": {
+        "company_name": {
+          "type": "string",
+          "description": "Company name of the byrd account."
+        },
+        "first_name": {
+          "type": "string",
+          "description": "First name of the byrd account holder."
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the byrd account (UUID)."
+        },
+        "last_name": {
+          "type": "string",
+          "description": "Last name of the byrd account holder."
+        },
+        "sender_name": {
+          "type": "string",
+          "description": "Sender name printed on shipping labels and used in tracking emails; if empty, `company_name` is used."
+        }
+      },
+      "title": "Shipment user"
+    },
+    "ShipmentWarehouse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the warehouse (UUID); `null` until a warehouse is assigned."
+        },
+        "code": {
+          "type": "string",
+          "description": "Short code of the warehouse."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the warehouse."
+        }
+      },
+      "additionalProperties": false,
+      "title": "Shipment warehouse"
+    },
+    "UnitDimensions": {
+      "type": "object",
+      "properties": {
+        "height": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Height of the packed unit in cm; at least 1."
+        },
+        "width": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Width of the packed unit in cm; at least 1."
+        },
+        "length": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Length of the packed unit in cm; at least 1."
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0.01,
+          "description": "Weight of the packed unit in kg; at least 0.01."
+        }
+      },
+      "title": "Unit dimensions"
+    },
+    "UnitItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the unit item (UUID)."
+        },
+        "packaging_unit_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ID of the packaging unit the product was packed in (UUID); `null` when it was packed as single selling units."
+        },
+        "product": {
+          "readOnly": true,
+          "description": "Product packed in the unit.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/UnitProduct"
+            }
+          ]
+        },
+        "custom_bundle_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the custom bundle the item belongs to (UUID); `null` when it is not part of one."
+        },
+        "product_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid",
+          "writeOnly": true,
+          "description": "ID of the product packed in the unit (UUID)."
+        },
+        "serial_numbers": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "Serial numbers of the packed items, one for each item; `null` for products without serial number tracking.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "nullable": false,
+          "description": "Number packed, in packaging units when `packaging_unit_id` is set; at least 1."
+        }
+      },
+      "required": [
+        "quantity"
+      ],
+      "additionalProperties": false,
+      "title": "Unit item"
+    },
+    "UnitMetrics": {
+      "type": "object",
+      "properties": {
+        "total_items": {
+          "type": "integer",
+          "description": "Number of physical items in the unit, with packaging units counted by their contents."
+        },
+        "total_skus": {
+          "type": "integer",
+          "description": "Number of distinct products in the unit."
+        },
+        "total_multi_picks": {
+          "type": "integer",
+          "description": "Number of packaging units in the unit."
+        },
+        "total_single_picks": {
+          "type": "integer",
+          "description": "Number of single selling units in the unit, not counting packaging units and branding products."
+        },
+        "total_organic_picks": {
+          "type": "integer",
+          "description": "Number of organic products in the unit."
+        },
+        "total_grs_picks": {
+          "type": "integer",
+          "description": "Number of GRS (Global Recycled Standard) certified products in the unit."
+        },
+        "total_fragile_picks": {
+          "type": "integer",
+          "description": "Number of fragile products in the unit."
+        },
+        "total_branding_picks": {
+          "type": "integer",
+          "description": "Number of branding products, such as flyers or stickers, in the unit."
+        },
+        "total_serial_numbers": {
+          "type": "integer",
+          "description": "Number of serial numbers recorded for the unit."
+        },
+        "total_dangerous_goods": {
+          "type": "integer",
+          "description": "Number of dangerous goods products in the unit."
+        }
+      },
+      "title": "Unit metrics"
+    },
+    "UnitProduct": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the product (UUID)."
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Name of the product."
+        },
+        "sku": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Stock keeping unit (SKU) of the product, unique in your account."
+        },
+        "barcodes": {
+          "readOnly": true,
+          "description": "All barcodes of the product.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProductBarcode"
+          }
+        },
+        "serial_number_enabled": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether serial numbers of the product are recorded when it is shipped."
+        }
+      },
+      "title": "Unit product"
+    }
+  }
+}

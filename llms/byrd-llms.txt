@@ -2,62 +2,121 @@
 
 > Create and manage your shipments, products, deliveries and returns using byrd APIs.  byrd is an e-commerce logistics partner with 25+ fulfillment warehouses in Europe.
 
-## Guides
-- [Authentication](https://developers.getbyrd.com/docs/authentication.md): To call the byrd APIs an Authorization header with a token is needed. This is how you can get the token and refresh it.
-- [How to call the APIs](https://developers.getbyrd.com/docs/how-to-call-bryd-apis.md)
-- [Frequency of calls to the API](https://developers.getbyrd.com/docs/frequency-of-calls-to-the-api.md)
+## Guides: getting-started
 - [Integration Overview](https://developers.getbyrd.com/docs/integration-overview.md)
-- [Getting the details of a product](https://developers.getbyrd.com/docs/getting-product-details.md): API reference [ProductAPI](ref:productapi_get)
-- [Listing products](https://developers.getbyrd.com/docs/listing-products.md): API reference [ProductAPI](ref:productapi_get)
-- [Listing bundle ingredients](https://developers.getbyrd.com/docs/listing-bundle-ingredients.md)
-- [Listing products lots](https://developers.getbyrd.com/docs/listing-products-lots.md): API reference [LotListAPI](ref:lotlistapi_get)
-- [Getting stock movements](https://developers.getbyrd.com/docs/stock-movements.md): API reference [ProductAPI](ref:productapi_get)
-- [Listing deliveries](https://developers.getbyrd.com/docs/listing-deliveries.md): API reference [DeliveriesAPI](ref:deliveriesapi_get)
-- [Creating a shipment](https://developers.getbyrd.com/docs/creating-a-shipment.md): API reference [ShipmentListAPIV3](ref:shipmentlistapiv3_post)
-- [Pickup points for Mondial Relay France](https://developers.getbyrd.com/docs/pickup-points-for-mondial-relay-fr.md)
-- [Pickup points for Sendcloud](https://developers.getbyrd.com/docs/pickup-points-for-sendcloud.md)
-- [Listing shipments](https://developers.getbyrd.com/docs/listing-shipments.md): API reference [ShipmentListAPIV3](ref:shipmentlistapiv3_get)
-- [Announcing returns](https://developers.getbyrd.com/docs/announcing-returns.md): API reference [ReturnShipmentAnnouncedAPI](ref:returnshipmentannouncedapi_post)
+- Getting started with byrd APIs
+  - [Authentication](https://developers.getbyrd.com/docs/authentication.md)
+  - [How to call the APIs](https://developers.getbyrd.com/docs/how-to-call-byrd-apis.md)
+  - [Frequency of calls to the API](https://developers.getbyrd.com/docs/frequency-of-calls-to-the-api.md)
+
+## Guides: shipments
+- Creating shipments
+  - [Creating a shipment](https://developers.getbyrd.com/docs/creating-a-shipment.md): API reference [ShipmentListAPIV3](ref:shipmentlistapiv3_post)
+  - [Pickup points for Mondial Relay France](https://developers.getbyrd.com/docs/pickup-points-for-mondial-relay-fr.md)
+  - [Pickup points for Sendcloud](https://developers.getbyrd.com/docs/pickup-points-for-sendcloud.md)
+- Getting unit data and other shipment details
+  - [Listing shipments](https://developers.getbyrd.com/docs/listing-shipments.md): API reference [ShipmentListAPIV3](ref:shipmentlistapiv3_get)
+
+## Guides: returns
+- [Announcing returns](https://developers.getbyrd.com/docs/announcing-returns.md): Announce a customer return and receive a return label by email
 - [Listing returns](https://developers.getbyrd.com/docs/listing-returns.md): API reference [ReturnShipmentListAPI](ref:returnshipmentlistapi_get)
 
-## API Reference
-- [Get details of your own user.](https://developers.getbyrd.com/reference/authapiv2_get.md)
-- [Endpoint for returning a list of B2BConfigTemplate instances.](https://developers.getbyrd.com/reference/b2bconfigtemplateapi_get.md): This endpoint will fetch and return all available b2b templates.
-- [Log in User into system.](https://developers.getbyrd.com/reference/loginapiv2_post.md)
-- [Prepare a new access token for a User.](https://developers.getbyrd.com/reference/refreshtokenapi_post.md)
-- [Get CSV Shipment Report.](https://developers.getbyrd.com/reference/shipmentexportapi_get.md)
-- [Update user account's details.](https://developers.getbyrd.com/reference/userapiv2_patch.md)
-- [Create a new Delivery.](https://developers.getbyrd.com/reference/deliveriesapi_post.md)
-- [List Deliveries.](https://developers.getbyrd.com/reference/deliveriesapi_get.md)
-- [Perform a full update of the given delivery.](https://developers.getbyrd.com/reference/deliveryapi_put.md)
-- [Update the status on the matching Delivery.](https://developers.getbyrd.com/reference/deliveryapi_patch.md)
-- [Delete a Delivery.](https://developers.getbyrd.com/reference/deliveryapi_delete.md)
-- [Get details of a Delivery.](https://developers.getbyrd.com/reference/deliveryapi_get.md)
-- [Get CSV Inventory Report.](https://developers.getbyrd.com/reference/inventoryexportapi_get.md)
-- [Get details of a specific Lot.](https://developers.getbyrd.com/reference/lotdetailapi_get.md)
-- [List Lots](https://developers.getbyrd.com/reference/lotlistapi_get.md)
-- [Update details of a Product.](https://developers.getbyrd.com/reference/productapi_put.md)
-- [Update details of a Product.](https://developers.getbyrd.com/reference/productapi_patch.md)
-- [Delete a Product.](https://developers.getbyrd.com/reference/productapi_delete.md)
-- [Get details of a Product.](https://developers.getbyrd.com/reference/productapi_get.md)
-- [Create a new Product.](https://developers.getbyrd.com/reference/productsapi_post.md)
-- [List Products.](https://developers.getbyrd.com/reference/productsapi_get.md)
-- [Update details of a Shipment.](https://developers.getbyrd.com/reference/shipmentapiv3_patch.md)
-- [Soft delete a Shipment instance.](https://developers.getbyrd.com/reference/shipmentapiv3_delete.md)
-- [Detail endpoint for a v3 Shipment.](https://developers.getbyrd.com/reference/shipmentapiv3_get.md)
-- [Resource for scheduling shipments for release.](https://developers.getbyrd.com/reference/shipmentbatchreleaseapiv3_post.md)
-- [/v3/shipments/{shipment_id}/documents/{document_id}/file](https://developers.getbyrd.com/reference/shipmentdocumentfileapiv3_get.md)
-- [Upload document(s) for a shipment.](https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_post.md)
-- [List endpoint for shipment documents.](https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_get.md)
-- [Resource for creating a shipment.](https://developers.getbyrd.com/reference/shipmentlistapiv3_post.md)
-- [List endpoint for V3 Shipments.](https://developers.getbyrd.com/reference/shipmentlistapiv3_get.md)
-- [List endpoint for fetching a shipment's picks.](https://developers.getbyrd.com/reference/shipmentpicklistapiv3_get.md)
-- [Resource for recalling a shipment and deleting its fulfillment.](https://developers.getbyrd.com/reference/shipmentrecallapiv3_post.md)
-- [Get available carrier options.](https://developers.getbyrd.com/reference/carrierapi_get.md): Available carrier options.
+## Guides: deliveries-in-byrd
+- [Listing deliveries](https://developers.getbyrd.com/docs/listing-deliveries.md): API reference [DeliveriesAPI](ref:deliveriesapi_get)
+- [Listing the lots of a delivery](https://developers.getbyrd.com/docs/listing-the-lots-of-a-delivery.md): API reference [DeliveryLotsAPI](ref:deliverylotsapi_get)
+
+## Guides: managing-products
+- Getting products stock and other details
+  - [Getting the details of a product](https://developers.getbyrd.com/docs/getting-product-details.md): API reference [ProductAPI](ref:productapi_get)
+  - [Listing products](https://developers.getbyrd.com/docs/listing-products.md): API reference [ProductAPI](ref:productapi_get)
+  - [Listing bundle ingredients](https://developers.getbyrd.com/docs/listing-bundle-ingredients.md)
+  - [Listing products lots](https://developers.getbyrd.com/docs/listing-products-lots.md): API reference [LotListAPI](ref:lotlistapi_get)
+  - [Getting stock movements](https://developers.getbyrd.com/docs/stock-movements.md): API reference [ProductAPI](ref:productapi_get)
+
+## API Reference: byrd APIs
+- Authentication
+  - [Log in and get an access token](https://developers.getbyrd.com/reference/loginapiv2_post.md): Exchanges your API key and secret, or your dashboard email and password, for a JWT access token, valid for 7 days unless you ask for less. Send the token as `Authorization: Bearer <token>` on every…
+  - [Refresh an access token](https://developers.getbyrd.com/reference/refreshtokenapi_post.md): Exchanges an access token that is still valid for a new one for the same user, valid for 7 days. Fails when the account is locked.
+  - [Get your own user](https://developers.getbyrd.com/reference/authapiv2_get.md): Returns the account details of the user the access token was issued to.
+  - [Update your account details](https://developers.getbyrd.com/reference/userapiv2_patch.md): Changes only the fields you send; read-only fields cannot be changed. A customer account must keep a phone number.
+- Catalog
+  - [List your products](https://developers.getbyrd.com/reference/productsapi_get.md): Returns your products with their stock levels, paginated. Deleted products and packaging materials are left out unless you ask for them. See the Listing products guide.
+  - [Create a product](https://developers.getbyrd.com/reference/productsapi_post.md): Creates a product, or a bundle when `productType` is `bundle`. The SKU must match the one your sales channel sends on its order lines, otherwise orders for it cannot be released.
+  - [Get a product](https://developers.getbyrd.com/reference/productapi_get.md): Returns the details and stock levels of one of your products, also when it was deleted.
+  - [Update a product](https://developers.getbyrd.com/reference/productapi_put.md): Behaves exactly like `PATCH`: only the fields you send are changed.
+  - [Update a product](https://developers.getbyrd.com/reference/productapi_patch.md): Changes only the fields you send. Also used to answer the change requests of the warehouse, through `changeRequests`.
+  - [Delete a product](https://developers.getbyrd.com/reference/productapi_delete.md): Only possible once no stock of the product is stored any more and it is not an ingredient of a bundle. Deleted products are only listed with `include_deleted=true`.
+  - [Get stock statistics for a product](https://developers.getbyrd.com/reference/productstatsapi_get.md): Returns when the product was last picked and last restocked, and how many units are in deliveries not inbounded yet, optionally for a single warehouse.
+  - [Get a product's stock per warehouse](https://developers.getbyrd.com/reference/productstockbywarehouseapi_get.md): Returns the physical, reserved and unavailable stock of the product in each warehouse that holds or reserves it.
+  - [List the serial numbers of a product](https://developers.getbyrd.com/reference/productserialnumbersapi_get.md): Returns the serial numbers recorded for units of the product in inventory, paginated. Use `outbounded` to tell units still in stock from shipped ones, and `q` to search for a serial number.
+  - [List the ingredients of a bundle](https://developers.getbyrd.com/reference/bundlelistapi_get.md): Returns each product the bundle is made of, with its quantity. Fails when the product is not a bundle.
+  - [Add an ingredient to a bundle](https://developers.getbyrd.com/reference/bundlelistapi_post.md): Adds one of your products to the bundle with the given quantity.
+  - [Set the ingredients of a bundle](https://developers.getbyrd.com/reference/bundlelistapi_put.md): Replaces all ingredients of the bundle with the ones you send.
+  - [Get an ingredient of a bundle](https://developers.getbyrd.com/reference/bundledetailsapi_get.md): Returns the ingredient product and its quantity in the bundle.
+  - [Remove an ingredient from a bundle](https://developers.getbyrd.com/reference/bundledetailsapi_delete.md): The ingredient product itself is not deleted. Fails with `400` when `bundle_id` is not a bundle.
+  - [List lots](https://developers.getbyrd.com/reference/lotlistapi_get.md): Returns the lots of your products with their stock levels, so a product appears once per lot. Set `warehouse_details=true` to get the stock of each lot per warehouse.
+  - [Create a lot](https://developers.getbyrd.com/reference/lotlistapi_post.md): Creates a lot (batch) for one of your physical products. The lot number must be unique for the product.
+  - [Get a lot](https://developers.getbyrd.com/reference/lotdetailapi_get.md): Returns one of your lots. Deleted lots, and lots of deleted products, are not found.
+  - [Update a lot](https://developers.getbyrd.com/reference/lotdetailapi_patch.md): Changes only the fields you send. Set `activated` to `false` to stop units of the lot from being shipped, and back to `true` to allow it again.
+  - [List the supported dangerous goods](https://developers.getbyrd.com/reference/dangerousgoodsunitlimitsapi_get.md): Returns the UN numbers byrd can ship and the maximum quantity of each a single product may contain. Use them in the `dangerousGoods` of your products.
+- Inbound
+  - [List deliveries](https://developers.getbyrd.com/reference/deliveriesapi_get.md): Returns your deliveries, the inbound shipments of stock you send to a warehouse, with their items, containers and metrics. Filter them with the query parameters and use `only` to return fewer fields.…
+  - [Announce a delivery](https://developers.getbyrd.com/reference/deliveriesapi_post.md): Tells the warehouse what stock to expect, so the goods can be received against the delivery on arrival. Send the products in `deliveryItems` and the parcels or pallets in `deliveryContainers`; the…
+  - [Count deliveries](https://developers.getbyrd.com/reference/deliverylistcountapiv3_get.md): Returns the number of your deliveries that match the filters, which are the same as for listing deliveries.
+  - [Get a delivery](https://developers.getbyrd.com/reference/deliveryapi_get.md): Returns one of your deliveries with its items, containers and metrics. Use `only` to return fewer fields. See [Getting a delivery](doc:getting-the-details-of-a-delivery).
+  - [Replace a delivery](https://developers.getbyrd.com/reference/deliveryapi_put.md): Replaces the delivery, including all its items and containers, with the data you send. Only possible while the delivery is `announced`.
+  - [Update a delivery](https://developers.getbyrd.com/reference/deliveryapi_patch.md): Changes only the fields you send and returns them. As a customer, you can change a delivery only while it is `announced`, except for its customs declaration: `customsMRN`, `isInternational`,…
+  - [Cancel a delivery](https://developers.getbyrd.com/reference/deliveryapi_delete.md): Only a delivery still in `announced` can be cancelled; once the warehouse has accepted it, it can no longer be withdrawn. A cancelled delivery moves to `deleted`.
+  - [List the lots received in a delivery](https://developers.getbyrd.com/reference/deliverylotsapi_get.md): Returns one entry per lot received with the delivery and the amount received of it, ordered by SKU and lot number. Only products with lots enabled appear, and the list is empty until the delivery has…
+  - [Get a delivery item](https://developers.getbyrd.com/reference/deliveryitemapi_get.md): Returns one item of your deliveries, with the announced, arrived and received amounts of its product.
+  - [List delivery documents](https://developers.getbyrd.com/reference/deliverydocumentsapi_get.md): Returns the documents attached to your deliveries, newest first by default. Pass `deliveryID` to list the documents of one delivery.
+  - [Attach a document to a delivery](https://developers.getbyrd.com/reference/deliverydocumentsapi_post.md): The file has to be uploaded beforehand; the document references it by its URL.
+  - [Update a delivery document](https://developers.getbyrd.com/reference/deliverydocumentapi_patch.md): Changes the name or type of the document, or moves it to another delivery you may access (for a customer, one of their own). Its file and URL cannot be changed, and customers cannot change its…
+  - [Delete a delivery document](https://developers.getbyrd.com/reference/deliverydocumentapi_delete.md): Detaches the document from its delivery. Read-only documents cannot be deleted.
+- Shipments
+  - [List shipments](https://developers.getbyrd.com/reference/shipmentlistapiv3_get.md): Returns your shipments that match the filters, newest first by default. To keep tracking data in sync, list the shipments sent in a period with `sent_date_from` and `sent_date_to`; add…
+  - [Create a shipment](https://developers.getbyrd.com/reference/shipmentlistapiv3_post.md): Creates a B2C shipment, or a B2B shipment when `b2b_config` is sent. The shipment starts in status `new` and is released to a warehouse automatically when `options.auto_release` is `true`. Use…
+  - [Count shipments](https://developers.getbyrd.com/reference/shipmentlistcountapiv3_get.md): Returns the number of your shipments that match the same filters as the list endpoint, up to 100000.
+  - [Get a shipment](https://developers.getbyrd.com/reference/shipmentapiv3_get.md): Returns the details of one of your shipments, including its parcels (`units`) with their tracking data and the items packed in each. Use `only` to return just the fields you need.
+  - [Update a shipment](https://developers.getbyrd.com/reference/shipmentapiv3_patch.md): Changes only the fields you send; a list you send, such as `items` or `documents`, replaces the existing one. The items and the service can be changed until the shipment is released, and the…
+  - [Delete a shipment](https://developers.getbyrd.com/reference/shipmentapiv3_delete.md): Deletes one of your shipments that has not been released to a warehouse yet. To delete a released shipment, recall it first.
+  - [Release shipments](https://developers.getbyrd.com/reference/shipmentbatchreleaseapiv3_post.md): Schedules shipments in status `new` for release to a warehouse, which then reserves their stock and starts fulfilment. The release runs in the background; the response lists the shipments that were…
+  - [Recall shipments](https://developers.getbyrd.com/reference/shipmentbatchrecallapiv3_post.md): Recalls several released shipments at once, as the single recall does for one. If any of them cannot be recalled, the request fails with the errors of each one that could not.
+  - [Recall a shipment](https://developers.getbyrd.com/reference/shipmentrecallapiv3_post.md): Takes a shipment back from the warehouse while it is still `released`, before picking starts, and cancels its fulfilment. The shipment returns to `new` with sub-status `recalled` and can be released…
+  - [Validate a shipment's address](https://developers.getbyrd.com/reference/shipmentaddressvalidationapiv3_post.md): Queues the destination address of a shipment in status `new` for validation, for example after you corrected it. Only available when address validation is enabled for your account, and not for…
+  - [Schedule the pickup of a B2B shipment](https://developers.getbyrd.com/reference/schedulepickupapiv3_post.md): Sets the days a packed B2B shipment will be collected and, if known, the carrier and its tracking data, or that you collect it yourself. Allowed while the shipment's sub-status is…
+  - [List shipment documents](https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_get.md): Returns the documents of a shipment, such as the documents you uploaded and its return labels. Shipping labels byrd created are listed once the shipment is sent.
+  - [Upload shipment documents](https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_post.md): Adds documents to a shipment, for example a delivery note to print and pack with it, or your own shipping label for a B2B shipment. A shipping label can only be uploaded while the shipment waits for…
+  - [Download a shipment document file](https://developers.getbyrd.com/reference/shipmentdocumentfileapiv3_get.md): Returns the file of one document of the shipment, for example the PDF of its return label. Shipping labels byrd created can be downloaded once the shipment is sent.
+  - [Download a shipment report](https://developers.getbyrd.com/reference/shipmentreportapiv3_get.md): Returns a CSV file with one row per item in each parcel of your shipments in the given period, most recent first and up to 10000 rows.
+  - [List units](https://developers.getbyrd.com/reference/unitlistapiv3_get.md): Returns the units (parcels and pallets) of your shipments, newest first by default, one page at a time. Filter by `shipment_id` to page through the units of a shipment that has too many to read from…
+  - [Count units](https://developers.getbyrd.com/reference/unitlistcountapiv3_get.md): Returns how many of your units match the filters, which are the same as those of the unit list. The count stops at 10,000; `capped` tells you when it did.
+  - [Get a shipment unit](https://developers.getbyrd.com/reference/shipmentunitapiv3_get.md): Returns one unit (parcel or pallet) of one of your shipments, with its carrier and tracking details, dimensions, packed items and serial numbers. See the tracking data guide for how units are used.
+  - [List picks](https://developers.getbyrd.com/reference/picklistapiv3_get.md): Returns the picks of your shipments: which product the warehouse picks, how many, from which storage and lot. Filter by `shipment_ids` to get the picks of specific shipments.
+  - [List a shipment's picks](https://developers.getbyrd.com/reference/shipmentpicklistapiv3_get.md): Returns what was picked for the shipment, including the storage and lot each item came from. Lot details are complete once the shipment is `packaged`. See the shipped items lot data guide.
+  - [List a shipment's reservations](https://developers.getbyrd.com/reference/shipmentreservationlistapiv3_get.md): Returns the stock reserved for the shipment in the warehouse, per product and lot, newest first. Reservations from earlier release attempts are left out.
+  - [List returns](https://developers.getbyrd.com/reference/returnshipmentlistapi_get.md): Returns the courier and customer returns of your shipments, newest first unless you sort otherwise, filtered by the query parameters. See the Listing returns guide for the meaning of `returnType`,…
+  - [Get a return](https://developers.getbyrd.com/reference/returnshipmentdetailapi_get.md): Returns one of your returns with its original shipment and the announced and received items.
+  - [Announce a return](https://developers.getbyrd.com/reference/returnshipmentannouncedapiv3_post.md): Creates a customer return in the `announced` state for items of one of your shipments. The return label is generated asynchronously and emailed to `send_documents_to_email` a few seconds later,…
+  - [Regenerate the documents of a return](https://developers.getbyrd.com/reference/returnshipmentdocumentsapiv3_post.md): Generates a new return label for an announced return that has not been posted yet and emails it to `send_documents_to_email` (unless `send_email` is `false`), for example because the QR code on the…
+- Account
+  - [List warehouses](https://developers.getbyrd.com/reference/warehousesapi_get.md): Returns the warehouses your account is linked to: the warehouses your stock can be stored in and your shipments sent from. See [Listing warehouses](doc:listing-warehouses).
+  - [Get a warehouse](https://developers.getbyrd.com/reference/warehouseapi_get.md): Returns one of the warehouses your account is linked to; any other warehouse answers `404`.
+  - [List your warehouse links](https://developers.getbyrd.com/reference/userwarehouselinksapi_get.md): Returns the active links between your account and the warehouses it can use, including which of them is your default warehouse.
+  - [List B2B templates](https://developers.getbyrd.com/reference/b2bconfigtemplateapi_get.md): Returns the latest version of each B2B template enabled for your account, translated into `lang`, with the warehouses you can use it in. Use its `key`, `id` and `customerInputSchema` to create a B2B…
+  - [Get a B2B configuration](https://developers.getbyrd.com/reference/b2bconfigapi_get.md): Returns the B2B configuration of one of your B2B shipments with its template, translated into `lang` (English by default).
+  - [Export shipments as CSV](https://developers.getbyrd.com/reference/shipmentexportapi_get.md): Returns a CSV file with one row per item of your shipments whose `range_type` date falls between `start_date` and `end_date`. Use your own user ID in the path.
+  - [Export returns as CSV](https://developers.getbyrd.com/reference/returnsexportapi_get.md): Returns a CSV file with one row per returned item of your returns whose shipment's `range_type` date falls between `start_date` and `end_date`. Use your own user ID in the path.
+  - [Download your inventory as CSV](https://developers.getbyrd.com/reference/inventoryexportapi_get.md): Returns a CSV file with one row per product and its physical, reserved and unavailable stock. Set `by_warehouse` or `by_lot` to split the rows per warehouse or per lot.
 
 ## Changelog
+- [Sort products by physical stock](https://developers.getbyrd.com/changelog/added_products_sort_by_physical_stock.md)
+- [Added tracking sub-statuses to sent shipment units](https://developers.getbyrd.com/changelog/added_sent_unit_tracking_substatus.md)
+- [Added Mondial Relay Pickup Points support and packaging material suggestion](https://developers.getbyrd.com/changelog/added_mr_pickup_points_and_pm.md)
+- [Added custom bundles, packaging material, pickup points and returns](https://developers.getbyrd.com/changelog/added_custom_bundles_and_other.md)
+- [Added marketplace order references to shipments](https://developers.getbyrd.com/changelog/added_marketplace_order_references.md)
+- [Removed the V2 returns announce endpoint](https://developers.getbyrd.com/changelog/removed_v2_returns_announce_endpoint.md)
 - [Added listing bundle ingredients](https://developers.getbyrd.com/changelog/added_listing_bundle_ingredients.md)
 - [Added filter deliveries by date](https://developers.getbyrd.com/changelog/added_filter_deliveries_by_date.md)
 - [Added Sendcloud pickup points](https://developers.getbyrd.com/changelog/added_sendcloud_pickup_points.md)
 - [Added details about call rate limits](https://developers.getbyrd.com/changelog/added-details-about-call-rate-limits.md)
-- [Added create announced returns](https://developers.getbyrd.com/changelog/added_create_announced_returns.md)

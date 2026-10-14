@@ -1,6 +1,7 @@
 generated: '2026-07-18'
 method: searched
 source: https://developers.getbyrd.com/docs/frequency-of-calls-to-the-api
+name: Byrd API Rate Limits
 docs: https://developers.getbyrd.com/docs/frequency-of-calls-to-the-api
 rate_limits:
   - scope: login

@@ -1,0 +1,1818 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/byrd/main/json-schema/byrd-product-schema.json",
+  "title": "Product",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/byrd-apis-openapi.yml#/components/schemas/Product",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "ID of the product (UUID)."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "When the record was created (ISO 8601)."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "When the record was last changed (ISO 8601)."
+    },
+    "active": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Whether the product can be shipped. Defaults to `true`."
+    },
+    "barcode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 48,
+      "description": "Value of the primary barcode printed on the product, at most 48 characters; mirrors the primary entry of `barcodes`. `null` when the product has no barcode."
+    },
+    "barcodeType": {
+      "description": "Symbology of `barcode`; required when `barcode` is set.\n\n- `ean_13`: EAN-13\n- `code_128`: Code 128\n- `gs1_128`: GS1-128\n- `qr_code`: QR code",
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "ean_13",
+        "code_128",
+        "gs1_128",
+        "qr_code",
+        null
+      ]
+    },
+    "barcodes": {
+      "description": "All barcodes printed on the product, at most one of them primary. When you send both `barcode` and `barcodes`, `barcode` must match the primary entry.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/Barcode"
+      }
+    },
+    "customsTariffNumber": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^([0-9]{6}|[0-9]{8}|[0-9]{10})$",
+      "description": "Harmonised System (HS) tariff code of the product: 6, 8 or 10 digits. Required for shipments leaving the EU or the UK."
+    },
+    "customsValue": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Amount, as a string with two decimals separated by a dot."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "Currency (ISO 4217 code, e.g. `EUR`)."
+        },
+        "taxFactor": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Tax factor of the price, for example `1.19` for 19% VAT; `null` when not set."
+        }
+      },
+      "required": [
+        "currency",
+        "value"
+      ],
+      "description": "Value declared to customs for the product when the shipment item has no price, for example for a free gift; `null` for none. Not the purchase price."
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Free-text description of the product."
+    },
+    "ean": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "European Article Number (EAN) of the product, passed on as its GTIN in customs data."
+    },
+    "isbn": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "International Standard Book Number (ISBN) of the product, passed on as its GTIN in customs data when it has no EAN or UPC."
+    },
+    "lotsEnabled": {
+      "type": "boolean",
+      "description": "Whether lots (batches) of the product are tracked when it is inbounded and shipped. Bundles cannot be lot tracked. Defaults to `false`."
+    },
+    "packagingUnitEnabled": {
+      "type": "boolean",
+      "description": "Whether the product also comes in packaging units holding several units, which the warehouse can pick as a whole. Defaults to `false`."
+    },
+    "serialNumberEnabled": {
+      "type": "boolean",
+      "description": "Whether serial numbers of the product are recorded when it is shipped. Defaults to `false`."
+    },
+    "serialNumberRegex": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Regular expression the serial numbers recorded when shipping the product must match; `null` for no check."
+    },
+    "inventorySerialNumberEnabled": {
+      "type": "boolean",
+      "description": "Whether serial numbers are also tracked in inventory, from inbounding onwards. Requires `serialNumberEnabled`. Defaults to `false`."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Name of the product; at least one character."
+    },
+    "originCountryCode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z]{2}$",
+      "description": "Country the product was made in (ISO 3166-1 alpha-2); `UK` is stored as `GB`. Required for shipments leaving the EU or the UK."
+    },
+    "organic": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Whether the product is organic and needs special storage and shipping conditions. Bundles cannot be organic. Defaults to `false`."
+    },
+    "grs": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Whether the product complies with the Global Recycled Standard (GRS) and needs specific storage conditions. Defaults to `false`."
+    },
+    "fragile": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Whether the product is fragile and needs special packaging. For a bundle it is derived from the ingredients and cannot be set. Defaults to `false`."
+    },
+    "productID": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Deprecated. ID of the article in your shop system; required when `shopID` is set."
+    },
+    "productType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Type of the product. Defaults to `product`; `bundle`, `supplementary` and `packaging_material` cannot be changed afterwards.\n\n- `product`: a regular physical product\n- `bundle`: a group of other products sold under one SKU, see `bundleIngredients`\n- `prepacked_product`: a product shipped in its own packaging\n- `packaging_material`: packaging material, such as boxes or fillers\n- `branding`: branded material packed into shipments, not counted as a product item\n- `supplementary`: a product only shipped together with another product\n- `alias`: another SKU for an existing product, sharing its stock\n- `marketing`: marketing material"
+    },
+    "purchasePrice": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Amount, as a string with two decimals separated by a dot."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "Currency (ISO 4217 code, e.g. `EUR`)."
+        },
+        "taxFactor": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Tax factor of the price, for example `1.19` for 19% VAT; `null` when not set."
+        }
+      },
+      "required": [
+        "currency",
+        "value"
+      ],
+      "description": "Purchase price of one unit, used to insure shipments. Use the purchase price, not the retail price; bundles cannot have one."
+    },
+    "purchasePriceEvidenceURL": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "HTTPS link to a document proving the purchase price, such as an invoice."
+    },
+    "reorderPoint": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Available stock level at or below which the product is reported as low on stock, for example in the daily notification email if you enabled it. Defaults to `0`."
+    },
+    "retailPrice": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Retail price of one unit, for your reference; at least 0."
+    },
+    "sku": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "description": "Your stock keeping unit (SKU) for the product, unique among your products. It must match the SKU your sales channel sends on order lines."
+    },
+    "upc": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Universal Product Code (UPC) of the product, passed on as its GTIN in customs data when it has no EAN."
+    },
+    "variantID": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Deprecated. ID of the article variant in your shop system."
+    },
+    "deleted": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "Whether the product was deleted."
+    },
+    "deletedDate": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "When the product was deleted (ISO 8601); `null` if it was not."
+    },
+    "physicalStock": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Units of the product in byrd warehouses, including reserved and unavailable units."
+    },
+    "reservedStock": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Units reserved for shipments released to a warehouse and not picked yet."
+    },
+    "availableStock": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Units available for new shipments: physical stock minus reserved and unavailable stock, never below 0. For a bundle, the number of complete bundles its ingredients allow."
+    },
+    "unavailableStock": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Units that cannot be shipped: damaged, in a deactivated storage, or in a lot that is deactivated, expired or outside its shipping window."
+    },
+    "stocksByWarehouse": {
+      "type": "object",
+      "readOnly": true,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "integer",
+            "description": "Units in this warehouse that can be ordered."
+          },
+          "physical": {
+            "type": "integer",
+            "description": "Units of the product in this warehouse, including reserved and unavailable units."
+          },
+          "reserved": {
+            "type": "integer",
+            "description": "Units in this warehouse reserved for released shipments and not picked yet."
+          },
+          "unavailable": {
+            "type": "integer",
+            "description": "Units in this warehouse that cannot be shipped, for example because they are damaged or in a deactivated storage or lot."
+          }
+        }
+      },
+      "description": "Stock levels per warehouse, keyed by warehouse ID, each with `available`, `physical`, `reserved` and `unavailable` units. Only warehouses holding or reserving the product are listed."
+    },
+    "unreleasedReservations": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Units needed by your shipments that are not released to a warehouse yet; not included in `reservedStock`."
+    },
+    "bundleIngredients": {
+      "writeOnly": true,
+      "description": "Products a bundle is made of and how many units of each, as `ingredientID` and `quantity`; only for `productType` `bundle`. Replaces the current ingredients. Write-only: read them with the bundle endpoints.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/Bundle"
+      }
+    },
+    "user": {
+      "type": "object",
+      "readOnly": true,
+      "description": "Deprecated: use `userID`. Object with the `id` of the owner.",
+      "additionalProperties": {}
+    },
+    "userID": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "ID of the byrd user who owns the product (UUID). Products you create are always yours."
+    },
+    "shop": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "readOnly": true,
+      "description": "Deprecated: use `shopID`. Object with the `id` of the shop.",
+      "additionalProperties": {}
+    },
+    "shopID": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid",
+      "description": "ID of the shop the product is linked to (UUID); `null` when it is not linked to a shop."
+    },
+    "storages": {
+      "readOnly": true,
+      "description": "Storages holding the product in byrd warehouses. Only included when requested with `include_storages=true`.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ProductStorage"
+      }
+    },
+    "lots": {
+      "readOnly": true,
+      "description": "Lots (batches) of the product. Only included when listing products with `include_lots=true`.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/LotIncludedInProduct"
+      }
+    },
+    "packagingUnits": {
+      "maxItems": 1,
+      "description": "Packaging unit of the product: a pack of several units with its own barcode. At most one; its barcode is required when you create the product and must differ from the product barcodes.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ProductPackagingUnit"
+      }
+    },
+    "dangerousGoods": {
+      "description": "Dangerous goods the product contains, one entry per UN number. Bundles cannot have any: add them to the ingredients instead.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/ProductDangerousGoods"
+      }
+    },
+    "dangerousGoodsMSDSURL": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "HTTPS link to the material safety data sheet (MSDS) of the dangerous goods in the product."
+    },
+    "isDangerousGoods": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "Whether the product contains dangerous goods; for a bundle, whether any of its ingredients does."
+    },
+    "bsku": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "readOnly": true,
+      "pattern": "^BSKU-([A-Z0-9]){10}$",
+      "description": "Unique SKU byrd generates for the product, unrelated to your `sku`."
+    },
+    "skipBarcodePick": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "Whether the warehouse may skip scanning the product barcode when picking and packing. Set by byrd."
+    },
+    "dimensions": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the dimensions record (UUID)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "length": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.01,
+          "description": "Length in cm; at least 0.01."
+        },
+        "width": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.01,
+          "description": "Width in cm; at least 0.01."
+        },
+        "height": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.01,
+          "description": "Height in cm; at least 0.01."
+        },
+        "weight": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.001,
+          "description": "Weight in kg; at least 0.001."
+        },
+        "sizeGroup": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "S",
+            "XS",
+            "M",
+            "L",
+            "XL",
+            "XXL",
+            "CUSTOM",
+            "PAL",
+            null
+          ],
+          "description": "Size group used for charging, based on the sum of the shortest and the longest side.\n\n- `XS`: flat items such as envelopes and polybags\n- `S`: up to 35 cm\n- `M`: 35 cm or more\n- `L`: 65 cm or more\n- `XL`: 95 cm or more\n- `XXL`: 115 cm or more\n- `CUSTOM`: custom size, mostly for items with a variable height\n- `PAL`: pallets"
+        },
+        "isHeightVariable": {
+          "type": "boolean",
+          "description": "Whether the height can vary, for example for soft or compressible items. Defaults to `false`."
+        },
+        "createdBy": {
+          "readOnly": true,
+          "description": "Who provided the dimensions.\n\n- `CUSTOMER`: you\n- `PARTNER`: the warehouse, which measured the product",
+          "type": "string",
+          "enum": [
+            "CUSTOMER",
+            "PARTNER"
+          ]
+        },
+        "scannerIdentifier": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "readOnly": true,
+          "description": "Identifier of the scanner the warehouse measured the dimensions with; `null` when they were not scanned."
+        }
+      },
+      "description": "Size and weight of one unit of the product. The weight is needed for shipments leaving the EU or the UK; a `prepacked_product` needs all dimensions and a `sizeGroup`."
+    },
+    "changeRequests": {
+      "description": "Changes the warehouse asks you to make to the product settings, one per `info`; `null` when there are none. Answer them by sending this list back with a `status` of `accepted` or `declined`.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/ProductChangeRequest"
+      }
+    },
+    "dimensionsPhotoURLs": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "readOnly": true,
+      "description": "Links to the photos the warehouse took when it measured the product; `null` when there are none.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "$defs": {
+    "Barcode": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "description": "Value encoded in the barcode, 1 to 48 characters; which characters are allowed depends on `barcodeType`."
+        },
+        "barcodeType": {
+          "description": "Symbology of the barcode; required when `value` is set.\n\n- `ean_13`: EAN-13\n- `code_128`: Code 128\n- `gs1_128`: GS1-128\n- `qr_code`: QR code",
+          "type": "string",
+          "enum": [
+            "ean_13",
+            "code_128",
+            "gs1_128",
+            "qr_code"
+          ]
+        },
+        "isPrimary": {
+          "type": "boolean",
+          "description": "Whether this is the primary barcode of the product, mirrored in its `barcode` and `barcodeType` fields. At most one barcode can be primary. Defaults to `false`."
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "Barcode"
+    },
+    "Bundle": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the link between the bundle and this ingredient (UUID)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "ingredient": {
+          "readOnly": true,
+          "description": "Details of the ingredient product.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Product"
+            }
+          ]
+        },
+        "ingredientID": {
+          "type": "string",
+          "format": "uuid",
+          "writeOnly": true,
+          "description": "ID of the product to include in the bundle (UUID). It must be a regular product, a prepacked product, a packaging material or a branding item, and cannot be changed afterwards."
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "Number of units of the ingredient in one bundle."
+        }
+      },
+      "required": [
+        "ingredientID",
+        "quantity"
+      ],
+      "title": "Bundle"
+    },
+    "LotIncludedInProduct": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the lot (UUID)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "productID": {
+          "type": "string",
+          "format": "uuid",
+          "description": "ID of the product the lot belongs to (UUID); a physical product, not a bundle. It cannot be changed after the lot is created."
+        },
+        "lotNumber": {
+          "type": "string",
+          "description": "Lot (batch) number, 1 to 64 characters; unique per product."
+        },
+        "expiryDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date",
+          "description": "Date the lot expires (ISO 8601 date); cannot be in the past. `null` when the lot does not expire."
+        },
+        "notBefore": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "First moment units of the lot may be shipped (ISO 8601, UTC); must be before `notAfter`. `null` for no limit."
+        },
+        "notAfter": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Last moment units of the lot may be shipped (ISO 8601, UTC); cannot be in the past. When you do not set it, it is derived from `expiryDate` if byrd has a minimum remaining shelf life configured for your products. `null` for no limit."
+        },
+        "activated": {
+          "type": "boolean",
+          "description": "Whether units of the lot can be picked for shipments; stock of a deactivated lot is unavailable. Defaults to `true`."
+        }
+      },
+      "required": [
+        "lotNumber",
+        "productID"
+      ],
+      "title": "Lot included in product"
+    },
+    "Product": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the product (UUID)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "active": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the product can be shipped. Defaults to `true`."
+        },
+        "barcode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 48,
+          "description": "Value of the primary barcode printed on the product, at most 48 characters; mirrors the primary entry of `barcodes`. `null` when the product has no barcode."
+        },
+        "barcodeType": {
+          "description": "Symbology of `barcode`; required when `barcode` is set.\n\n- `ean_13`: EAN-13\n- `code_128`: Code 128\n- `gs1_128`: GS1-128\n- `qr_code`: QR code",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "ean_13",
+            "code_128",
+            "gs1_128",
+            "qr_code",
+            null
+          ]
+        },
+        "barcodes": {
+          "description": "All barcodes printed on the product, at most one of them primary. When you send both `barcode` and `barcodes`, `barcode` must match the primary entry.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Barcode"
+          }
+        },
+        "customsTariffNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]{6}|[0-9]{8}|[0-9]{10})$",
+          "description": "Harmonised System (HS) tariff code of the product: 6, 8 or 10 digits. Required for shipments leaving the EU or the UK."
+        },
+        "customsValue": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "description": "Amount, as a string with two decimals separated by a dot."
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "description": "Currency (ISO 4217 code, e.g. `EUR`)."
+            },
+            "taxFactor": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Tax factor of the price, for example `1.19` for 19% VAT; `null` when not set."
+            }
+          },
+          "required": [
+            "currency",
+            "value"
+          ],
+          "description": "Value declared to customs for the product when the shipment item has no price, for example for a free gift; `null` for none. Not the purchase price."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-text description of the product."
+        },
+        "ean": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "European Article Number (EAN) of the product, passed on as its GTIN in customs data."
+        },
+        "isbn": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "International Standard Book Number (ISBN) of the product, passed on as its GTIN in customs data when it has no EAN or UPC."
+        },
+        "lotsEnabled": {
+          "type": "boolean",
+          "description": "Whether lots (batches) of the product are tracked when it is inbounded and shipped. Bundles cannot be lot tracked. Defaults to `false`."
+        },
+        "packagingUnitEnabled": {
+          "type": "boolean",
+          "description": "Whether the product also comes in packaging units holding several units, which the warehouse can pick as a whole. Defaults to `false`."
+        },
+        "serialNumberEnabled": {
+          "type": "boolean",
+          "description": "Whether serial numbers of the product are recorded when it is shipped. Defaults to `false`."
+        },
+        "serialNumberRegex": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Regular expression the serial numbers recorded when shipping the product must match; `null` for no check."
+        },
+        "inventorySerialNumberEnabled": {
+          "type": "boolean",
+          "description": "Whether serial numbers are also tracked in inventory, from inbounding onwards. Requires `serialNumberEnabled`. Defaults to `false`."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name of the product; at least one character."
+        },
+        "originCountryCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{2}$",
+          "description": "Country the product was made in (ISO 3166-1 alpha-2); `UK` is stored as `GB`. Required for shipments leaving the EU or the UK."
+        },
+        "organic": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the product is organic and needs special storage and shipping conditions. Bundles cannot be organic. Defaults to `false`."
+        },
+        "grs": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the product complies with the Global Recycled Standard (GRS) and needs specific storage conditions. Defaults to `false`."
+        },
+        "fragile": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the product is fragile and needs special packaging. For a bundle it is derived from the ingredients and cannot be set. Defaults to `false`."
+        },
+        "productID": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Deprecated. ID of the article in your shop system; required when `shopID` is set."
+        },
+        "productType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Type of the product. Defaults to `product`; `bundle`, `supplementary` and `packaging_material` cannot be changed afterwards.\n\n- `product`: a regular physical product\n- `bundle`: a group of other products sold under one SKU, see `bundleIngredients`\n- `prepacked_product`: a product shipped in its own packaging\n- `packaging_material`: packaging material, such as boxes or fillers\n- `branding`: branded material packed into shipments, not counted as a product item\n- `supplementary`: a product only shipped together with another product\n- `alias`: another SKU for an existing product, sharing its stock\n- `marketing`: marketing material"
+        },
+        "purchasePrice": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "description": "Amount, as a string with two decimals separated by a dot."
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "description": "Currency (ISO 4217 code, e.g. `EUR`)."
+            },
+            "taxFactor": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Tax factor of the price, for example `1.19` for 19% VAT; `null` when not set."
+            }
+          },
+          "required": [
+            "currency",
+            "value"
+          ],
+          "description": "Purchase price of one unit, used to insure shipments. Use the purchase price, not the retail price; bundles cannot have one."
+        },
+        "purchasePriceEvidenceURL": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "HTTPS link to a document proving the purchase price, such as an invoice."
+        },
+        "reorderPoint": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Available stock level at or below which the product is reported as low on stock, for example in the daily notification email if you enabled it. Defaults to `0`."
+        },
+        "retailPrice": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Retail price of one unit, for your reference; at least 0."
+        },
+        "sku": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "Your stock keeping unit (SKU) for the product, unique among your products. It must match the SKU your sales channel sends on order lines."
+        },
+        "upc": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Universal Product Code (UPC) of the product, passed on as its GTIN in customs data when it has no EAN."
+        },
+        "variantID": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Deprecated. ID of the article variant in your shop system."
+        },
+        "deleted": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the product was deleted."
+        },
+        "deletedDate": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the product was deleted (ISO 8601); `null` if it was not."
+        },
+        "physicalStock": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Units of the product in byrd warehouses, including reserved and unavailable units."
+        },
+        "reservedStock": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Units reserved for shipments released to a warehouse and not picked yet."
+        },
+        "availableStock": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Units available for new shipments: physical stock minus reserved and unavailable stock, never below 0. For a bundle, the number of complete bundles its ingredients allow."
+        },
+        "unavailableStock": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Units that cannot be shipped: damaged, in a deactivated storage, or in a lot that is deactivated, expired or outside its shipping window."
+        },
+        "stocksByWarehouse": {
+          "type": "object",
+          "readOnly": true,
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "available": {
+                "type": "integer",
+                "description": "Units in this warehouse that can be ordered."
+              },
+              "physical": {
+                "type": "integer",
+                "description": "Units of the product in this warehouse, including reserved and unavailable units."
+              },
+              "reserved": {
+                "type": "integer",
+                "description": "Units in this warehouse reserved for released shipments and not picked yet."
+              },
+              "unavailable": {
+                "type": "integer",
+                "description": "Units in this warehouse that cannot be shipped, for example because they are damaged or in a deactivated storage or lot."
+              }
+            }
+          },
+          "description": "Stock levels per warehouse, keyed by warehouse ID, each with `available`, `physical`, `reserved` and `unavailable` units. Only warehouses holding or reserving the product are listed."
+        },
+        "unreleasedReservations": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Units needed by your shipments that are not released to a warehouse yet; not included in `reservedStock`."
+        },
+        "bundleIngredients": {
+          "writeOnly": true,
+          "description": "Products a bundle is made of and how many units of each, as `ingredientID` and `quantity`; only for `productType` `bundle`. Replaces the current ingredients. Write-only: read them with the bundle endpoints.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Bundle"
+          }
+        },
+        "user": {
+          "type": "object",
+          "readOnly": true,
+          "description": "Deprecated: use `userID`. Object with the `id` of the owner.",
+          "additionalProperties": {}
+        },
+        "userID": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid",
+          "description": "ID of the byrd user who owns the product (UUID). Products you create are always yours."
+        },
+        "shop": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "readOnly": true,
+          "description": "Deprecated: use `shopID`. Object with the `id` of the shop.",
+          "additionalProperties": {}
+        },
+        "shopID": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid",
+          "description": "ID of the shop the product is linked to (UUID); `null` when it is not linked to a shop."
+        },
+        "storages": {
+          "readOnly": true,
+          "description": "Storages holding the product in byrd warehouses. Only included when requested with `include_storages=true`.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProductStorage"
+          }
+        },
+        "lots": {
+          "readOnly": true,
+          "description": "Lots (batches) of the product. Only included when listing products with `include_lots=true`.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LotIncludedInProduct"
+          }
+        },
+        "packagingUnits": {
+          "maxItems": 1,
+          "description": "Packaging unit of the product: a pack of several units with its own barcode. At most one; its barcode is required when you create the product and must differ from the product barcodes.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProductPackagingUnit"
+          }
+        },
+        "dangerousGoods": {
+          "description": "Dangerous goods the product contains, one entry per UN number. Bundles cannot have any: add them to the ingredients instead.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/ProductDangerousGoods"
+          }
+        },
+        "dangerousGoodsMSDSURL": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "HTTPS link to the material safety data sheet (MSDS) of the dangerous goods in the product."
+        },
+        "isDangerousGoods": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the product contains dangerous goods; for a bundle, whether any of its ingredients does."
+        },
+        "bsku": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "readOnly": true,
+          "pattern": "^BSKU-([A-Z0-9]){10}$",
+          "description": "Unique SKU byrd generates for the product, unrelated to your `sku`."
+        },
+        "skipBarcodePick": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the warehouse may skip scanning the product barcode when picking and packing. Set by byrd."
+        },
+        "dimensions": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "readOnly": true,
+              "description": "ID of the dimensions record (UUID)."
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "readOnly": true,
+              "description": "When the record was created (ISO 8601)."
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "readOnly": true,
+              "description": "When the record was last changed (ISO 8601)."
+            },
+            "length": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0.01,
+              "description": "Length in cm; at least 0.01."
+            },
+            "width": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0.01,
+              "description": "Width in cm; at least 0.01."
+            },
+            "height": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0.01,
+              "description": "Height in cm; at least 0.01."
+            },
+            "weight": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0.001,
+              "description": "Weight in kg; at least 0.001."
+            },
+            "sizeGroup": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "S",
+                "XS",
+                "M",
+                "L",
+                "XL",
+                "XXL",
+                "CUSTOM",
+                "PAL",
+                null
+              ],
+              "description": "Size group used for charging, based on the sum of the shortest and the longest side.\n\n- `XS`: flat items such as envelopes and polybags\n- `S`: up to 35 cm\n- `M`: 35 cm or more\n- `L`: 65 cm or more\n- `XL`: 95 cm or more\n- `XXL`: 115 cm or more\n- `CUSTOM`: custom size, mostly for items with a variable height\n- `PAL`: pallets"
+            },
+            "isHeightVariable": {
+              "type": "boolean",
+              "description": "Whether the height can vary, for example for soft or compressible items. Defaults to `false`."
+            },
+            "createdBy": {
+              "readOnly": true,
+              "description": "Who provided the dimensions.\n\n- `CUSTOMER`: you\n- `PARTNER`: the warehouse, which measured the product",
+              "type": "string",
+              "enum": [
+                "CUSTOMER",
+                "PARTNER"
+              ]
+            },
+            "scannerIdentifier": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "readOnly": true,
+              "description": "Identifier of the scanner the warehouse measured the dimensions with; `null` when they were not scanned."
+            }
+          },
+          "description": "Size and weight of one unit of the product. The weight is needed for shipments leaving the EU or the UK; a `prepacked_product` needs all dimensions and a `sizeGroup`."
+        },
+        "changeRequests": {
+          "description": "Changes the warehouse asks you to make to the product settings, one per `info`; `null` when there are none. Answer them by sending this list back with a `status` of `accepted` or `declined`.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/ProductChangeRequest"
+          }
+        },
+        "dimensionsPhotoURLs": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "readOnly": true,
+          "description": "Links to the photos the warehouse took when it measured the product; `null` when there are none.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Product"
+    },
+    "ProductChangeRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the change request (UUID)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "info": {
+          "type": "string",
+          "enum": [
+            "organic",
+            "grs",
+            "lotsEnabled",
+            "serialNumberEnabled",
+            "packagingUnitEnabled",
+            "productType",
+            "fragile",
+            "isDangerousGoods"
+          ],
+          "description": "Product setting the warehouse asks you to change, because it does not match the product it received.\n\n- `organic`\n- `grs`\n- `lotsEnabled`\n- `serialNumberEnabled`\n- `packagingUnitEnabled`\n- `productType`: whether the product is a `prepacked_product`\n- `fragile`\n- `isDangerousGoods`"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "accepted",
+            "declined"
+          ],
+          "description": "Status of the change request. To answer one, send `accepted` or `declined` together with its `info`.\n\n- `open`: waiting for your answer\n- `accepted`: you accepted the change; the warehouse will apply it\n- `declined`: you declined the change"
+        }
+      },
+      "required": [
+        "info",
+        "status"
+      ],
+      "title": "Product change request"
+    },
+    "ProductDangerousGoods": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the dangerous goods entry (UUID)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "UNNumber": {
+          "type": "string",
+          "description": "Four-digit UN number of the dangerous good. The supported numbers and their limits are listed by the dangerous goods limits endpoint."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Amount of this dangerous good in one unit of the product, in the `unit` of its UN number; at most its `limit`. List a UN number once and add up the amounts if the product contains it several times."
+        },
+        "productID": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the product containing the dangerous goods (UUID)."
+        },
+        "dangerousGoodsClass": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Dangerous goods class of the UN number, for example `9` for lithium batteries."
+        },
+        "unit": {
+          "readOnly": true,
+          "description": "Unit `quantity` and `limit` are given in.\n\n- `wh`: watt-hours\n- `g`: grams\n- `l`: litres",
+          "type": "string",
+          "enum": [
+            "wh",
+            "g",
+            "l"
+          ]
+        },
+        "limit": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Maximum `quantity` of this UN number a single product may contain, in `unit`."
+        },
+        "dangerousGoodsType": {
+          "readOnly": true,
+          "description": "Shipping regulation the limits of the UN number come from.\n\n- `SV188`: ADR special provision 188 (small lithium cells and batteries)\n- `LQ`: limited quantities",
+          "type": "string",
+          "enum": [
+            "SV188",
+            "LQ"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Human-readable name of the UN number."
+        }
+      },
+      "required": [
+        "UNNumber",
+        "quantity"
+      ],
+      "title": "Product dangerous goods"
+    },
+    "ProductPackagingUnit": {
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "type": "integer",
+          "minimum": 2,
+          "description": "Number of selling units the packaging unit holds; at least 2."
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether the packaging unit can be used to ship the product. Defaults to `true`."
+        },
+        "barcodeType": {
+          "description": "Type of the packaging unit's barcode; required when a barcode value is given.\n\n- `ean_13`\n- `code_128`\n- `gs1_128`\n- `qr_code`",
+          "type": "string",
+          "enum": [
+            "ean_13",
+            "code_128",
+            "gs1_128",
+            "qr_code"
+          ]
+        },
+        "barcodeValue": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 48,
+          "description": "Barcode printed on the packaging unit; at most 48 characters."
+        },
+        "shippable": {
+          "type": "boolean",
+          "description": "Whether the packaging unit is prepacked and can be shipped as it is, without extra packaging. Defaults to `false`."
+        },
+        "dimensions": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "readOnly": true,
+              "description": "ID of the dimensions record (UUID)."
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "readOnly": true,
+              "description": "When the record was created (ISO 8601)."
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "readOnly": true,
+              "description": "When the record was last changed (ISO 8601)."
+            },
+            "length": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0.01,
+              "description": "Length in cm; at least 0.01."
+            },
+            "width": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0.01,
+              "description": "Width in cm; at least 0.01."
+            },
+            "height": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0.01,
+              "description": "Height in cm; at least 0.01."
+            },
+            "weight": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0.001,
+              "description": "Weight in kg; at least 0.001."
+            },
+            "sizeGroup": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "S",
+                "XS",
+                "M",
+                "L",
+                "XL",
+                "XXL",
+                "CUSTOM",
+                "PAL",
+                null
+              ],
+              "description": "Size group used for charging, based on the sum of the shortest and the longest side.\n\n- `XS`: flat items such as envelopes and polybags\n- `S`: up to 35 cm\n- `M`: 35 cm or more\n- `L`: 65 cm or more\n- `XL`: 95 cm or more\n- `XXL`: 115 cm or more\n- `CUSTOM`: custom size, mostly for items with a variable height\n- `PAL`: pallets"
+            },
+            "isHeightVariable": {
+              "type": "boolean",
+              "description": "Whether the height can vary, for example for soft or compressible items. Defaults to `false`."
+            },
+            "createdBy": {
+              "readOnly": true,
+              "description": "Who provided the dimensions.\n\n- `CUSTOMER`: you\n- `PARTNER`: the warehouse, which measured the product",
+              "type": "string",
+              "enum": [
+                "CUSTOMER",
+                "PARTNER"
+              ]
+            },
+            "scannerIdentifier": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "readOnly": true,
+              "description": "Identifier of the scanner the warehouse measured the dimensions with; `null` when they were not scanned."
+            }
+          },
+          "description": "Dimensions of the packaging unit itself, as measured by the warehouse; `null` until measured."
+        }
+      },
+      "required": [
+        "quantity"
+      ],
+      "title": "Product packaging unit"
+    },
+    "ProductStorage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the storage (UUID)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was created (ISO 8601)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the record was last changed (ISO 8601)."
+        },
+        "reservedStock": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Units in the storage reserved for shipments and not picked yet."
+        },
+        "product": {
+          "readOnly": true,
+          "description": "Product stored in the storage.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/StorageProduct"
+            }
+          ]
+        },
+        "warehouse": {
+          "readOnly": true,
+          "description": "Warehouse the storage is in.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/StorageWarehouse"
+            }
+          ]
+        },
+        "locationID": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the storage location (shelf or pallet place) in the warehouse (UUID)."
+        },
+        "user": {
+          "type": "object",
+          "readOnly": true,
+          "description": "Object with the `id` of the user who owns the stock.",
+          "additionalProperties": {}
+        },
+        "lot": {
+          "readOnly": true,
+          "description": "Lot stored in the storage; `null` for products without lots.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ProductStorageLot"
+            }
+          ]
+        },
+        "deleted": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the storage was deleted."
+        },
+        "blockedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true,
+          "description": "When the storage was blocked (ISO 8601); `null` when it is not blocked."
+        },
+        "blockReason": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Why the warehouse blocked the storage; `null` when it is not blocked.\n\n- `inaccurate_stock`: the recorded stock is wrong\n- `stock_count`: the stock is being counted\n- `special_arrangement`: set aside by special arrangement\n- `insufficient_stock`: not enough stock to pick"
+        },
+        "activated": {
+          "type": "boolean",
+          "default": true,
+          "readOnly": true,
+          "description": "Whether the storage can be picked from; stock in a deactivated storage is unavailable."
+        },
+        "bsid": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "readOnly": true,
+          "pattern": "^BSID-([A-Z0-9]){10}$",
+          "description": "Unique storage identifier byrd generates: `BSID-` followed by 10 letters or digits."
+        },
+        "pu": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "default": null,
+          "readOnly": true
+        },
+        "shelfIdentifier": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Label of the storage location in the warehouse, such as a shelf code."
+        },
+        "stock": {
+          "type": "integer",
+          "default": 0,
+          "readOnly": true,
+          "description": "Units of the product in the storage."
+        },
+        "stockCounted": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "type": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "Type of the storage location.\n\n- `0`: store (legacy)\n- `10`: pallet\n- `20`: shelf"
+        }
+      },
+      "title": "Product storage"
+    },
+    "ProductStorageLot": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the lot (UUID)."
+        },
+        "lotNumber": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Lot (batch) number, 1 to 64 characters; unique per product."
+        },
+        "expiryDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date",
+          "description": "Date the lot expires (ISO 8601 date); cannot be in the past. `null` when the lot does not expire."
+        },
+        "notBefore": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "First moment units of the lot may be shipped (ISO 8601, UTC); must be before `notAfter`. `null` for no limit."
+        },
+        "notAfter": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Last moment units of the lot may be shipped (ISO 8601, UTC); cannot be in the past. When you do not set it, it is derived from `expiryDate` if byrd has a minimum remaining shelf life configured for your products. `null` for no limit."
+        },
+        "activated": {
+          "type": "boolean",
+          "description": "Whether units of the lot can be picked for shipments; stock of a deactivated lot is unavailable. Defaults to `true`."
+        }
+      },
+      "required": [
+        "lotNumber"
+      ],
+      "title": "Product storage lot"
+    },
+    "StorageProduct": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the product (UUID)."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name of the product; at least one character."
+        },
+        "sku": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "Your stock keeping unit (SKU) for the product, unique among your products. It must match the SKU your sales channel sends on order lines."
+        },
+        "bsku": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "readOnly": true,
+          "pattern": "^BSKU-([A-Z0-9]){10}$",
+          "description": "Unique SKU byrd generates for the product, unrelated to your `sku`."
+        },
+        "ean": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "European Article Number (EAN) of the product, passed on as its GTIN in customs data."
+        },
+        "fragile": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the product is fragile and needs special packaging. For a bundle it is derived from the ingredients and cannot be set. Defaults to `false`."
+        },
+        "barcode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 48,
+          "description": "Value of the primary barcode printed on the product, at most 48 characters; mirrors the primary entry of `barcodes`. `null` when the product has no barcode."
+        },
+        "barcodes": {
+          "description": "All barcodes printed on the product, at most one of them primary. When you send both `barcode` and `barcodes`, `barcode` must match the primary entry.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/Barcode"
+          }
+        },
+        "skipBarcodePick": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Whether the warehouse may skip scanning the product barcode when picking and packing. Set by byrd."
+        },
+        "organic": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the product is organic and needs special storage and shipping conditions. Bundles cannot be organic. Defaults to `false`."
+        },
+        "grs": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the product complies with the Global Recycled Standard (GRS) and needs specific storage conditions. Defaults to `false`."
+        },
+        "packagingUnitEnabled": {
+          "type": "boolean",
+          "description": "Whether the product also comes in packaging units holding several units, which the warehouse can pick as a whole. Defaults to `false`."
+        },
+        "packagingUnits": {
+          "maxItems": 1,
+          "description": "Packaging unit of the product: a pack of several units with its own barcode. At most one; its barcode is required when you create the product and must differ from the product barcodes.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProductPackagingUnit"
+          }
+        },
+        "serialNumberEnabled": {
+          "type": "boolean",
+          "description": "Whether serial numbers of the product are recorded when it is shipped. Defaults to `false`."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Storage product"
+    },
+    "StorageWarehouse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true,
+          "description": "ID of the record (UUID)."
+        },
+        "countryCode": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Country the warehouse is in (ISO 3166-1 alpha-2)."
+        }
+      },
+      "title": "Storage warehouse"
+    }
+  }
+}
