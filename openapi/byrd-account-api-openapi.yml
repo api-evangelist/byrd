@@ -1,0 +1,916 @@
+openapi: 3.2.0
+info:
+  description: The byrd APIs for managing products, inbound deliveries, shipments and returns.
+  contact:
+    email: info@getbyrd.com
+    name: General company contact
+    url: https://getbyrd.com/kontakt/
+  license:
+    name: Copyright byrd technologies GmbH
+  termsOfService: https://getbyrd.com/agb/
+  version: '20260924'
+  title: byrd Account API
+servers:
+- description: Production server
+  url: https://api.getbyrd.com/
+security:
+- tokenAuth: []
+tags:
+- name: Account
+  description: The warehouses and B2B templates available to your account, and CSV exports of your shipments, returns and inventory.
+paths:
+  /v2/b2b_config/{b2b_config_id}:
+    get:
+      operationId: b2bconfigapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/B2BConfigDetail'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Account
+      description: 'Returns the B2B configuration of one of your B2B shipments with its
+
+        template, translated into `lang` (English by default).'
+      x-byrd-roles:
+      - admin
+      - customer
+      - operator
+      - warehouse_support
+      - service
+      parameters:
+      - in: query
+        name: lang
+        description: Language of the translated template texts, as a two-letter code (ISO 639-1), e.g. `de`. Defaults to `en`; texts missing in that language are returned in English.
+        schema:
+          type:
+          - string
+          - 'null'
+          default: en
+          pattern: ^[A-Za-z]{2}$
+        required: false
+      - name: b2b_config_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the B2B configuration (UUID).
+      summary: Get a B2B configuration
+  /v2/b2b_config_templates:
+    get:
+      operationId: b2bconfigtemplateapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/B2BConfigTemplate'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Account
+      description: 'Returns the latest version of each B2B template enabled for your
+
+        account, translated into `lang`, with the warehouses you can use it
+
+        in. Use its `key`, `id` and `customerInputSchema` to create a B2B
+
+        shipment; see the Listing B2B config templates guide.'
+      x-byrd-roles:
+      - admin
+      - warehouse
+      - customer
+      - operator
+      - customer_support
+      - warehouse_support
+      - service
+      parameters:
+      - in: query
+        name: lang
+        description: Language of the translated template texts, as a two-letter code (ISO 639-1), e.g. `de`. Defaults to `en`; texts missing in that language are returned in English.
+        schema:
+          type:
+          - string
+          - 'null'
+          default: en
+          pattern: ^[A-Za-z]{2}$
+        required: false
+      - in: query
+        name: user_id
+        description: ID of the customer whose templates to list (UUID). Ignored for customers, who always get their own templates.
+        schema:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        required: false
+      summary: List B2B templates
+  /v2/export/user/{user_id}/returns:
+    get:
+      operationId: returnsexportapi_get
+      responses:
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Undefined'
+      tags:
+      - Account
+      description: 'Returns a CSV file with one row per returned item of your returns
+
+        whose shipment''s `range_type` date falls between `start_date` and
+
+        `end_date`. Use your own user ID in the path.'
+      x-byrd-roles:
+      - admin
+      - customer
+      - operator
+      - customer_support
+      - service
+      parameters:
+      - in: query
+        name: start_date
+        description: First day of the export period (YYYY-MM-DD, inclusive). Defaults to 30 days before `end_date`. The period can be at most 365 days.
+        schema:
+          type: string
+          format: date
+        required: false
+      - in: query
+        name: end_date
+        description: Last day of the export period (YYYY-MM-DD, inclusive). Defaults to today and cannot be in the future.
+        schema:
+          type: string
+          format: date
+        required: false
+      - in: query
+        name: range_type
+        description: 'Shipment date that `start_date` and `end_date` apply to. Defaults to `returned-date`.
+
+
+          - `returned-date`: when the shipment was returned
+
+          - `shipped-date`: when the shipment was sent'
+        schema:
+          type: string
+          default: returned-date
+          enum:
+          - returned-date
+          - shipped-date
+        required: false
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of your byrd account (UUID); any other account answers `404`.
+      summary: Export returns as CSV
+  /v2/export/user/{user_id}/shipments:
+    get:
+      operationId: shipmentexportapi_get
+      responses:
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Undefined'
+      tags:
+      - Account
+      description: 'Returns a CSV file with one row per item of your shipments whose
+
+        `range_type` date falls between `start_date` and `end_date`. Use
+
+        your own user ID in the path.'
+      x-byrd-roles:
+      - admin
+      - customer
+      - operator
+      - customer_support
+      - service
+      parameters:
+      - in: query
+        name: start_date
+        description: First day of the export period (YYYY-MM-DD, inclusive). Defaults to 30 days before `end_date`. The period can be at most 365 days.
+        schema:
+          type: string
+          format: date
+        required: false
+      - in: query
+        name: end_date
+        description: Last day of the export period (YYYY-MM-DD, inclusive). Defaults to today and cannot be in the future.
+        schema:
+          type: string
+          format: date
+        required: false
+      - in: query
+        name: range_type
+        description: 'Shipment date that `start_date` and `end_date` apply to. Defaults to `created-date`.
+
+
+          - `created-date`: when the shipment was created
+
+          - `packaged-date`: when the shipment was packed
+
+          - `shipped-date`: when the shipment was sent
+
+          - `returned-date`: when the shipment was returned'
+        schema:
+          type: string
+          default: created-date
+          enum:
+          - returned-date
+          - shipped-date
+          - packaged-date
+          - created-date
+        required: false
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of your byrd account (UUID); any other account answers `404`.
+      summary: Export shipments as CSV
+  /v2/warehouse/export/user/{user_id}/inventory:
+    get:
+      operationId: inventoryexportapi_get
+      responses:
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Undefined'
+      tags:
+      - Account
+      description: 'Returns a CSV file with one row per product and its physical,
+
+        reserved and unavailable stock. Set `by_warehouse` or `by_lot` to
+
+        split the rows per warehouse or per lot.'
+      x-byrd-roles:
+      - service
+      - customer
+      - customer_support
+      - admin
+      - operator
+      parameters:
+      - in: query
+        name: by_lot
+        description: Whether to add one row per lot of each product, with the lot details. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: by_warehouse
+        description: Whether to add one row per warehouse holding each product, with the warehouse details. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of your byrd account (UUID); any other account answers `404`.
+      summary: Download your inventory as CSV
+  /v2/warehouse/user-warehouse-links:
+    get:
+      operationId: userwarehouselinksapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                allOf:
+                - type: object
+                  required:
+                  - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/UserWarehouseLink'
+                - $ref: '#/components/schemas/PaginationFields'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Account
+      description: 'Returns the active links between your account and the warehouses it
+
+        can use, including which of them is your default warehouse.'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: userID
+        description: Only return the links of these byrd accounts (comma-separated UUIDs). Ignored for customer accounts, which always get their own links.
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: warehouseID
+        description: Only return the links to this warehouse (UUID). Ignored for customer accounts.
+        schema:
+          type: string
+          format: uuid
+        required: false
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Page'
+      summary: List your warehouse links
+  /v2/warehouse/warehouses:
+    get:
+      operationId: warehousesapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                allOf:
+                - type: object
+                  required:
+                  - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Warehouse'
+                - $ref: '#/components/schemas/PaginationFields'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Account
+      description: 'Returns the warehouses your account is linked to: the warehouses
+
+        your stock can be stored in and your shipments sent from. See
+
+        Listing warehouses.'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: ids
+        description: Only return the warehouses with these IDs (comma-separated UUIDs).
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: sort_by
+        description: Field to sort the warehouses by; only `name` is supported.
+        schema:
+          type: string
+          enum:
+          - name
+        required: false
+      - in: query
+        name: order
+        description: 'Sort direction for `sort_by`: `asc` (default) or `desc`.'
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+        required: false
+      - in: query
+        name: carrier_name
+        description: Only return the warehouses that ship with this carrier, given as a carrier identifier such as `dhl_de`.
+        schema:
+          type: string
+        required: false
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Query'
+      - $ref: '#/components/parameters/Fields'
+      summary: List warehouses
+  /v2/warehouse/warehouses/{warehouse_id}:
+    get:
+      operationId: warehouseapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Warehouse'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Account
+      description: 'Returns one of the warehouses your account is linked to; any other
+
+        warehouse answers `404`.'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: warehouse_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the warehouse (UUID).
+      summary: Get a warehouse
+components:
+  responses:
+    Undefined:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UndefinedResponse'
+      description: Generic success response
+    Error:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Generic error response
+  schemas:
+    DeliveryAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the address (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        adminArea:
+          type: string
+          description: State, province or region.
+        subAdminArea:
+          type: string
+          description: County or district within the state.
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: Country (ISO 3166-1 alpha-2), for example `DE`.
+        countryName:
+          type: string
+          description: Name of the country.
+        locality:
+          type: string
+          description: City.
+        subLocality:
+          type: string
+          description: District or neighbourhood within the city.
+        postalCode:
+          type: string
+          description: Postal code. For countries with numeric postal codes, anything but digits is removed, such as a `DE-` prefix.
+        thoroughfare:
+          type: string
+          description: Name of the street, without the house number.
+        subThoroughfare:
+          type: string
+          description: House number.
+        subSubThoroughfare:
+          type: string
+          description: Additional address details, such as building or floor.
+        latitude:
+          type:
+          - number
+          - 'null'
+          description: Latitude of the address in decimal degrees; `null` if unknown.
+        longitude:
+          type:
+          - number
+          - 'null'
+          description: Longitude of the address in decimal degrees; `null` if unknown.
+        phone:
+          type:
+          - string
+          - 'null'
+          description: Phone number, with the country code where possible, for example `+49 1234567890`. For a recipient, it is given to the carrier, and characters other than digits and `+` are removed.
+      required:
+      - adminArea
+      - countryCode
+      - locality
+      - postalCode
+      - subAdminArea
+      - subLocality
+      - subSubThoroughfare
+      - subThoroughfare
+      - thoroughfare
+      title: Delivery address
+    Template:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Key of the template, e.g. `amazon`; send it as `b2b_config.template_key` when you create a B2B shipment with `POST /v3/shipments`. Stays the same across template versions.
+        title:
+          type: string
+          readOnly: true
+          description: Name of the template, in the requested language.
+        description:
+          type: string
+          readOnly: true
+          description: Description of the template, in the requested language.
+        warehouseInstructionsHTML:
+          type: string
+          readOnly: true
+          description: Instructions the warehouse follows to prepare shipments with this template, as simple HTML, in the requested language.
+        customerInputSchema:
+          type: object
+          readOnly: true
+          description: Fields to fill in `b2b_config.customer_input` of `POST /v3/shipments` when you use the template, keyed by field name. Each field is a JSON Schema definition (type and constraints such as `enum`, `pattern`, `minimum`) with a translated `label` and `description`.
+        requiredInputFields:
+          type: array
+          readOnly: true
+          items:
+            type: string
+          description: Names of the `customerInputSchema` fields you must fill in.
+      title: Template
+    UserWarehouseLink:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        userID:
+          type: string
+          format: uuid
+          description: ID of the byrd account the warehouse is linked to (UUID).
+        warehouseID:
+          type: string
+          format: uuid
+          description: ID of the linked warehouse (UUID).
+        warehouse:
+          readOnly: true
+          description: Details of the linked warehouse.
+          allOf:
+          - $ref: '#/components/schemas/Warehouse'
+        isDefault:
+          type: boolean
+          default: false
+          description: Whether this is your default warehouse, which byrd tries first when it chooses the warehouse a shipment is fulfilled from. At most one of your links is the default.
+      required:
+      - userID
+      - warehouseID
+      title: User warehouse link
+    PaginationFields:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: Current page of results, 0-indexed
+        per_page:
+          type: integer
+          description: Number of results per page
+        page_count:
+          type: integer
+          description: Number of result pages
+        total_count:
+          type: integer
+          description: Total number of results across all pages
+      title: Pagination fields
+    B2BConfigTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID of the latest template version (UUID); send it as `b2b_config.template_id` when you create a B2B shipment with `POST /v3/shipments`.
+        key:
+          type: string
+          description: Key of the template, e.g. `amazon`; send it as `b2b_config.template_key` when you create a B2B shipment with `POST /v3/shipments`. Stays the same across template versions.
+        warehouseIDs:
+          type: array
+          readOnly: true
+          items:
+            type: string
+            format: uuid
+          description: IDs of the warehouses you can use the template in (UUIDs).
+        title:
+          type: string
+          readOnly: true
+          description: Name of the template, in the requested language.
+        description:
+          type: string
+          readOnly: true
+          description: Description of the template, in the requested language.
+        warehouseInstructionsHTML:
+          type: string
+          readOnly: true
+          description: Instructions the warehouse follows to prepare shipments with this template, as simple HTML, in the requested language.
+        customerInputSchema:
+          type: object
+          readOnly: true
+          description: Fields to fill in `b2b_config.customer_input` of `POST /v3/shipments` when you use the template, keyed by field name. Each field is a JSON Schema definition (type and constraints such as `enum`, `pattern`, `minimum`) with a translated `label` and `description`.
+        requiredInputFields:
+          type: array
+          readOnly: true
+          items:
+            type: string
+          description: Names of the `customerInputSchema` fields you must fill in.
+        allowPickups:
+          type: boolean
+          readOnly: true
+          description: Whether you may collect shipments using this template from the warehouse yourself (`pickup` service) instead of having them shipped.
+      title: B2B config template
+    B2BConfigDetail:
+      type: object
+      properties:
+        customerInput:
+          type: string
+          description: Values you entered for the fields of the template, keyed by field name as defined in its `customerInputSchema`.
+        template:
+          description: Template the configuration uses, translated into the requested language.
+          allOf:
+          - $ref: '#/components/schemas/Template'
+      title: B2B config detail
+    UndefinedResponse:
+      type: object
+      description: Generic (expected) response when endpoint doesn't explicitly define one
+      properties:
+        data:
+          type: object
+      title: Undefined response
+    Warehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        code:
+          type: string
+          description: Unique three-letter code of the warehouse.
+          example: TST
+        displayName:
+          type: string
+          description: Name of the warehouse as shown in the byrd dashboard, usually based on its location.
+        name:
+          type: string
+          description: Name of the warehouse.
+        legalName:
+          type: string
+          readOnly: true
+          description: Legal name of the company operating the warehouse; `null` when not set.
+        countryCode:
+          type: string
+          readOnly: true
+          description: Country the warehouse is in (ISO 3166-1 alpha-2).
+          example: DE
+        deliveryAddress:
+          readOnly: true
+          description: Address of the warehouse, where deliveries of your stock are sent.
+          allOf:
+          - $ref: '#/components/schemas/DeliveryAddress'
+        disallowedShipmentOptions:
+          type: string
+          readOnly: true
+          description: Shipment options the warehouse does not support, such as `express` or `pickup_point`; a shipment with one of these options cannot be fulfilled from this warehouse. `null` when every option is supported.
+        openingHours:
+          type: string
+          readOnly: true
+          description: Opening hours of the warehouse, keyed by ISO weekday number (`1` = Monday to `7` = Sunday). Each weekday holds a list of time ranges `[[start_hour, start_minute], [end_hour, end_minute]]`, earliest first. `null` when no opening hours are set.
+      required:
+      - code
+      - displayName
+      - name
+      title: Warehouse
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - Authentication.AuthenticationRequired
+          - Authentication.ExpiredJWTToken
+          - Authentication.InvalidCredentials
+          - Authentication.InvalidJWTToken
+          - Authentication.LocalityRequired
+          - Authentication.MissingPermission
+          - Authentication.ReadOnly
+          - Authentication.RoleNotAllowed
+          - Authentication.UserLocked
+          - Exception.404
+          - Exception.500
+          - Request.InvalidPagination
+          - Request.InvalidQuery
+          - Request.InvalidSchema
+          - Request.NoInput
+          - Request.ResourceNotFound
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            description: Embedded instance of Error
+      title: Error
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Result page to jump to, 0-indexed
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    PerPage:
+      name: per_page
+      in: query
+      description: Number of results per page
+      schema:
+        type: integer
+        default: 250
+        minimum: 1
+    Query:
+      name: q
+      in: query
+      description: The search term
+      schema:
+        type: string
+    Fields:
+      name: fields
+      in: query
+      description: Model fields to search through; comma separated
+      schema:
+        type: array
+        items:
+          type: string
+        description: Fields are comma separated
+      explode: false
+      required: false
+  securitySchemes:
+    tokenAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authorization with previously obtained JSON Web Token
+x-provenance:
+  method: searched
+  source: https://developers.getbyrd.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developers.getbyrd.com/reference/authapiv2_get.md
+  - https://developers.getbyrd.com/reference/b2bconfigapi_get.md
+  - https://developers.getbyrd.com/reference/b2bconfigtemplateapi_get.md
+  - https://developers.getbyrd.com/reference/bundledetailsapi_delete.md
+  - https://developers.getbyrd.com/reference/bundledetailsapi_get.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_get.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_post.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_put.md
+  - https://developers.getbyrd.com/reference/dangerousgoodsunitlimitsapi_get.md
+  - https://developers.getbyrd.com/reference/deliveriesapi_get.md
+  - https://developers.getbyrd.com/reference/deliveriesapi_post.md
+  - https://developers.getbyrd.com/reference/deliveryapi_delete.md
+  - https://developers.getbyrd.com/reference/deliveryapi_get.md
+  - https://developers.getbyrd.com/reference/deliveryapi_patch.md
+  - https://developers.getbyrd.com/reference/deliveryapi_put.md
+  - https://developers.getbyrd.com/reference/deliverydocumentapi_delete.md
+  - https://developers.getbyrd.com/reference/deliverydocumentapi_patch.md
+  - https://developers.getbyrd.com/reference/deliverydocumentsapi_get.md
+  - https://developers.getbyrd.com/reference/deliverydocumentsapi_post.md
+  - https://developers.getbyrd.com/reference/deliveryitemapi_get.md
+  - https://developers.getbyrd.com/reference/deliverylistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/deliverylotsapi_get.md
+  - https://developers.getbyrd.com/reference/inventoryexportapi_get.md
+  - https://developers.getbyrd.com/reference/loginapiv2_post.md
+  - https://developers.getbyrd.com/reference/lotdetailapi_get.md
+  - https://developers.getbyrd.com/reference/lotdetailapi_patch.md
+  - https://developers.getbyrd.com/reference/lotlistapi_get.md
+  - https://developers.getbyrd.com/reference/lotlistapi_post.md
+  - https://developers.getbyrd.com/reference/picklistapiv3_get.md
+  - https://developers.getbyrd.com/reference/productapi_delete.md
+  - https://developers.getbyrd.com/reference/productapi_get.md
+  - https://developers.getbyrd.com/reference/productapi_patch.md
+  - https://developers.getbyrd.com/reference/productapi_put.md
+  - https://developers.getbyrd.com/reference/productsapi_get.md
+  - https://developers.getbyrd.com/reference/productsapi_post.md
+  - https://developers.getbyrd.com/reference/productserialnumbersapi_get.md
+  - https://developers.getbyrd.com/reference/productstatsapi_get.md
+  - https://developers.getbyrd.com/reference/productstockbywarehouseapi_get.md
+  - https://developers.getbyrd.com/reference/refreshtokenapi_post.md
+  - https://developers.getbyrd.com/reference/returnsexportapi_get.md
+  - https://developers.getbyrd.com/reference/returnshipmentannouncedapiv3_post.md
+  - https://developers.getbyrd.com/reference/returnshipmentdetailapi_get.md
+  - https://developers.getbyrd.com/reference/returnshipmentdocumentsapiv3_post.md
+  - https://developers.getbyrd.com/reference/returnshipmentlistapi_get.md
+  - https://developers.getbyrd.com/reference/schedulepickupapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentaddressvalidationapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_delete.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_patch.md
+  - https://developers.getbyrd.com/reference/shipmentbatchrecallapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentbatchreleaseapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentfileapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentexportapi_get.md
+  - https://developers.getbyrd.com/reference/shipmentlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentlistapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentlistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentpicklistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentrecallapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentreportapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentreservationlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentunitapiv3_get.md
+  - https://developers.getbyrd.com/reference/unitlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/unitlistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/userapiv2_patch.md
+  - https://developers.getbyrd.com/reference/userwarehouselinksapi_get.md
+  - https://developers.getbyrd.com/reference/warehouseapi_get.md
+  - https://developers.getbyrd.com/reference/warehousesapi_get.md
+  merge:
+    pages: 69
+    deduped: 601
+    conflicts_kept_first: 0

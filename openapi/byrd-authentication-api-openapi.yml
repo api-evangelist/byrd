@@ -1,0 +1,1129 @@
+openapi: 3.2.0
+info:
+  description: The byrd APIs for managing products, inbound deliveries, shipments and returns.
+  contact:
+    email: info@getbyrd.com
+    name: General company contact
+    url: https://getbyrd.com/kontakt/
+  license:
+    name: Copyright byrd technologies GmbH
+  termsOfService: https://getbyrd.com/agb/
+  version: '20260924'
+  title: byrd Authentication API
+servers:
+- description: Production server
+  url: https://api.getbyrd.com/
+security:
+- tokenAuth: []
+tags:
+- name: Authentication
+  description: Log in with your API key to get an access token, refresh it, and read or update your account.
+paths:
+  /v2/auth:
+    get:
+      operationId: authapiv2_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Authentication
+      description: 'Returns the account details of the user the access token was issued
+
+        to.'
+      summary: Get your own user
+  /v2/login:
+    post:
+      operationId: loginapiv2_post
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - token
+                - payload
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LoginResponse'
+                allOf:
+                - $ref: '#/components/schemas/LoginResponse'
+          description: 'The access token and its decoded payload, sent twice with the same values: at the top level, for older clients, and under `data`.
+
+            '
+        '400':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Authentication
+      description: 'Exchanges your API key and secret, or your dashboard email and
+
+        password, for a JWT access token, valid for 7 days unless you ask
+
+        for less. Send the token as
+
+        `Authorization: Bearer ` on every other call. The endpoint
+
+        allows at most five calls per minute, so reuse the token until it
+
+        expires. See the Authentication guide.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostLogin'
+      security: []
+      summary: Log in and get an access token
+  /v2/refresh_token:
+    post:
+      operationId: refreshtokenapi_post
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - token
+                - payload
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LoginResponse'
+                allOf:
+                - $ref: '#/components/schemas/LoginResponse'
+          description: 'The access token and its decoded payload, sent twice with the same values: at the top level, for older clients, and under `data`.
+
+            '
+        '400':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Authentication
+      description: 'Exchanges an access token that is still valid for a new one for the
+
+        same user, valid for 7 days. Fails when the account is locked.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRefreshToken'
+      security: []
+      summary: Refresh an access token
+  /v2/users/{user_id}:
+    patch:
+      operationId: userapiv2_patch
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+          description: 'The request set `status` on a user who is not a customer. Only customer accounts carry one.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - User.Update.Invalid.Status
+        '401':
+          description: 'The request changed a field the caller''s role may not write - `isStaff`, `v3CarrierSelector` or `status`. The offending field is named in `extra.field`.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - User.Update.Permission.Insufficient
+        '403':
+          $ref: '#/components/responses/Error'
+        '422':
+          description: 'The request mentioned `isDemo`, which is set when the account is created and cannot be changed afterwards.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - User.Update.Immutable.IsDemo
+      tags:
+      - Authentication
+      description: 'Changes only the fields you send; read-only fields cannot be changed.
+
+        A customer account must keep a phone number.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      x-byrd-roles:
+      - sales
+      - admin
+      - warehouse
+      - scoped_admin
+      - customer
+      - operator
+      - customer_support
+      - warehouse_support
+      - service
+      x-byrd-permissions:
+        type: permission
+        name: user:write
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of your byrd account (UUID); any other account answers `404`.
+      summary: Update your account details
+components:
+  schemas:
+    PostLogin:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Your API key. A value containing `@` is treated as the email address you log in to the dashboard with.
+        password:
+          type: string
+          description: Your API secret, or the password of your login email when `username` is an email address.
+        validity:
+          type: integer
+          default: 604800
+          description: How long the token stays valid, in seconds. Defaults to and is capped at 604800 (7 days).
+      required:
+      - password
+      - username
+      title: Post login
+    PostRefreshToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Access token to replace. It must still be valid; the new token is valid for 7 days.
+      required:
+      - token
+      title: Post refresh token
+    UserLocality:
+      type: object
+      properties:
+        localityID:
+          type: string
+          description: ID of the warehouse (UUID).
+      title: User locality
+    LoginPayload:
+      type: object
+      properties:
+        aud:
+          type: string
+          description: 'Audience the token is issued for: `api.getbyrd.com`.'
+        iss:
+          type: string
+          description: 'Issuer of the token: `api.getbyrd.com`.'
+        jti:
+          type: string
+          description: Unique ID of the token (UUID).
+        role:
+          type: string
+          description: Role of the user the token is issued to, e.g. `customer`.
+        sub:
+          type: string
+          description: ID of the user the token is issued to (UUID).
+        loc:
+          type: array
+          description: IDs of the warehouses your account is linked to (UUIDs).
+          items:
+            type: string
+        fpk:
+          type: string
+          description: Key of the fulfillment provider your account belongs to.
+        exp:
+          type: integer
+          description: When the token expires, as a Unix timestamp in seconds.
+        iat:
+          type: integer
+          description: When the token was issued, as a Unix timestamp in seconds.
+        nbf:
+          type: integer
+          description: Time before which the token is not accepted, as a Unix timestamp in seconds.
+        scp:
+          type: array
+          description: Names of the permissions granted to the user.
+          items:
+            type: string
+        imp:
+          type: string
+          description: ID of the byrd user who opened this session on your behalf (UUID); absent for your own logins.
+        ron:
+          type: boolean
+          description: Whether the session is read-only; absent for your own logins.
+        authMethod:
+          type: string
+          description: 'How the credentials were checked when the session started.
+
+
+            - `apikey`: API key and secret
+
+            - `password`: login email and password
+
+            - `sso`: single sign-on'
+      additionalProperties: false
+      title: Login payload
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          readOnly: true
+          description: 'JWT access token. Send it as `Authorization: Bearer <token>` on every other call.'
+        payload:
+          readOnly: true
+          description: Decoded claims of `token`.
+          allOf:
+          - $ref: '#/components/schemas/LoginPayload'
+      additionalProperties: false
+      title: Login response
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - Authentication.AuthenticationRequired
+          - Authentication.ExpiredJWTToken
+          - Authentication.InvalidCredentials
+          - Authentication.InvalidJWTToken
+          - Authentication.LocalityRequired
+          - Authentication.MissingPermission
+          - Authentication.ReadOnly
+          - Authentication.RoleNotAllowed
+          - Authentication.UserLocked
+          - Exception.404
+          - Exception.500
+          - Request.InvalidPagination
+          - Request.InvalidQuery
+          - Request.InvalidSchema
+          - Request.NoInput
+          - Request.ResourceNotFound
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            description: Embedded instance of Error
+      title: Error
+    TotalPrice:
+      type: object
+      properties:
+        value:
+          type: number
+          description: Amount, as a string with two decimals separated by a dot.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          description: Currency (ISO 4217 code, e.g. `EUR`).
+        taxFactor:
+          type:
+          - number
+          - 'null'
+          description: Tax factor of the price, for example `1.19` for 19% VAT; `null` when not set.
+      required:
+      - currency
+      - value
+      title: Total price
+    Address:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        thoroughfare:
+          type:
+          - string
+          - 'null'
+          description: Street name; send the house number in `subThoroughfare` where possible.
+        subThoroughfare:
+          type:
+          - string
+          - 'null'
+          description: House or building number.
+        subSubThoroughfare:
+          type:
+          - string
+          - 'null'
+          description: Additional address details, such as building, floor or apartment.
+        locality:
+          type: string
+          description: City or town.
+        subLocality:
+          type:
+          - string
+          - 'null'
+          description: District or neighbourhood within the city.
+        adminArea:
+          type:
+          - string
+          - 'null'
+          description: State, province or region, where the country uses one.
+        subAdminArea:
+          type:
+          - string
+          - 'null'
+          description: County or district below the state or region.
+        postalCode:
+          type: string
+          description: Postal code. A prefix matching `countryCode`, as in `DE-12345`, is removed.
+        countryCode:
+          type: string
+          pattern: ^[A-Z]{2}$
+          description: Country, as an ISO 3166-1 alpha-2 code.
+        latitude:
+          type:
+          - number
+          - 'null'
+          description: Latitude of the address, in decimal degrees.
+        longitude:
+          type:
+          - number
+          - 'null'
+          description: Longitude of the address, in decimal degrees.
+        validated:
+          type: boolean
+          readOnly: true
+          description: Whether byrd has validated the address. `false` only means it was not validated, not that it is invalid.
+      required:
+      - countryCode
+      - locality
+      - postalCode
+      title: Address
+    UserUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        firstName:
+          type: string
+          description: First name of the account holder.
+        lastName:
+          type: string
+          description: Last name of the account holder.
+        companyName:
+          type:
+          - string
+          - 'null'
+          description: Name of your company; `null` when not set.
+        senderName:
+          type:
+          - string
+          - 'null'
+          description: Sender name printed on shipping labels instead of the company name; `null` when not set.
+        vatNumber:
+          type:
+          - string
+          - 'null'
+          description: VAT number of your company; `null` when not set.
+        eoriNumber:
+          type:
+          - string
+          - 'null'
+          description: EORI number of your company, used on export customs documents; `null` when not set.
+        phone:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9+()/ -]*$
+          description: 'Phone number of your company: digits, spaces and `+ ( ) / -` only. Required: it may be printed on shipping labels.'
+        email:
+          type: string
+          format: email
+          description: Email address you log in to the dashboard with.
+        billingEmail:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Email address invoices are sent to; `null` when not set.
+        sendTrackingEmails:
+          type: boolean
+          description: Whether byrd sends the recipients of your shipments a tracking email after the shipment is sent.
+        billingAddress:
+          readOnly: false
+          description: 'Billing address of your company. Send the complete address: it replaces the stored one rather than being merged into it.'
+          allOf:
+          - $ref: '#/components/schemas/Address'
+        codIBAN:
+          type:
+          - string
+          - 'null'
+          description: IBAN of the bank account cash-on-delivery amounts are paid out to; `null` when not set.
+        codBIC:
+          type:
+          - string
+          - 'null'
+          description: BIC of the bank account cash-on-delivery amounts are paid out to; `null` when not set.
+        userDefaults:
+          type: object
+          description: Free-form JSON object with your dashboard preferences. An update replaces the whole object.
+          additionalProperties: {}
+        language:
+          type:
+          - string
+          - 'null'
+          enum:
+          - en
+          - de
+          - pl
+          - fr
+          - it
+          - es
+          - null
+          description: 'Preferred language of the dashboard; `null` when not set.
+
+
+            - `en`: English
+
+            - `de`: German
+
+            - `pl`: Polish
+
+            - `fr`: French
+
+            - `it`: Italian
+
+            - `es`: Spanish'
+        addressValidationEnabled:
+          type: boolean
+          description: Whether byrd validates the destination address of your shipments before releasing them. Pickup shipments are never validated.
+        economyFallbackEnabled:
+          type: boolean
+          description: Whether an `economy` shipment is sent with `standard` shipping when no economy service is available for it. Does not apply to B2B shipments.
+        defaultShipmentService:
+          type: string
+          enum:
+          - economy
+          - standard
+          - express
+          description: 'Shipping service applied to shipments you create without naming one. B2B and pallet shipments always start with `standard`. Defaults to `standard`.
+
+
+            - `economy`: cheapest, slower delivery
+
+            - `standard`: regular delivery
+
+            - `express`: faster delivery, picked with higher priority'
+        partialFulfillmentEnabled:
+          type: boolean
+          description: Whether byrd tries to split a shipment when one or more of its SKUs are out of stock.
+        b2bPalletEnabled:
+          type: boolean
+          description: Whether you can create B2B shipments sent on pallets.
+        fallbackPhoneEnabled:
+          type: boolean
+          description: Whether your phone number is used on shipping labels when the recipient has no phone number. Defaults to `true`.
+        blockedShipmentRetryEnabled:
+          type: boolean
+          description: Whether shipments that could not be released for lack of stock are released again automatically, oldest first, once the stock is replenished. Defaults to `false`.
+        ioss:
+          type:
+          - string
+          - 'null'
+          description: Import One-Stop Shop (IOSS) number used for customs declarations; `null` when not set. Set it to `null` to stop it being sent.
+        ukims:
+          type:
+          - string
+          - 'null'
+          description: UK Internal Market Scheme (UKIMS) number used for customs declarations; `null` when not set. Set it to `null` to stop it being sent.
+        countryCode:
+          type: string
+          readOnly: true
+          description: Country your account is registered in, as a two-letter code (ISO 3166-1 alpha-2, except `EL` for Greece).
+        fulfillmentProviderKey:
+          type: string
+          readOnly: true
+          description: Key of the fulfillment provider your account belongs to.
+        referralPromotionCode:
+          type: string
+          readOnly: true
+        warehousingEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether warehousing is enabled for your account. Deprecated.
+        enabledServices:
+          type: object
+          readOnly: true
+          description: 'byrd applications the user can access, as an object of booleans: `customers` (the customer dashboard), `partners` (the warehouse dashboard) and `warehousing` (deprecated).'
+          additionalProperties: {}
+        directComplete:
+          type: boolean
+          readOnly: true
+          description: Whether the warehouse may use the simplified picking process for your shipments, skipping barcode scans when picking.
+        brandingEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether the warehouse adds your branding items to all your shipments.
+        localities:
+          readOnly: true
+          description: Warehouses your account is linked to.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/UserLocality'
+        notificationConfig:
+          type:
+          - object
+          - 'null'
+          properties:
+            active:
+              type: boolean
+              description: Whether the daily report email is sent to you.
+            lastSent:
+              type: string
+              format: date
+              readOnly: true
+              description: Date the daily report was last sent (ISO 8601); `null` when it was never sent.
+            sendHour:
+              type:
+              - integer
+              - 'null'
+              minimum: 5
+              maximum: 21
+              description: Hour of the day, in `timezone`, at which the daily report is sent. Leave unset to keep the default of 09:00 Europe/Vienna.
+            timezone:
+              type:
+              - string
+              - 'null'
+              description: IANA timezone name `sendHour` is read in, e.g. `Europe/Vienna`.
+          description: Settings of the daily report email; `null` when never configured.
+        inventoryInsurance:
+          type: boolean
+          readOnly: true
+          description: Whether you have booked inventory insurance with byrd.
+        euleEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether you may use the byrdAI MCP server, for example in Claude or ChatGPT.
+        returnsPortalTabVisible:
+          type: boolean
+          readOnly: true
+          description: Whether the Returns tab is shown in your dashboard profile.
+        returnsPortalEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether you may configure your returns portal in the dashboard. The returns portal is an add-on; contact byrd to enable it.
+        shippingLabelName:
+          type: string
+          readOnly: true
+          description: 'Sender name printed on your shipping labels: `senderName` if set, else `companyName`, else your first and last name.'
+        invoiceAllowed:
+          type: boolean
+          readOnly: true
+          description: Whether you may pay by bank transfer against invoice instead of by credit card or SEPA direct debit.
+        credit:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/TotalPrice'
+        passwordRequiresChange:
+          type: boolean
+          readOnly: true
+          description: Whether you must change your password at the next login.
+        warehouseInstructions:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: Packing instructions the warehouse follows for all your shipments (HTML); `null` when there are none.
+        skipBarcodePick:
+          type: boolean
+          readOnly: true
+          description: Whether warehouse staff may skip scanning product barcodes when picking and packing your shipments.
+        isStaff:
+          type: boolean
+          readOnly: true
+          description: Whether the account belongs to a byrd employee.
+        unpaidBalance:
+          type: boolean
+          readOnly: true
+          description: Whether your account has an unpaid balance.
+        fulfillmentLock:
+          type: boolean
+          readOnly: true
+          description: Whether fulfillment of your shipments is stopped. While `true`, new and existing shipments are not released to the warehouse.
+        role:
+          type:
+          - string
+          - 'null'
+          enum:
+          - sales
+          - admin
+          - warehouse
+          - scoped_admin
+          - courier
+          - customer
+          - monitor
+          - operator
+          - customer_support
+          - warehouse_support
+          - service
+          - local_admin
+          - null
+          readOnly: true
+          description: Role of the user; `customer` for customer accounts.
+      required:
+      - email
+      - firstName
+      - lastName
+      - role
+      - sendTrackingEmails
+      - warehouseInstructions
+      title: User update
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        firstName:
+          type: string
+          description: First name of the account holder.
+        lastName:
+          type: string
+          description: Last name of the account holder.
+        companyName:
+          type:
+          - string
+          - 'null'
+          description: Name of your company; `null` when not set.
+        senderName:
+          type:
+          - string
+          - 'null'
+          description: Sender name printed on shipping labels instead of the company name; `null` when not set.
+        vatNumber:
+          type:
+          - string
+          - 'null'
+          description: VAT number of your company; `null` when not set.
+        eoriNumber:
+          type:
+          - string
+          - 'null'
+          description: EORI number of your company, used on export customs documents; `null` when not set.
+        phone:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9+()/ -]*$
+          description: 'Phone number of your company: digits, spaces and `+ ( ) / -` only. Required: it may be printed on shipping labels.'
+        email:
+          type: string
+          format: email
+          description: Email address you log in to the dashboard with.
+        billingEmail:
+          type:
+          - string
+          - 'null'
+          format: email
+          description: Email address invoices are sent to; `null` when not set.
+        sendTrackingEmails:
+          type: boolean
+          description: Whether byrd sends the recipients of your shipments a tracking email after the shipment is sent.
+        billingAddress:
+          description: Billing address of your company.
+          allOf:
+          - $ref: '#/components/schemas/Address'
+        codIBAN:
+          type:
+          - string
+          - 'null'
+          description: IBAN of the bank account cash-on-delivery amounts are paid out to; `null` when not set.
+        codBIC:
+          type:
+          - string
+          - 'null'
+          description: BIC of the bank account cash-on-delivery amounts are paid out to; `null` when not set.
+        userDefaults:
+          type: object
+          description: Free-form JSON object with your dashboard preferences. An update replaces the whole object.
+          additionalProperties: {}
+        language:
+          type:
+          - string
+          - 'null'
+          enum:
+          - en
+          - de
+          - pl
+          - fr
+          - it
+          - es
+          - null
+          description: 'Preferred language of the dashboard; `null` when not set.
+
+
+            - `en`: English
+
+            - `de`: German
+
+            - `pl`: Polish
+
+            - `fr`: French
+
+            - `it`: Italian
+
+            - `es`: Spanish'
+        addressValidationEnabled:
+          type: boolean
+          description: Whether byrd validates the destination address of your shipments before releasing them. Pickup shipments are never validated.
+        economyFallbackEnabled:
+          type: boolean
+          description: Whether an `economy` shipment is sent with `standard` shipping when no economy service is available for it. Does not apply to B2B shipments.
+        defaultShipmentService:
+          type: string
+          enum:
+          - economy
+          - standard
+          - express
+          description: 'Shipping service applied to shipments you create without naming one. B2B and pallet shipments always start with `standard`. Defaults to `standard`.
+
+
+            - `economy`: cheapest, slower delivery
+
+            - `standard`: regular delivery
+
+            - `express`: faster delivery, picked with higher priority'
+        partialFulfillmentEnabled:
+          type: boolean
+          description: Whether byrd tries to split a shipment when one or more of its SKUs are out of stock.
+        b2bPalletEnabled:
+          type: boolean
+          description: Whether you can create B2B shipments sent on pallets.
+        fallbackPhoneEnabled:
+          type: boolean
+          description: Whether your phone number is used on shipping labels when the recipient has no phone number. Defaults to `true`.
+        blockedShipmentRetryEnabled:
+          type: boolean
+          description: Whether shipments that could not be released for lack of stock are released again automatically, oldest first, once the stock is replenished. Defaults to `false`.
+        ioss:
+          type:
+          - string
+          - 'null'
+          description: Import One-Stop Shop (IOSS) number used for customs declarations; `null` when not set. Set it to `null` to stop it being sent.
+        ukims:
+          type:
+          - string
+          - 'null'
+          description: UK Internal Market Scheme (UKIMS) number used for customs declarations; `null` when not set. Set it to `null` to stop it being sent.
+        countryCode:
+          type: string
+          readOnly: true
+          description: Country your account is registered in, as a two-letter code (ISO 3166-1 alpha-2, except `EL` for Greece).
+        fulfillmentProviderKey:
+          type: string
+          readOnly: true
+          description: Key of the fulfillment provider your account belongs to.
+        referralPromotionCode:
+          type: string
+          readOnly: true
+        warehousingEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether warehousing is enabled for your account. Deprecated.
+        enabledServices:
+          type: object
+          readOnly: true
+          description: 'byrd applications the user can access, as an object of booleans: `customers` (the customer dashboard), `partners` (the warehouse dashboard) and `warehousing` (deprecated).'
+          additionalProperties: {}
+        directComplete:
+          type: boolean
+          readOnly: true
+          description: Whether the warehouse may use the simplified picking process for your shipments, skipping barcode scans when picking.
+        brandingEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether the warehouse adds your branding items to all your shipments.
+        localities:
+          readOnly: true
+          description: Warehouses your account is linked to.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/UserLocality'
+        notificationConfig:
+          type:
+          - object
+          - 'null'
+          properties:
+            active:
+              type: boolean
+              description: Whether the daily report email is sent to you.
+            lastSent:
+              type: string
+              format: date
+              readOnly: true
+              description: Date the daily report was last sent (ISO 8601); `null` when it was never sent.
+            sendHour:
+              type:
+              - integer
+              - 'null'
+              minimum: 5
+              maximum: 21
+              description: Hour of the day, in `timezone`, at which the daily report is sent. Leave unset to keep the default of 09:00 Europe/Vienna.
+            timezone:
+              type:
+              - string
+              - 'null'
+              description: IANA timezone name `sendHour` is read in, e.g. `Europe/Vienna`.
+          description: Settings of the daily report email; `null` when never configured.
+        inventoryInsurance:
+          type: boolean
+          readOnly: true
+          description: Whether you have booked inventory insurance with byrd.
+        euleEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether you may use the byrdAI MCP server, for example in Claude or ChatGPT.
+        returnsPortalTabVisible:
+          type: boolean
+          readOnly: true
+          description: Whether the Returns tab is shown in your dashboard profile.
+        returnsPortalEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether you may configure your returns portal in the dashboard. The returns portal is an add-on; contact byrd to enable it.
+        shippingLabelName:
+          type: string
+          readOnly: true
+          description: 'Sender name printed on your shipping labels: `senderName` if set, else `companyName`, else your first and last name.'
+        invoiceAllowed:
+          type: boolean
+          readOnly: true
+          description: Whether you may pay by bank transfer against invoice instead of by credit card or SEPA direct debit.
+        credit:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/TotalPrice'
+        passwordRequiresChange:
+          type: boolean
+          readOnly: true
+          description: Whether you must change your password at the next login.
+        warehouseInstructions:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: Packing instructions the warehouse follows for all your shipments (HTML); `null` when there are none.
+        skipBarcodePick:
+          type: boolean
+          readOnly: true
+          description: Whether warehouse staff may skip scanning product barcodes when picking and packing your shipments.
+        isStaff:
+          type: boolean
+          readOnly: true
+          description: Whether the account belongs to a byrd employee.
+        unpaidBalance:
+          type: boolean
+          readOnly: true
+          description: Whether your account has an unpaid balance.
+        fulfillmentLock:
+          type: boolean
+          readOnly: true
+          description: Whether fulfillment of your shipments is stopped. While `true`, new and existing shipments are not released to the warehouse.
+        role:
+          type:
+          - string
+          - 'null'
+          enum:
+          - sales
+          - admin
+          - warehouse
+          - scoped_admin
+          - courier
+          - customer
+          - monitor
+          - operator
+          - customer_support
+          - warehouse_support
+          - service
+          - local_admin
+          - null
+          readOnly: true
+          description: Role of the user; `customer` for customer accounts.
+      required:
+      - email
+      - firstName
+      - lastName
+      - role
+      - sendTrackingEmails
+      - warehouseInstructions
+      title: User
+  responses:
+    Error:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Generic error response
+  securitySchemes:
+    tokenAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authorization with previously obtained JSON Web Token
+x-provenance:
+  method: searched
+  source: https://developers.getbyrd.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developers.getbyrd.com/reference/authapiv2_get.md
+  - https://developers.getbyrd.com/reference/b2bconfigapi_get.md
+  - https://developers.getbyrd.com/reference/b2bconfigtemplateapi_get.md
+  - https://developers.getbyrd.com/reference/bundledetailsapi_delete.md
+  - https://developers.getbyrd.com/reference/bundledetailsapi_get.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_get.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_post.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_put.md
+  - https://developers.getbyrd.com/reference/dangerousgoodsunitlimitsapi_get.md
+  - https://developers.getbyrd.com/reference/deliveriesapi_get.md
+  - https://developers.getbyrd.com/reference/deliveriesapi_post.md
+  - https://developers.getbyrd.com/reference/deliveryapi_delete.md
+  - https://developers.getbyrd.com/reference/deliveryapi_get.md
+  - https://developers.getbyrd.com/reference/deliveryapi_patch.md
+  - https://developers.getbyrd.com/reference/deliveryapi_put.md
+  - https://developers.getbyrd.com/reference/deliverydocumentapi_delete.md
+  - https://developers.getbyrd.com/reference/deliverydocumentapi_patch.md
+  - https://developers.getbyrd.com/reference/deliverydocumentsapi_get.md
+  - https://developers.getbyrd.com/reference/deliverydocumentsapi_post.md
+  - https://developers.getbyrd.com/reference/deliveryitemapi_get.md
+  - https://developers.getbyrd.com/reference/deliverylistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/deliverylotsapi_get.md
+  - https://developers.getbyrd.com/reference/inventoryexportapi_get.md
+  - https://developers.getbyrd.com/reference/loginapiv2_post.md
+  - https://developers.getbyrd.com/reference/lotdetailapi_get.md
+  - https://developers.getbyrd.com/reference/lotdetailapi_patch.md
+  - https://developers.getbyrd.com/reference/lotlistapi_get.md
+  - https://developers.getbyrd.com/reference/lotlistapi_post.md
+  - https://developers.getbyrd.com/reference/picklistapiv3_get.md
+  - https://developers.getbyrd.com/reference/productapi_delete.md
+  - https://developers.getbyrd.com/reference/productapi_get.md
+  - https://developers.getbyrd.com/reference/productapi_patch.md
+  - https://developers.getbyrd.com/reference/productapi_put.md
+  - https://developers.getbyrd.com/reference/productsapi_get.md
+  - https://developers.getbyrd.com/reference/productsapi_post.md
+  - https://developers.getbyrd.com/reference/productserialnumbersapi_get.md
+  - https://developers.getbyrd.com/reference/productstatsapi_get.md
+  - https://developers.getbyrd.com/reference/productstockbywarehouseapi_get.md
+  - https://developers.getbyrd.com/reference/refreshtokenapi_post.md
+  - https://developers.getbyrd.com/reference/returnsexportapi_get.md
+  - https://developers.getbyrd.com/reference/returnshipmentannouncedapiv3_post.md
+  - https://developers.getbyrd.com/reference/returnshipmentdetailapi_get.md
+  - https://developers.getbyrd.com/reference/returnshipmentdocumentsapiv3_post.md
+  - https://developers.getbyrd.com/reference/returnshipmentlistapi_get.md
+  - https://developers.getbyrd.com/reference/schedulepickupapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentaddressvalidationapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_delete.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_patch.md
+  - https://developers.getbyrd.com/reference/shipmentbatchrecallapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentbatchreleaseapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentfileapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentexportapi_get.md
+  - https://developers.getbyrd.com/reference/shipmentlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentlistapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentlistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentpicklistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentrecallapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentreportapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentreservationlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentunitapiv3_get.md
+  - https://developers.getbyrd.com/reference/unitlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/unitlistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/userapiv2_patch.md
+  - https://developers.getbyrd.com/reference/userwarehouselinksapi_get.md
+  - https://developers.getbyrd.com/reference/warehouseapi_get.md
+  - https://developers.getbyrd.com/reference/warehousesapi_get.md
+  merge:
+    pages: 69
+    deduped: 601
+    conflicts_kept_first: 0

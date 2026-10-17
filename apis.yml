@@ -150,16 +150,18 @@ common:
   url: skills/_index.yml
 
 apis:
-- name: byrd Fulfillment API
-  description: REST API to create and manage products, deliveries (inbound stock), shipments (outbound orders), and returns across byrd's European
-    fulfillment network. JWT bearer auth; JSON over HTTPS (TLS 1.2+); resources versioned in the URL path (v2 auth/user, v3 shipments; documented
-    API version 3.1).
+- aid: byrd:byrd-account-api
+  name: Byrd Account API
+  description: >-
+    The warehouses and B2B templates available to your account, and CSV exports of your shipments, returns
+    and inventory.
   humanURL: https://developers.getbyrd.com
   baseURL: https://api.getbyrd.com
-  version: '3.1'
+  tags:
+  - Account
   properties:
-  - url: openapi/byrd-apis-openapi.yml
-    type: OpenAPI
+  - type: OpenAPI
+    url: openapi/byrd-account-api-openapi.yml
   - type: Authentication
     url: authentication/byrd-authentication.yml
   - type: Conventions
@@ -176,9 +178,6 @@ apis:
     url: conformance/byrd-conformance.yml
   - type: X-MCPServerCandidate
     url: mcp/byrd-mcp.yml
-    note: 'Renamed from MCPServer 2026-09-03 (roadmap#247): the manifest self-describes as status: candidate — a tool list derived from the published
-      API contracts, not an existing server. The scorer already read the manifest and reported mcp_server correctly; the MCPServer type was crediting
-      the artifact-type surfaces with a server that does not exist.'
   - type: JSONSchema
     url: json-schema/byrd-product-schema.json
   - type: JSONSchema
@@ -191,8 +190,164 @@ apis:
     url: json-schema/byrd-shipment-schema.json
   - type: JSONSchema
     url: json-schema/byrd-delivery-schema.json
-  aid: byrd:byrd-fulfillment-api
-
+- aid: byrd:byrd-authentication-api
+  name: Byrd Authentication API
+  description: >-
+    Log in with your API key to get an access token, refresh it, and read or update your account.
+  humanURL: https://developers.getbyrd.com
+  baseURL: https://api.getbyrd.com
+  tags:
+  - Authentication
+  properties:
+  - type: OpenAPI
+    url: openapi/byrd-authentication-api-openapi.yml
+  - type: Authentication
+    url: authentication/byrd-authentication.yml
+  - type: Conventions
+    url: conventions/byrd-conventions.yml
+  - type: ErrorCatalog
+    url: errors/byrd-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/byrd-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/byrd-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/byrd-changelog.yml
+  - type: Conformance
+    url: conformance/byrd-conformance.yml
+  - type: X-MCPServerCandidate
+    url: mcp/byrd-mcp.yml
+  - type: JSONSchema
+    url: json-schema/byrd-product-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-with-metrics-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-request-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-shipment-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-schema.json
+- aid: byrd:byrd-catalog-api
+  name: Byrd Catalog API
+  description: >-
+    Products and bundles, their lots, serial numbers and stock, and the dangerous goods limits that apply
+    to them.
+  humanURL: https://developers.getbyrd.com
+  baseURL: https://api.getbyrd.com
+  tags:
+  - Catalog
+  properties:
+  - type: OpenAPI
+    url: openapi/byrd-catalog-api-openapi.yml
+  - type: Authentication
+    url: authentication/byrd-authentication.yml
+  - type: Conventions
+    url: conventions/byrd-conventions.yml
+  - type: ErrorCatalog
+    url: errors/byrd-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/byrd-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/byrd-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/byrd-changelog.yml
+  - type: Conformance
+    url: conformance/byrd-conformance.yml
+  - type: X-MCPServerCandidate
+    url: mcp/byrd-mcp.yml
+  - type: JSONSchema
+    url: json-schema/byrd-product-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-with-metrics-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-request-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-shipment-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-schema.json
+- aid: byrd:byrd-inbound-api
+  name: Byrd Inbound API
+  description: >-
+    Deliveries of your stock to a warehouse: announce them, follow them in, and manage their documents.
+  humanURL: https://developers.getbyrd.com
+  baseURL: https://api.getbyrd.com
+  tags:
+  - Inbound
+  properties:
+  - type: OpenAPI
+    url: openapi/byrd-inbound-api-openapi.yml
+  - type: Authentication
+    url: authentication/byrd-authentication.yml
+  - type: Conventions
+    url: conventions/byrd-conventions.yml
+  - type: ErrorCatalog
+    url: errors/byrd-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/byrd-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/byrd-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/byrd-changelog.yml
+  - type: Conformance
+    url: conformance/byrd-conformance.yml
+  - type: X-MCPServerCandidate
+    url: mcp/byrd-mcp.yml
+  - type: JSONSchema
+    url: json-schema/byrd-product-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-with-metrics-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-request-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-shipment-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-schema.json
+- aid: byrd:byrd-shipments-api
+  name: Byrd Shipments API
+  description: >-
+    Orders shipped to your customers: create and release them, follow their units and picks, and handle
+    their returns.
+  humanURL: https://developers.getbyrd.com
+  baseURL: https://api.getbyrd.com
+  tags:
+  - Shipments
+  properties:
+  - type: OpenAPI
+    url: openapi/byrd-shipments-api-openapi.yml
+  - type: Authentication
+    url: authentication/byrd-authentication.yml
+  - type: Conventions
+    url: conventions/byrd-conventions.yml
+  - type: ErrorCatalog
+    url: errors/byrd-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/byrd-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/byrd-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/byrd-changelog.yml
+  - type: Conformance
+    url: conformance/byrd-conformance.yml
+  - type: X-MCPServerCandidate
+    url: mcp/byrd-mcp.yml
+  - type: JSONSchema
+    url: json-schema/byrd-product-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-with-metrics-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-request-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-create-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-shipment-schema.json
+  - type: JSONSchema
+    url: json-schema/byrd-delivery-schema.json
 x-enrichment:
   date: '2026-07-19'
   status: backfilled

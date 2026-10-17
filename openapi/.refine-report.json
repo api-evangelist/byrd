@@ -1,0 +1,24 @@
+{
+  "provider": "byrd",
+  "sources": [
+    "byrd-apis-openapi.yml"
+  ],
+  "outputs": [
+    "byrd-account-api-openapi.yml",
+    "byrd-authentication-api-openapi.yml",
+    "byrd-catalog-api-openapi.yml",
+    "byrd-inbound-api-openapi.yml",
+    "byrd-shipments-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/byrd-apis-openapi.yml"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (0 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "byrd-apis-openapi.yml: upgraded openapi 3.0.0 -> OpenAPI 3.2.0",
+    "apis.yml register: written (+5 apis, 5 total)"
+  ],
+  "skipped": []
+}

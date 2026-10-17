@@ -1,0 +1,3935 @@
+openapi: 3.2.0
+info:
+  description: The byrd APIs for managing products, inbound deliveries, shipments and returns.
+  contact:
+    email: info@getbyrd.com
+    name: General company contact
+    url: https://getbyrd.com/kontakt/
+  license:
+    name: Copyright byrd technologies GmbH
+  termsOfService: https://getbyrd.com/agb/
+  version: '20260924'
+  title: byrd Inbound API
+servers:
+- description: Production server
+  url: https://api.getbyrd.com/
+security:
+- tokenAuth: []
+tags:
+- name: Inbound
+  description: 'Deliveries of your stock to a warehouse: announce them, follow them in, and manage their documents.'
+paths:
+  /v2/warehouse/deliveries:
+    get:
+      operationId: deliveriesapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                allOf:
+                - type: object
+                  required:
+                  - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/DeliveryWithMetrics'
+                - $ref: '#/components/schemas/PaginationFields'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Returns your deliveries, the inbound shipments of stock you send to a
+
+        warehouse, with their items, containers and metrics. Filter them with
+
+        the query parameters and use `only` to return fewer fields. See
+
+        Listing deliveries.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: include_deleted
+        description: Whether to include cancelled deliveries. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: include_items
+        description: Whether to include `deliveryItems` in each delivery. Defaults to `true`; set it to `false` for faster responses when deliveries have many items.
+        schema:
+          type: boolean
+          default: true
+        required: false
+      - in: query
+        name: include_containers
+        description: Whether to include `deliveryContainers` in each delivery. Defaults to `true`.
+        schema:
+          type: boolean
+          default: true
+        required: false
+      - in: query
+        name: product_ids
+        description: Only deliveries that contain at least one of these products (UUIDs).
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: warehouse_ids
+        description: Only deliveries to these warehouses (UUIDs).
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: status
+        description: Only deliveries in one of these statuses (see `status`).
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - announced
+            - atWarehouse
+            - inProcessing
+            - completed
+            - deleted
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: user_id
+        description: Only deliveries of this user (UUID). Cannot be combined with `user_ids`. You only ever see your own deliveries.
+        schema:
+          type: string
+          format: uuid
+        required: false
+      - in: query
+        name: user_ids
+        description: Only deliveries of these users (UUIDs). Cannot be combined with `user_id`. You only ever see your own deliveries.
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: type
+        description: 'Only deliveries of this type.
+
+
+          - `container`: deliveries arriving in a shipping container
+
+          - `regular`: all other deliveries'
+        schema:
+          type: string
+          enum:
+          - container
+          - regular
+        required: false
+      - in: query
+        name: sku
+        description: Only deliveries that contain the product with this SKU.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: barcode
+        description: Only deliveries that contain a product with this barcode, either its main barcode or one of its additional barcodes.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: first_inbound_only
+        description: Whether to return only the first delivery inbounded into each warehouse, per customer. Deliveries that were never inbounded are left out; deliveries inbounded at the same earliest time are all returned. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: colli_discrepancy
+        description: Whether to return only deliveries where the number of boxes and pallets counted on arrival differs from the number of containers announced. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: sort_by
+        description: 'Field to sort the deliveries by: `createdAt`, `updatedAt`, `expectedDeliveryDateFrom`, `atWarehouseDateTime`, `inProcessingDateTime`, `inboundedDateTime`, `inboundingDeadline` or `aggregatedContainerStatus`.'
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: sort_order
+        description: 'Sort direction.
+
+
+          - `asc`: ascending
+
+          - `desc`: descending'
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+        required: false
+      - in: query
+        name: aggregated_container_status
+        description: Only deliveries with this tracking status (see `aggregatedContainerStatus`). `pick_up` also matches deliveries that are not tracked.
+        schema:
+          type:
+          - string
+          - 'null'
+          enum:
+          - partially_delivered
+          - pick_up
+          - in_transit
+          - out_for_delivery
+          - delivered
+          - delayed
+          - failed_delivery
+          - null
+        required: false
+      - in: query
+        name: date_field
+        description: 'Date field that `date_from` and `date_to` filter on. Defaults to `created_at`.
+
+
+          - `created_at`: when the delivery was announced
+
+          - `at_warehouse_at`: when the warehouse accepted it
+
+          - `inbounded_at`: when it was completed
+
+          - `status_updated_at`: when its status last changed'
+        schema:
+          type: string
+          default: created_at
+          enum:
+          - created_at
+          - at_warehouse_at
+          - inbounded_at
+          - status_updated_at
+        required: false
+      - in: query
+        name: date_from
+        description: Only deliveries whose `date_field` is at or after this time (ISO 8601, UTC). Must be before `date_to`.
+        schema:
+          type: string
+          format: date-time
+        required: false
+      - in: query
+        name: date_to
+        description: Only deliveries whose `date_field` is before this time (ISO 8601, UTC).
+        schema:
+          type: string
+          format: date-time
+        required: false
+      - in: query
+        name: only
+        description: Fields to return, as comma-separated dotted paths, for example `id,status,deliveryItems.product.sku`. All fields are returned when omitted.
+        schema:
+          type: array
+          items:
+            type: string
+        required: false
+        explode: false
+        style: form
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Query'
+      - $ref: '#/components/parameters/Fields'
+      summary: List deliveries
+    post:
+      operationId: deliveriesapi_post
+      responses:
+        '201':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DeliveryCreate'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Tells the warehouse what stock to expect, so the goods can be received
+
+        against the delivery on arrival. Send the products in `deliveryItems`
+
+        and the parcels or pallets in `deliveryContainers`; the delivery
+
+        starts as `announced`. Print the delivery note and attach it to every
+
+        parcel or pallet. See
+
+        Announcing a delivery.'
+      requestBody:
+        content:
+          application/vnd.byrd.customer+json:
+            schema:
+              $ref: '#/components/schemas/DeliveryCreateRequest'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      summary: Announce a delivery
+  /v2/warehouse/deliveries/{delivery_id}:
+    get:
+      operationId: deliveryapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DeliveryWithMetrics'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Returns one of your deliveries with its items, containers and
+
+        metrics. Use `only` to return fewer fields. See
+
+        Getting a delivery.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: only
+        description: Fields to return, as comma-separated dotted paths, for example `id,status,deliveryItems.product.sku`. All fields are returned when omitted.
+        schema:
+          type: array
+          items:
+            type: string
+        required: false
+        explode: false
+        style: form
+      - name: delivery_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the delivery (UUID).
+      summary: Get a delivery
+    put:
+      operationId: deliveryapi_put
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Delivery'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Replaces the delivery, including all its items and containers, with
+
+        the data you send. Only possible while the delivery is `announced`.'
+      requestBody:
+        content:
+          application/vnd.byrd.customer+json:
+            schema:
+              $ref: '#/components/schemas/DeliveryReplaceRequest'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: delivery_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the delivery (UUID).
+      summary: Replace a delivery
+    patch:
+      operationId: deliveryapi_patch
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Delivery'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Changes only the fields you send and returns them. As a customer,
+
+        you can change a delivery only while it is `announced`, except for
+
+        its customs declaration: `customsMRN`, `isInternational`,
+
+        `senderName` and `senderAddress`. The customs MRN can only be set
+
+        while the delivery is `announced` or `atWarehouse`, and an
+
+        international delivery cannot be made domestic once it has arrived.
+
+        To change the items or containers, replace the delivery with a full
+
+        update.'
+      requestBody:
+        content:
+          application/vnd.byrd.customer+json:
+            schema:
+              $ref: '#/components/schemas/DeliveryBase'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: delivery_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the delivery (UUID).
+      summary: Update a delivery
+    delete:
+      operationId: deliveryapi_delete
+      responses:
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Undefined'
+      tags:
+      - Inbound
+      description: 'Only a delivery still in `announced` can be cancelled; once the
+
+        warehouse has accepted it, it can no longer be withdrawn. A cancelled
+
+        delivery moves to `deleted`.'
+      x-byrd-roles:
+      - admin
+      - service
+      - customer
+      parameters:
+      - name: delivery_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the delivery (UUID).
+      summary: Cancel a delivery
+  /v2/warehouse/deliveries/{delivery_id}/lots:
+    get:
+      operationId: deliverylotsapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DeliveryReceivedLot'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Returns one entry per lot received with the delivery and the amount
+
+        received of it, ordered by SKU and lot number. Only products with
+
+        lots enabled appear, and the list is empty until the delivery has
+
+        been inbounded. See
+
+        Listing the lots of a delivery.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: delivery_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the delivery (UUID).
+      summary: List the lots received in a delivery
+  /v2/warehouse/delivery-documents:
+    get:
+      operationId: deliverydocumentsapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  required:
+                  - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/DeliveryDocument'
+                - $ref: '#/components/schemas/PaginationFields'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Returns the documents attached to your deliveries, newest first by
+
+        default. Pass `deliveryID` to list the documents of one delivery.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: deliveryID
+        description: ID of the delivery to list the documents of (UUID); documents of all your deliveries are listed when omitted.
+        schema:
+          type:
+          - string
+          - 'null'
+          default: null
+        required: false
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/SortBy'
+      - $ref: '#/components/parameters/SortOrder'
+      summary: List delivery documents
+    post:
+      operationId: deliverydocumentsapi_post
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DeliveryDocument'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'The file has to be uploaded beforehand; the document references it
+
+        by its URL.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryDocumentInput'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      summary: Attach a document to a delivery
+  /v2/warehouse/delivery-documents/{document_id}:
+    patch:
+      operationId: deliverydocumentapi_patch
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DeliveryDocument'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Changes the name or type of the document, or moves it to another
+
+        delivery you may access (for a customer, one of their own). Its file
+
+        and URL cannot be changed, and customers cannot change its uploader.
+
+        Read-only documents cannot be updated.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryDocumentUpdate'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the delivery document (UUID).
+      summary: Update a delivery document
+    delete:
+      operationId: deliverydocumentapi_delete
+      responses:
+        '204':
+          $ref: '#/components/responses/Empty'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Detaches the document from its delivery. Read-only documents cannot
+
+        be deleted.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the delivery document (UUID).
+      summary: Delete a delivery document
+  /v2/warehouse/delivery-items/{item_id}:
+    get:
+      operationId: deliveryitemapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DeliveryItem'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Returns one item of your deliveries, with the announced, arrived and
+
+        received amounts of its product.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: item_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the delivery item (UUID).
+      summary: Get a delivery item
+  /v3/deliveries/count:
+    get:
+      operationId: deliverylistcountapiv3_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DeliveryCount'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Inbound
+      description: 'Returns the number of your deliveries that match the filters, which
+
+        are the same as for listing deliveries.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: include_deleted
+        description: Whether to include cancelled deliveries. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: include_items
+        description: Whether to include `deliveryItems` in each delivery. Defaults to `true`; set it to `false` for faster responses when deliveries have many items.
+        schema:
+          type: boolean
+          default: true
+        required: false
+      - in: query
+        name: include_containers
+        description: Whether to include `deliveryContainers` in each delivery. Defaults to `true`.
+        schema:
+          type: boolean
+          default: true
+        required: false
+      - in: query
+        name: product_ids
+        description: Only deliveries that contain at least one of these products (UUIDs).
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: warehouse_ids
+        description: Only deliveries to these warehouses (UUIDs).
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: status
+        description: Only deliveries in one of these statuses (see `status`).
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - announced
+            - atWarehouse
+            - inProcessing
+            - completed
+            - deleted
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: user_id
+        description: Only deliveries of this user (UUID). Cannot be combined with `user_ids`. You only ever see your own deliveries.
+        schema:
+          type: string
+          format: uuid
+        required: false
+      - in: query
+        name: user_ids
+        description: Only deliveries of these users (UUIDs). Cannot be combined with `user_id`. You only ever see your own deliveries.
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: type
+        description: 'Only deliveries of this type.
+
+
+          - `container`: deliveries arriving in a shipping container
+
+          - `regular`: all other deliveries'
+        schema:
+          type: string
+          enum:
+          - container
+          - regular
+        required: false
+      - in: query
+        name: sku
+        description: Only deliveries that contain the product with this SKU.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: barcode
+        description: Only deliveries that contain a product with this barcode, either its main barcode or one of its additional barcodes.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: first_inbound_only
+        description: Whether to return only the first delivery inbounded into each warehouse, per customer. Deliveries that were never inbounded are left out; deliveries inbounded at the same earliest time are all returned. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: colli_discrepancy
+        description: Whether to return only deliveries where the number of boxes and pallets counted on arrival differs from the number of containers announced. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: sort_by
+        description: 'Field to sort the deliveries by: `createdAt`, `updatedAt`, `expectedDeliveryDateFrom`, `atWarehouseDateTime`, `inProcessingDateTime`, `inboundedDateTime`, `inboundingDeadline` or `aggregatedContainerStatus`.'
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: sort_order
+        description: 'Sort direction.
+
+
+          - `asc`: ascending
+
+          - `desc`: descending'
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+        required: false
+      - in: query
+        name: aggregated_container_status
+        description: Only deliveries with this tracking status (see `aggregatedContainerStatus`). `pick_up` also matches deliveries that are not tracked.
+        schema:
+          type:
+          - string
+          - 'null'
+          enum:
+          - partially_delivered
+          - pick_up
+          - in_transit
+          - out_for_delivery
+          - delivered
+          - delayed
+          - failed_delivery
+          - null
+        required: false
+      - in: query
+        name: date_field
+        description: 'Date field that `date_from` and `date_to` filter on. Defaults to `created_at`.
+
+
+          - `created_at`: when the delivery was announced
+
+          - `at_warehouse_at`: when the warehouse accepted it
+
+          - `inbounded_at`: when it was completed
+
+          - `status_updated_at`: when its status last changed'
+        schema:
+          type: string
+          default: created_at
+          enum:
+          - created_at
+          - at_warehouse_at
+          - inbounded_at
+          - status_updated_at
+        required: false
+      - in: query
+        name: date_from
+        description: Only deliveries whose `date_field` is at or after this time (ISO 8601, UTC). Must be before `date_to`.
+        schema:
+          type: string
+          format: date-time
+        required: false
+      - in: query
+        name: date_to
+        description: Only deliveries whose `date_field` is before this time (ISO 8601, UTC).
+        schema:
+          type: string
+          format: date-time
+        required: false
+      - in: query
+        name: only
+        description: Fields to return, as comma-separated dotted paths, for example `id,status,deliveryItems.product.sku`. All fields are returned when omitted.
+        schema:
+          type: array
+          items:
+            type: string
+        required: false
+        explode: false
+        style: form
+      - $ref: '#/components/parameters/Query'
+      - $ref: '#/components/parameters/Fields'
+      summary: Count deliveries
+components:
+  schemas:
+    DeliveryCreateRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        customsMRN:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9]{2}GB[A-Z0-9]{14}\Z
+          description: 'UK customs Movement Reference Number (MRN) of the goods: 18 characters, two digits for the year, `GB`, then 14 uppercase letters or digits. Only allowed for deliveries to a warehouse in the United Kingdom; you can set it while the delivery is `announced` or `atWarehouse`, including with a partial update after arrival. `null` when not provided.'
+          example: 25GB1234567890ABCD
+        description:
+          type:
+          - string
+          - 'null'
+          description: Free-text summary of the contents of the delivery; `null` when not provided.
+        expectedDeliveryDateFrom:
+          type: string
+          format: date-time
+          description: Start of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must equal `expectedDeliveryDateTo`. Customers can only change it while the delivery is `announced`.
+        expectedDeliveryDateTo:
+          type: string
+          format: date-time
+          description: End of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must be a business day at least 10 business days from now. Customers can only change it while the delivery is `announced`.
+        expressInbounding:
+          type: boolean
+          description: Whether express inbounding is requested. Always send `false`.
+        isInternational:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods cross a border into the warehouse's country. Only for deliveries to a warehouse in the United Kingdom, where it is required when announcing or fully updating the delivery. When `true`, `senderName` and `senderAddress` are required and the warehouse cannot inbound the delivery until `customsMRN` is provided. Customers can still declare it `true` with a partial update after the delivery has left `announced`, but not change it back once the goods have arrived. `null` when it does not apply.
+        referenceNumber:
+          type:
+          - string
+          - 'null'
+          description: Your own reference for the delivery, such as a purchase order number; `null` when not provided.
+        requiresCounting:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse counts every item on arrival; charges may apply. When `false`, stock is booked as announced and byrd is not liable for discrepancies. Defaults to `true`; cannot be `true` together with `requiresSampling`. Customers can only change it while the delivery is `announced`.
+        requiresSampling:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse checks a representative sample of the goods on arrival instead of counting every item. Defaults to `false`; cannot be `true` together with `requiresCounting`. Customers can only change it while the delivery is `announced`.
+        senderAddress:
+          type:
+          - string
+          - 'null'
+          description: Address the delivery is sent from; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        senderName:
+          type:
+          - string
+          - 'null'
+          description: Name of the sender of the delivery; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        stocktaking:
+          type: boolean
+          description: Always send `true`.
+        unmixedDelivery:
+          type:
+          - boolean
+          - 'null'
+        containerSizeAnnounced:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          description: 'Size of the shipping container, as you announced it. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedAnnounced:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods in the shipping container are on pallets, as you announced it. Only for `container` deliveries; `null` otherwise.
+        deletedDate:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was cancelled (ISO 8601, UTC); `null` when it was not.
+        identifier:
+          type: string
+          readOnly: true
+          description: Short human-readable identifier of the delivery, shown in the dashboard and printed as a barcode on the delivery note.
+          example: TST-8VO4
+        statusUpdatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the status of the delivery last changed (ISO 8601, UTC).
+        inboundedDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was completed and its stock became available (ISO 8601, UTC); `null` until then.
+        inProcessingDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse started processing the delivery, moving it to `inProcessing` (ISO 8601, UTC); `null` until then.
+        atWarehouseDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse accepted the delivery, moving it to `atWarehouse` (ISO 8601, UTC); `null` until then.
+        aggregatedContainerStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Tracking status of the delivery as a whole, combined from the tracking statuses of its containers; `null` when none of them is tracked.
+
+
+            - `pick_up`: waiting to be picked up by the carrier
+
+            - `in_transit`: on the way to the warehouse
+
+            - `out_for_delivery`: out for delivery to the warehouse
+
+            - `partially_delivered`: some containers were delivered, others not yet
+
+            - `delivered`: all containers were delivered
+
+            - `delayed`: delivery is delayed
+
+            - `failed_delivery`: the carrier failed to deliver'
+        customsMRNProvidedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the customs MRN was first provided (ISO 8601, UTC); `null` while there is none. The inbound deadline of an international delivery is not counted before this.
+        subStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Detail on the current status; `null` when there is none.
+
+
+            - `waitingOnMRN`: the delivery needs a customs MRN before the warehouse can inbound it; provide it in `customsMRN`'
+        originConfirmedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse last recorded where the goods came from (`warehouseOriginIsUK`) (ISO 8601, UTC); `null` when it has not.
+        deliveryContainers:
+          minItems: 1
+          description: Parcels or pallets the delivery arrives in, one per tracking number; at least one is required when announcing. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryContainer'
+        warehouseID:
+          type: string
+          format: uuid
+          writeOnly: true
+          description: ID of the warehouse receiving the delivery (UUID).
+        warehouse:
+          readOnly: true
+          description: 'Warehouse receiving the delivery: its ID and country code.'
+          allOf:
+          - $ref: '#/components/schemas/StorageWarehouse'
+        deliveryStandards:
+          readOnly: true
+          description: Results of the delivery standards the warehouse checked on arrival; empty until they are checked.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryStandard'
+        deviation:
+          type: boolean
+          readOnly: true
+        deliverDate:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          type: string
+          default: regular
+          enum:
+          - container
+          - regular
+          - unknown
+          description: 'Type of delivery. Defaults to `regular`.
+
+
+            - `container`: arriving in a shipping container; the expected dates must be equal, a business day, and at least 10 business days from now
+
+            - `regular`: every other delivery
+
+            - `unknown`: type not recorded'
+        acceptanceFee:
+          readOnly: true
+          description: Fee charged for accepting the delivery at the warehouse; `null` when none was charged.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        customsPaid:
+          readOnly: true
+          description: Customs charges the warehouse paid on your behalf when receiving the delivery; `null` when none were paid.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        damages:
+          type: string
+          readOnly: true
+          description: Description of the overall damage the warehouse found on the delivery; `null` when none was recorded.
+        deleted:
+          type: boolean
+          readOnly: true
+          description: Whether the delivery was cancelled.
+        deliveryCostsPaid:
+          readOnly: true
+          description: Delivery costs the warehouse paid on your behalf when receiving the delivery; `null` when none were paid.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        deliveryNotes:
+          type: string
+          readOnly: true
+          description: Other comments the warehouse recorded when accepting the delivery; `null` when there are none.
+        putawayFee:
+          readOnly: true
+          description: Fee charged for putting the stock of the delivery away into storage; `null` when none was charged.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        status:
+          type: string
+          enum:
+          - announced
+          - atWarehouse
+          - inProcessing
+          - completed
+          - deleted
+          readOnly: true
+          description: 'Current status of the delivery.
+
+
+            - `announced`: announced and not yet arrived
+
+            - `atWarehouse`: arrived and accepted by the warehouse
+
+            - `inProcessing`: being counted and put away
+
+            - `completed`: inbounded; the stock is available
+
+            - `deleted`: cancelled'
+        userID:
+          type: string
+          readOnly: true
+          description: ID of the user the delivery belongs to (UUID).
+        deliveredBoxes:
+          type: integer
+          readOnly: true
+          minimum: 0
+          description: Number of loose boxes (parcels) the warehouse counted on arrival; `null` until the delivery has been counted.
+        deliveredPallets:
+          type: integer
+          readOnly: true
+          minimum: 0
+          description: Number of full pallets the warehouse counted on arrival; `null` until the delivery has been counted.
+        containerSizeConfirmed:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          readOnly: true
+          description: 'Size of the shipping container, as confirmed by the warehouse on arrival. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedConfirmed:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the goods in the shipping container are on pallets, as confirmed by the warehouse on arrival. Only for `container` deliveries; `null` otherwise.
+        palletizationMinutes:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Time the warehouse spent putting the goods of the shipping container onto pallets, in minutes. Only for `container` deliveries; `null` otherwise.
+        meetsEUOrganicRequirements:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the delivery meets the EU organic requirements, as checked by the warehouse; `null` when it was not checked.
+        warehouseOriginIsUK:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the goods came from within the United Kingdom, as found by the warehouse on arrival. Only recorded for deliveries to a UK warehouse not declared international; `false` means an MRN is needed before inbounding. `null` when not recorded.
+        standardsCompliance:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'How far the delivery met the delivery standards checked by the warehouse on arrival.
+
+
+            - `compliant`: all standards were met
+
+            - `partially_compliant`: some standards were met
+
+            - `non_compliant`: no standard was met
+
+            - `compliance_not_checked`: the standards were not checked yet'
+        sortedBoxesCount:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Number of boxes the warehouse had to sort while processing the delivery; `null` until recorded.
+        sortedItemsCount:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Number of items the warehouse had to sort while processing the delivery; `null` until recorded.
+        deliveryItems:
+          minItems: 1
+          description: Products in the delivery and their announced amounts; at least one is required when announcing, and each product may appear only once. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryItem'
+        inboundingDeadline:
+          description: Date by which the warehouse is due to inbound the delivery, and how that date was set. Calculated by byrd; ignored when sent.
+          allOf:
+          - $ref: '#/components/schemas/InboundingDeadline'
+        documents:
+          description: Documents to attach to the delivery when announcing it, such as invoices or packing lists. Upload the files first.
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentCreate'
+      required:
+      - deliveryContainers
+      - deliveryItems
+      - expectedDeliveryDateFrom
+      - expectedDeliveryDateTo
+      - expressInbounding
+      - stocktaking
+      - warehouseID
+      title: Delivery create request
+    InboundingDeadline:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date by which the warehouse is due to inbound the delivery (ISO 8601 date); `null` when there is no deadline yet.
+        type:
+          type: string
+          description: 'How the deadline was set.
+
+
+            - `not-applicable`: there is no deadline yet
+
+            - `sla`: calculated from the warehouse''s inbound service level, counted from the arrival of the delivery
+
+            - `special-arrangement`: a date specially agreed with byrd'
+      required:
+      - date
+      title: Inbounding deadline
+    PaginationFields:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: Current page of results, 0-indexed
+        per_page:
+          type: integer
+          description: Number of results per page
+        page_count:
+          type: integer
+          description: Number of result pages
+        total_count:
+          type: integer
+          description: Total number of results across all pages
+      title: Pagination fields
+    DeliveryReceivedLot:
+      type: object
+      properties:
+        productID:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the product the lot belongs to (UUID).
+        sku:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: Your SKU of the product; `null` when the product has none.
+        lotID:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the lot (UUID).
+        lotNumber:
+          type: string
+          readOnly: true
+          description: Lot (batch) number.
+        expiryDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          readOnly: true
+          description: Date the lot expires on (ISO 8601 date); `null` when the lot has no expiry date.
+        amountReceived:
+          type: integer
+          readOnly: true
+          description: Number of units of the lot received with this delivery. When the lot was put away several times, the amounts are added up.
+      title: Delivery received lot
+    DeliveryDocument:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        deliveryID:
+          type: string
+          description: 'ID of the delivery the document is attached to (UUID). It must be a delivery that has not been deleted and that you may access: for a customer, one of their own deliveries. Any other ID fails with 404, as for a delivery that does not exist. Change it to move the document to another delivery.'
+        name:
+          type: string
+          description: File name of the document. Characters other than letters, digits, `-`, `_`, `(`, `)` and `.` are removed.
+        documentType:
+          type: string
+          enum:
+          - invoice
+          - delivery_note
+          - signed_delivery_note
+          - order
+          - packing_list
+          - customs
+          - other
+          description: 'Kind of document. Signed delivery notes are added by the warehouse and are read-only for you.
+
+
+            - `invoice`: invoice
+
+            - `delivery_note`: delivery note
+
+            - `signed_delivery_note`: delivery note signed on arrival
+
+            - `order`: purchase order
+
+            - `packing_list`: packing list
+
+            - `customs`: customs document
+
+            - `other`: any other document'
+        fileType:
+          type: string
+          enum:
+          - jpg
+          - jpeg
+          - png
+          - pdf
+          - csv
+          - txt
+          description: 'Format of the file. Cannot be changed after the document is created.
+
+
+            - `pdf`
+
+            - `jpg`
+
+            - `jpeg`
+
+            - `png`
+
+            - `csv`
+
+            - `txt`'
+        url:
+          type: string
+          description: HTTPS URL of the uploaded file. It must point to byrd's file storage and have no query parameters. Cannot be changed after the document is created.
+        readOnly:
+          type: boolean
+          readOnly: true
+          description: Whether the document is read-only for you, so you cannot update or delete it.
+        userID:
+          type: string
+          description: 'ID of the user who uploaded the document (UUID). For customers, documents are always recorded as uploaded by them and the uploader cannot be changed: any value they send is ignored.'
+      required:
+      - deliveryID
+      - documentType
+      - fileType
+      - name
+      - url
+      - userID
+      title: Delivery document
+    UndefinedResponse:
+      type: object
+      description: Generic (expected) response when endpoint doesn't explicitly define one
+      properties:
+        data:
+          type: object
+      title: Undefined response
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - Authentication.AuthenticationRequired
+          - Authentication.ExpiredJWTToken
+          - Authentication.InvalidCredentials
+          - Authentication.InvalidJWTToken
+          - Authentication.LocalityRequired
+          - Authentication.MissingPermission
+          - Authentication.ReadOnly
+          - Authentication.RoleNotAllowed
+          - Authentication.UserLocked
+          - Exception.404
+          - Exception.500
+          - Request.InvalidPagination
+          - Request.InvalidQuery
+          - Request.InvalidSchema
+          - Request.NoInput
+          - Request.ResourceNotFound
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            description: Embedded instance of Error
+      title: Error
+    StorageWarehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        countryCode:
+          type: string
+          readOnly: true
+          description: Country the warehouse is in (ISO 3166-1 alpha-2).
+          example: DE
+      title: Storage warehouse
+    DeliveryBase:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        customsMRN:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9]{2}GB[A-Z0-9]{14}\Z
+          description: 'UK customs Movement Reference Number (MRN) of the goods: 18 characters, two digits for the year, `GB`, then 14 uppercase letters or digits. Only allowed for deliveries to a warehouse in the United Kingdom; you can set it while the delivery is `announced` or `atWarehouse`, including with a partial update after arrival. `null` when not provided.'
+          example: 25GB1234567890ABCD
+        description:
+          type:
+          - string
+          - 'null'
+          description: Free-text summary of the contents of the delivery; `null` when not provided.
+        expectedDeliveryDateFrom:
+          type: string
+          format: date-time
+          description: Start of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must equal `expectedDeliveryDateTo`. Customers can only change it while the delivery is `announced`.
+        expectedDeliveryDateTo:
+          type: string
+          format: date-time
+          description: End of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must be a business day at least 10 business days from now. Customers can only change it while the delivery is `announced`.
+        expressInbounding:
+          type: boolean
+          description: Whether express inbounding is requested. Always send `false`.
+        isInternational:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods cross a border into the warehouse's country. Only for deliveries to a warehouse in the United Kingdom, where it is required when announcing or fully updating the delivery. When `true`, `senderName` and `senderAddress` are required and the warehouse cannot inbound the delivery until `customsMRN` is provided. Customers can still declare it `true` with a partial update after the delivery has left `announced`, but not change it back once the goods have arrived. `null` when it does not apply.
+        referenceNumber:
+          type:
+          - string
+          - 'null'
+          description: Your own reference for the delivery, such as a purchase order number; `null` when not provided.
+        requiresCounting:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse counts every item on arrival; charges may apply. When `false`, stock is booked as announced and byrd is not liable for discrepancies. Defaults to `true`; cannot be `true` together with `requiresSampling`. Customers can only change it while the delivery is `announced`.
+        requiresSampling:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse checks a representative sample of the goods on arrival instead of counting every item. Defaults to `false`; cannot be `true` together with `requiresCounting`. Customers can only change it while the delivery is `announced`.
+        senderAddress:
+          type:
+          - string
+          - 'null'
+          description: Address the delivery is sent from; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        senderName:
+          type:
+          - string
+          - 'null'
+          description: Name of the sender of the delivery; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        stocktaking:
+          type: boolean
+          description: Always send `true`.
+        unmixedDelivery:
+          type:
+          - boolean
+          - 'null'
+        containerSizeAnnounced:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          description: 'Size of the shipping container, as you announced it. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedAnnounced:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods in the shipping container are on pallets, as you announced it. Only for `container` deliveries; `null` otherwise.
+        deletedDate:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was cancelled (ISO 8601, UTC); `null` when it was not.
+        identifier:
+          type: string
+          readOnly: true
+          description: Short human-readable identifier of the delivery, shown in the dashboard and printed as a barcode on the delivery note.
+          example: TST-8VO4
+        statusUpdatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the status of the delivery last changed (ISO 8601, UTC).
+        inboundedDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was completed and its stock became available (ISO 8601, UTC); `null` until then.
+        inProcessingDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse started processing the delivery, moving it to `inProcessing` (ISO 8601, UTC); `null` until then.
+        atWarehouseDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse accepted the delivery, moving it to `atWarehouse` (ISO 8601, UTC); `null` until then.
+        aggregatedContainerStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Tracking status of the delivery as a whole, combined from the tracking statuses of its containers; `null` when none of them is tracked.
+
+
+            - `pick_up`: waiting to be picked up by the carrier
+
+            - `in_transit`: on the way to the warehouse
+
+            - `out_for_delivery`: out for delivery to the warehouse
+
+            - `partially_delivered`: some containers were delivered, others not yet
+
+            - `delivered`: all containers were delivered
+
+            - `delayed`: delivery is delayed
+
+            - `failed_delivery`: the carrier failed to deliver'
+        customsMRNProvidedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the customs MRN was first provided (ISO 8601, UTC); `null` while there is none. The inbound deadline of an international delivery is not counted before this.
+        subStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Detail on the current status; `null` when there is none.
+
+
+            - `waitingOnMRN`: the delivery needs a customs MRN before the warehouse can inbound it; provide it in `customsMRN`'
+        originConfirmedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse last recorded where the goods came from (`warehouseOriginIsUK`) (ISO 8601, UTC); `null` when it has not.
+        deliveryContainers:
+          readOnly: true
+          description: Parcels or pallets the delivery arrives in, one per tracking number; at least one is required when announcing. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryContainer'
+        warehouseID:
+          type: string
+          format: uuid
+          writeOnly: true
+          description: ID of the warehouse receiving the delivery (UUID).
+        warehouse:
+          readOnly: true
+          description: 'Warehouse receiving the delivery: its ID and country code.'
+          allOf:
+          - $ref: '#/components/schemas/StorageWarehouse'
+        deliveryStandards:
+          readOnly: true
+          description: Results of the delivery standards the warehouse checked on arrival; empty until they are checked.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryStandard'
+        deviation:
+          type: boolean
+          readOnly: true
+        deliverDate:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          type: string
+          default: regular
+          enum:
+          - container
+          - regular
+          - unknown
+          description: 'Type of delivery. Defaults to `regular`.
+
+
+            - `container`: arriving in a shipping container; the expected dates must be equal, a business day, and at least 10 business days from now
+
+            - `regular`: every other delivery
+
+            - `unknown`: type not recorded'
+      required:
+      - expectedDeliveryDateFrom
+      - expectedDeliveryDateTo
+      - expressInbounding
+      - stocktaking
+      - warehouseID
+      title: Delivery base
+    AcceptanceFee:
+      type: object
+      properties:
+        value:
+          type: number
+          description: Amount, as a string with two decimals separated by a dot.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          description: Currency (ISO 4217 code, e.g. `EUR`).
+        taxFactor:
+          type:
+          - number
+          - 'null'
+          readOnly: true
+          description: Tax factor of the price, for example `1.19` for 19% VAT; `null` when not set.
+      required:
+      - currency
+      - value
+      title: Acceptance fee
+    DeliveryCreate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        customsMRN:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9]{2}GB[A-Z0-9]{14}\Z
+          description: 'UK customs Movement Reference Number (MRN) of the goods: 18 characters, two digits for the year, `GB`, then 14 uppercase letters or digits. Only allowed for deliveries to a warehouse in the United Kingdom; you can set it while the delivery is `announced` or `atWarehouse`, including with a partial update after arrival. `null` when not provided.'
+          example: 25GB1234567890ABCD
+        description:
+          type:
+          - string
+          - 'null'
+          description: Free-text summary of the contents of the delivery; `null` when not provided.
+        expectedDeliveryDateFrom:
+          type: string
+          format: date-time
+          description: Start of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must equal `expectedDeliveryDateTo`. Customers can only change it while the delivery is `announced`.
+        expectedDeliveryDateTo:
+          type: string
+          format: date-time
+          description: End of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must be a business day at least 10 business days from now. Customers can only change it while the delivery is `announced`.
+        expressInbounding:
+          type: boolean
+          description: Whether express inbounding is requested. Always send `false`.
+        isInternational:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods cross a border into the warehouse's country. Only for deliveries to a warehouse in the United Kingdom, where it is required when announcing or fully updating the delivery. When `true`, `senderName` and `senderAddress` are required and the warehouse cannot inbound the delivery until `customsMRN` is provided. Customers can still declare it `true` with a partial update after the delivery has left `announced`, but not change it back once the goods have arrived. `null` when it does not apply.
+        referenceNumber:
+          type:
+          - string
+          - 'null'
+          description: Your own reference for the delivery, such as a purchase order number; `null` when not provided.
+        requiresCounting:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse counts every item on arrival; charges may apply. When `false`, stock is booked as announced and byrd is not liable for discrepancies. Defaults to `true`; cannot be `true` together with `requiresSampling`. Customers can only change it while the delivery is `announced`.
+        requiresSampling:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse checks a representative sample of the goods on arrival instead of counting every item. Defaults to `false`; cannot be `true` together with `requiresCounting`. Customers can only change it while the delivery is `announced`.
+        senderAddress:
+          type:
+          - string
+          - 'null'
+          description: Address the delivery is sent from; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        senderName:
+          type:
+          - string
+          - 'null'
+          description: Name of the sender of the delivery; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        stocktaking:
+          type: boolean
+          description: Always send `true`.
+        unmixedDelivery:
+          type:
+          - boolean
+          - 'null'
+        containerSizeAnnounced:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          description: 'Size of the shipping container, as you announced it. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedAnnounced:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods in the shipping container are on pallets, as you announced it. Only for `container` deliveries; `null` otherwise.
+        deletedDate:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was cancelled (ISO 8601, UTC); `null` when it was not.
+        identifier:
+          type: string
+          readOnly: true
+          description: Short human-readable identifier of the delivery, shown in the dashboard and printed as a barcode on the delivery note.
+          example: TST-8VO4
+        statusUpdatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the status of the delivery last changed (ISO 8601, UTC).
+        inboundedDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was completed and its stock became available (ISO 8601, UTC); `null` until then.
+        inProcessingDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse started processing the delivery, moving it to `inProcessing` (ISO 8601, UTC); `null` until then.
+        atWarehouseDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse accepted the delivery, moving it to `atWarehouse` (ISO 8601, UTC); `null` until then.
+        aggregatedContainerStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Tracking status of the delivery as a whole, combined from the tracking statuses of its containers; `null` when none of them is tracked.
+
+
+            - `pick_up`: waiting to be picked up by the carrier
+
+            - `in_transit`: on the way to the warehouse
+
+            - `out_for_delivery`: out for delivery to the warehouse
+
+            - `partially_delivered`: some containers were delivered, others not yet
+
+            - `delivered`: all containers were delivered
+
+            - `delayed`: delivery is delayed
+
+            - `failed_delivery`: the carrier failed to deliver'
+        customsMRNProvidedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the customs MRN was first provided (ISO 8601, UTC); `null` while there is none. The inbound deadline of an international delivery is not counted before this.
+        subStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Detail on the current status; `null` when there is none.
+
+
+            - `waitingOnMRN`: the delivery needs a customs MRN before the warehouse can inbound it; provide it in `customsMRN`'
+        originConfirmedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse last recorded where the goods came from (`warehouseOriginIsUK`) (ISO 8601, UTC); `null` when it has not.
+        deliveryContainers:
+          readOnly: true
+          description: Parcels or pallets the delivery arrives in, one per tracking number; at least one is required when announcing. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryContainer'
+        warehouseID:
+          type: string
+          format: uuid
+          writeOnly: true
+          description: ID of the warehouse receiving the delivery (UUID).
+        warehouse:
+          readOnly: true
+          description: 'Warehouse receiving the delivery: its ID and country code.'
+          allOf:
+          - $ref: '#/components/schemas/StorageWarehouse'
+        deliveryStandards:
+          readOnly: true
+          description: Results of the delivery standards the warehouse checked on arrival; empty until they are checked.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryStandard'
+        deviation:
+          type: boolean
+          readOnly: true
+        deliverDate:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          type: string
+          default: regular
+          enum:
+          - container
+          - regular
+          - unknown
+          description: 'Type of delivery. Defaults to `regular`.
+
+
+            - `container`: arriving in a shipping container; the expected dates must be equal, a business day, and at least 10 business days from now
+
+            - `regular`: every other delivery
+
+            - `unknown`: type not recorded'
+        acceptanceFee:
+          readOnly: true
+          description: Fee charged for accepting the delivery at the warehouse; `null` when none was charged.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        customsPaid:
+          readOnly: true
+          description: Customs charges the warehouse paid on your behalf when receiving the delivery; `null` when none were paid.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        damages:
+          type: string
+          readOnly: true
+          description: Description of the overall damage the warehouse found on the delivery; `null` when none was recorded.
+        deleted:
+          type: boolean
+          readOnly: true
+          description: Whether the delivery was cancelled.
+        deliveryCostsPaid:
+          readOnly: true
+          description: Delivery costs the warehouse paid on your behalf when receiving the delivery; `null` when none were paid.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        deliveryNotes:
+          type: string
+          readOnly: true
+          description: Other comments the warehouse recorded when accepting the delivery; `null` when there are none.
+        putawayFee:
+          readOnly: true
+          description: Fee charged for putting the stock of the delivery away into storage; `null` when none was charged.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        status:
+          type: string
+          enum:
+          - announced
+          - atWarehouse
+          - inProcessing
+          - completed
+          - deleted
+          readOnly: true
+          description: 'Current status of the delivery.
+
+
+            - `announced`: announced and not yet arrived
+
+            - `atWarehouse`: arrived and accepted by the warehouse
+
+            - `inProcessing`: being counted and put away
+
+            - `completed`: inbounded; the stock is available
+
+            - `deleted`: cancelled'
+        userID:
+          type: string
+          readOnly: true
+          description: ID of the user the delivery belongs to (UUID).
+        deliveredBoxes:
+          type: integer
+          readOnly: true
+          minimum: 0
+          description: Number of loose boxes (parcels) the warehouse counted on arrival; `null` until the delivery has been counted.
+        deliveredPallets:
+          type: integer
+          readOnly: true
+          minimum: 0
+          description: Number of full pallets the warehouse counted on arrival; `null` until the delivery has been counted.
+        containerSizeConfirmed:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          readOnly: true
+          description: 'Size of the shipping container, as confirmed by the warehouse on arrival. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedConfirmed:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the goods in the shipping container are on pallets, as confirmed by the warehouse on arrival. Only for `container` deliveries; `null` otherwise.
+        palletizationMinutes:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Time the warehouse spent putting the goods of the shipping container onto pallets, in minutes. Only for `container` deliveries; `null` otherwise.
+        meetsEUOrganicRequirements:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the delivery meets the EU organic requirements, as checked by the warehouse; `null` when it was not checked.
+        warehouseOriginIsUK:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the goods came from within the United Kingdom, as found by the warehouse on arrival. Only recorded for deliveries to a UK warehouse not declared international; `false` means an MRN is needed before inbounding. `null` when not recorded.
+        standardsCompliance:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'How far the delivery met the delivery standards checked by the warehouse on arrival.
+
+
+            - `compliant`: all standards were met
+
+            - `partially_compliant`: some standards were met
+
+            - `non_compliant`: no standard was met
+
+            - `compliance_not_checked`: the standards were not checked yet'
+        sortedBoxesCount:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Number of boxes the warehouse had to sort while processing the delivery; `null` until recorded.
+        sortedItemsCount:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Number of items the warehouse had to sort while processing the delivery; `null` until recorded.
+        deliveryItems:
+          readOnly: true
+          description: Products in the delivery and their announced amounts; at least one is required when announcing, and each product may appear only once. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryItem'
+        inboundingDeadline:
+          description: Date by which the warehouse is due to inbound the delivery, and how that date was set. Calculated by byrd; ignored when sent.
+          allOf:
+          - $ref: '#/components/schemas/InboundingDeadline'
+        documents:
+          description: Documents to attach to the delivery when announcing it, such as invoices or packing lists. Upload the files first.
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentCreate'
+      required:
+      - expectedDeliveryDateFrom
+      - expectedDeliveryDateTo
+      - expressInbounding
+      - stocktaking
+      - warehouseID
+      title: Delivery create
+    DocumentCreate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        name:
+          type: string
+          description: File name of the document. Characters other than letters, digits, `-`, `_`, `(`, `)` and `.` are removed.
+        documentType:
+          type: string
+          enum:
+          - invoice
+          - delivery_note
+          - signed_delivery_note
+          - order
+          - packing_list
+          - customs
+          - other
+          description: 'Kind of document. Signed delivery notes are added by the warehouse and are read-only for you.
+
+
+            - `invoice`: invoice
+
+            - `delivery_note`: delivery note
+
+            - `signed_delivery_note`: delivery note signed on arrival
+
+            - `order`: purchase order
+
+            - `packing_list`: packing list
+
+            - `customs`: customs document
+
+            - `other`: any other document'
+        fileType:
+          type: string
+          enum:
+          - jpg
+          - jpeg
+          - png
+          - pdf
+          - csv
+          - txt
+          description: 'Format of the file. Cannot be changed after the document is created.
+
+
+            - `pdf`
+
+            - `jpg`
+
+            - `jpeg`
+
+            - `png`
+
+            - `csv`
+
+            - `txt`'
+        url:
+          type: string
+          description: HTTPS URL of the uploaded file. It must point to byrd's file storage and have no query parameters. Cannot be changed after the document is created.
+        readOnly:
+          type: boolean
+          readOnly: true
+          description: Whether the document is read-only for you, so you cannot update or delete it.
+        userID:
+          type: string
+          description: 'ID of the user who uploaded the document (UUID). For customers, documents are always recorded as uploaded by them and the uploader cannot be changed: any value they send is ignored.'
+      required:
+      - documentType
+      - fileType
+      - name
+      - url
+      additionalProperties: false
+      title: Document create
+    Barcode:
+      type: object
+      properties:
+        value:
+          type: string
+          minLength: 1
+          maxLength: 48
+          description: Value encoded in the barcode, 1 to 48 characters; which characters are allowed depends on `barcodeType`.
+        barcodeType:
+          description: 'Symbology of the barcode; required when `value` is set.
+
+
+            - `ean_13`: EAN-13
+
+            - `code_128`: Code 128
+
+            - `gs1_128`: GS1-128
+
+            - `qr_code`: QR code'
+          type: string
+          enum:
+          - ean_13
+          - code_128
+          - gs1_128
+          - qr_code
+        isPrimary:
+          type: boolean
+          description: Whether this is the primary barcode of the product, mirrored in its `barcode` and `barcodeType` fields. At most one barcode can be primary. Defaults to `false`.
+      required:
+      - value
+      title: Barcode
+    DeliveryStandard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the standard check (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        deliveryID:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the delivery the check belongs to (UUID).
+        label:
+          description: 'Standard the delivery was checked against.
+
+
+            - `ANNOUNCED_BEFORE_ARRIVAL`: the delivery was announced before it arrived
+
+            - `ARRIVED_WITH_BYRD_ID`: the parcels or pallets carried the delivery ID
+
+            - `ARRIVED_WITH_DELIVERY_NOTE`: the delivery arrived with its delivery note'
+          type: string
+          enum:
+          - ANNOUNCED_BEFORE_ARRIVAL
+          - ARRIVED_WITH_BYRD_ID
+          - ARRIVED_WITH_DELIVERY_NOTE
+        isFulfilled:
+          type: boolean
+          description: Whether the delivery met the standard.
+      required:
+      - isFulfilled
+      - label
+      title: Delivery standard
+    DeliveryDocumentUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        deliveryID:
+          type: string
+          description: 'ID of the delivery the document is attached to (UUID). It must be a delivery that has not been deleted and that you may access: for a customer, one of their own deliveries. Any other ID fails with 404, as for a delivery that does not exist. Change it to move the document to another delivery.'
+        name:
+          type: string
+          description: File name of the document. Characters other than letters, digits, `-`, `_`, `(`, `)` and `.` are removed.
+        documentType:
+          type: string
+          enum:
+          - invoice
+          - delivery_note
+          - signed_delivery_note
+          - order
+          - packing_list
+          - customs
+          - other
+          description: 'Kind of document. Signed delivery notes are added by the warehouse and are read-only for you.
+
+
+            - `invoice`: invoice
+
+            - `delivery_note`: delivery note
+
+            - `signed_delivery_note`: delivery note signed on arrival
+
+            - `order`: purchase order
+
+            - `packing_list`: packing list
+
+            - `customs`: customs document
+
+            - `other`: any other document'
+        readOnly:
+          type: boolean
+          readOnly: true
+          description: Whether the document is read-only for you, so you cannot update or delete it.
+        userID:
+          type: string
+          description: 'ID of the user who uploaded the document (UUID). For customers, documents are always recorded as uploaded by them and the uploader cannot be changed: any value they send is ignored.'
+      required:
+      - deliveryID
+      - documentType
+      - name
+      - userID
+      additionalProperties: false
+      title: Delivery document update
+    DeliveryItemProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the product (UUID).
+        bsku:
+          type:
+          - string
+          - 'null'
+          default: null
+          readOnly: true
+          pattern: ^BSKU-([A-Z0-9]){10}$
+          description: Unique SKU byrd generates for the product, unrelated to your `sku`.
+          example: BSKU-ONXV1VAF04
+        sku:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          description: Your stock keeping unit (SKU) for the product, unique among your products. It must match the SKU your sales channel sends on order lines.
+          example: AELMO-00005
+        name:
+          type: string
+          minLength: 1
+          description: Name of the product; at least one character.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Free-text description of the product.
+        organic:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the product is organic and needs special storage and shipping conditions. Bundles cannot be organic. Defaults to `false`.
+        grs:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the product complies with the Global Recycled Standard (GRS) and needs specific storage conditions. Defaults to `false`.
+        productType:
+          type:
+          - string
+          - 'null'
+          description: 'Type of the product. Defaults to `product`; `bundle`, `supplementary` and `packaging_material` cannot be changed afterwards.
+
+
+            - `product`: a regular physical product
+
+            - `bundle`: a group of other products sold under one SKU, see `bundleIngredients`
+
+            - `prepacked_product`: a product shipped in its own packaging
+
+            - `packaging_material`: packaging material, such as boxes or fillers
+
+            - `branding`: branded material packed into shipments, not counted as a product item
+
+            - `supplementary`: a product only shipped together with another product
+
+            - `alias`: another SKU for an existing product, sharing its stock
+
+            - `marketing`: marketing material'
+        lotsEnabled:
+          type: boolean
+          description: Whether lots (batches) of the product are tracked when it is inbounded and shipped. Bundles cannot be lot tracked. Defaults to `false`.
+        barcode:
+          type:
+          - string
+          - 'null'
+          maxLength: 48
+          description: Value of the primary barcode printed on the product, at most 48 characters; mirrors the primary entry of `barcodes`. `null` when the product has no barcode.
+        barcodes:
+          description: All barcodes printed on the product, at most one of them primary. When you send both `barcode` and `barcodes`, `barcode` must match the primary entry.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Barcode'
+      required:
+      - name
+      title: Delivery item product
+    DeliveryReplaceRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        customsMRN:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9]{2}GB[A-Z0-9]{14}\Z
+          description: 'UK customs Movement Reference Number (MRN) of the goods: 18 characters, two digits for the year, `GB`, then 14 uppercase letters or digits. Only allowed for deliveries to a warehouse in the United Kingdom; you can set it while the delivery is `announced` or `atWarehouse`, including with a partial update after arrival. `null` when not provided.'
+          example: 25GB1234567890ABCD
+        description:
+          type:
+          - string
+          - 'null'
+          description: Free-text summary of the contents of the delivery; `null` when not provided.
+        expectedDeliveryDateFrom:
+          type: string
+          format: date-time
+          description: Start of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must equal `expectedDeliveryDateTo`. Customers can only change it while the delivery is `announced`.
+        expectedDeliveryDateTo:
+          type: string
+          format: date-time
+          description: End of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must be a business day at least 10 business days from now. Customers can only change it while the delivery is `announced`.
+        expressInbounding:
+          type: boolean
+          description: Whether express inbounding is requested. Always send `false`.
+        isInternational:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods cross a border into the warehouse's country. Only for deliveries to a warehouse in the United Kingdom, where it is required when announcing or fully updating the delivery. When `true`, `senderName` and `senderAddress` are required and the warehouse cannot inbound the delivery until `customsMRN` is provided. Customers can still declare it `true` with a partial update after the delivery has left `announced`, but not change it back once the goods have arrived. `null` when it does not apply.
+        referenceNumber:
+          type:
+          - string
+          - 'null'
+          description: Your own reference for the delivery, such as a purchase order number; `null` when not provided.
+        requiresCounting:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse counts every item on arrival; charges may apply. When `false`, stock is booked as announced and byrd is not liable for discrepancies. Defaults to `true`; cannot be `true` together with `requiresSampling`. Customers can only change it while the delivery is `announced`.
+        requiresSampling:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse checks a representative sample of the goods on arrival instead of counting every item. Defaults to `false`; cannot be `true` together with `requiresCounting`. Customers can only change it while the delivery is `announced`.
+        senderAddress:
+          type:
+          - string
+          - 'null'
+          description: Address the delivery is sent from; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        senderName:
+          type:
+          - string
+          - 'null'
+          description: Name of the sender of the delivery; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        stocktaking:
+          type: boolean
+          description: Always send `true`.
+        unmixedDelivery:
+          type:
+          - boolean
+          - 'null'
+        containerSizeAnnounced:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          description: 'Size of the shipping container, as you announced it. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedAnnounced:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods in the shipping container are on pallets, as you announced it. Only for `container` deliveries; `null` otherwise.
+        deletedDate:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was cancelled (ISO 8601, UTC); `null` when it was not.
+        identifier:
+          type: string
+          readOnly: true
+          description: Short human-readable identifier of the delivery, shown in the dashboard and printed as a barcode on the delivery note.
+          example: TST-8VO4
+        statusUpdatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the status of the delivery last changed (ISO 8601, UTC).
+        inboundedDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was completed and its stock became available (ISO 8601, UTC); `null` until then.
+        inProcessingDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse started processing the delivery, moving it to `inProcessing` (ISO 8601, UTC); `null` until then.
+        atWarehouseDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse accepted the delivery, moving it to `atWarehouse` (ISO 8601, UTC); `null` until then.
+        aggregatedContainerStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Tracking status of the delivery as a whole, combined from the tracking statuses of its containers; `null` when none of them is tracked.
+
+
+            - `pick_up`: waiting to be picked up by the carrier
+
+            - `in_transit`: on the way to the warehouse
+
+            - `out_for_delivery`: out for delivery to the warehouse
+
+            - `partially_delivered`: some containers were delivered, others not yet
+
+            - `delivered`: all containers were delivered
+
+            - `delayed`: delivery is delayed
+
+            - `failed_delivery`: the carrier failed to deliver'
+        customsMRNProvidedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the customs MRN was first provided (ISO 8601, UTC); `null` while there is none. The inbound deadline of an international delivery is not counted before this.
+        subStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Detail on the current status; `null` when there is none.
+
+
+            - `waitingOnMRN`: the delivery needs a customs MRN before the warehouse can inbound it; provide it in `customsMRN`'
+        originConfirmedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse last recorded where the goods came from (`warehouseOriginIsUK`) (ISO 8601, UTC); `null` when it has not.
+        deliveryContainers:
+          minItems: 1
+          description: Parcels or pallets the delivery arrives in, one per tracking number; at least one is required when announcing. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryContainer'
+        warehouseID:
+          type: string
+          format: uuid
+          writeOnly: true
+          description: ID of the warehouse receiving the delivery (UUID).
+        warehouse:
+          readOnly: true
+          description: 'Warehouse receiving the delivery: its ID and country code.'
+          allOf:
+          - $ref: '#/components/schemas/StorageWarehouse'
+        deliveryStandards:
+          readOnly: true
+          description: Results of the delivery standards the warehouse checked on arrival; empty until they are checked.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryStandard'
+        deviation:
+          type: boolean
+          readOnly: true
+        deliverDate:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          type: string
+          default: regular
+          enum:
+          - container
+          - regular
+          - unknown
+          description: 'Type of delivery. Defaults to `regular`.
+
+
+            - `container`: arriving in a shipping container; the expected dates must be equal, a business day, and at least 10 business days from now
+
+            - `regular`: every other delivery
+
+            - `unknown`: type not recorded'
+        deliveryItems:
+          minItems: 1
+          description: Products in the delivery and their announced amounts; at least one is required when announcing, and each product may appear only once. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryItem'
+      required:
+      - deliveryContainers
+      - deliveryItems
+      - expectedDeliveryDateFrom
+      - expectedDeliveryDateTo
+      - expressInbounding
+      - stocktaking
+      - warehouseID
+      title: Delivery replace request
+    DeliveryItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        sequenceNumber:
+          type: integer
+          minimum: 0
+          description: Position of the item within the delivery, used to order the items; 0 or greater.
+        amount:
+          type: integer
+          minimum: 1
+          description: Number of units of the product announced in the delivery; at least 1.
+        amountArrivedDamaged:
+          type: integer
+          readOnly: true
+          description: Number of units that arrived damaged, as counted by the warehouse; `null` until recorded.
+        amountArrivedFinished:
+          type: integer
+          readOnly: true
+          description: Number of units that arrived intact, as counted by the warehouse; `null` until recorded.
+        boxcode:
+          type: string
+          description: Your identifier of the box or boxes the product arrives in. Separate several box codes with commas.
+        hasExistingStorage:
+          type: boolean
+          readOnly: true
+          description: Whether the product already has a storage location in the warehouse receiving the delivery.
+        newSKU:
+          type: boolean
+          readOnly: true
+          description: Whether the product had no stock location in the warehouse when the delivery was announced, making it new to that warehouse.
+        receivedAmount:
+          type: integer
+          readOnly: true
+          description: Number of units put away into stock from this item so far.
+        product:
+          readOnly: true
+          description: Product announced in this item.
+          allOf:
+          - $ref: '#/components/schemas/DeliveryItemProduct'
+        productID:
+          type: string
+          format: uuid
+          writeOnly: true
+          description: ID of the product announced in this item (UUID). The product must be active and cannot be a bundle or an alias.
+      required:
+      - amount
+      - boxcode
+      - productID
+      - sequenceNumber
+      title: Delivery item
+    Delivery:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        customsMRN:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9]{2}GB[A-Z0-9]{14}\Z
+          description: 'UK customs Movement Reference Number (MRN) of the goods: 18 characters, two digits for the year, `GB`, then 14 uppercase letters or digits. Only allowed for deliveries to a warehouse in the United Kingdom; you can set it while the delivery is `announced` or `atWarehouse`, including with a partial update after arrival. `null` when not provided.'
+          example: 25GB1234567890ABCD
+        description:
+          type:
+          - string
+          - 'null'
+          description: Free-text summary of the contents of the delivery; `null` when not provided.
+        expectedDeliveryDateFrom:
+          type: string
+          format: date-time
+          description: Start of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must equal `expectedDeliveryDateTo`. Customers can only change it while the delivery is `announced`.
+        expectedDeliveryDateTo:
+          type: string
+          format: date-time
+          description: End of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must be a business day at least 10 business days from now. Customers can only change it while the delivery is `announced`.
+        expressInbounding:
+          type: boolean
+          description: Whether express inbounding is requested. Always send `false`.
+        isInternational:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods cross a border into the warehouse's country. Only for deliveries to a warehouse in the United Kingdom, where it is required when announcing or fully updating the delivery. When `true`, `senderName` and `senderAddress` are required and the warehouse cannot inbound the delivery until `customsMRN` is provided. Customers can still declare it `true` with a partial update after the delivery has left `announced`, but not change it back once the goods have arrived. `null` when it does not apply.
+        referenceNumber:
+          type:
+          - string
+          - 'null'
+          description: Your own reference for the delivery, such as a purchase order number; `null` when not provided.
+        requiresCounting:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse counts every item on arrival; charges may apply. When `false`, stock is booked as announced and byrd is not liable for discrepancies. Defaults to `true`; cannot be `true` together with `requiresSampling`. Customers can only change it while the delivery is `announced`.
+        requiresSampling:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse checks a representative sample of the goods on arrival instead of counting every item. Defaults to `false`; cannot be `true` together with `requiresCounting`. Customers can only change it while the delivery is `announced`.
+        senderAddress:
+          type:
+          - string
+          - 'null'
+          description: Address the delivery is sent from; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        senderName:
+          type:
+          - string
+          - 'null'
+          description: Name of the sender of the delivery; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        stocktaking:
+          type: boolean
+          description: Always send `true`.
+        unmixedDelivery:
+          type:
+          - boolean
+          - 'null'
+        containerSizeAnnounced:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          description: 'Size of the shipping container, as you announced it. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedAnnounced:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods in the shipping container are on pallets, as you announced it. Only for `container` deliveries; `null` otherwise.
+        deletedDate:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was cancelled (ISO 8601, UTC); `null` when it was not.
+        identifier:
+          type: string
+          readOnly: true
+          description: Short human-readable identifier of the delivery, shown in the dashboard and printed as a barcode on the delivery note.
+          example: TST-8VO4
+        statusUpdatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the status of the delivery last changed (ISO 8601, UTC).
+        inboundedDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was completed and its stock became available (ISO 8601, UTC); `null` until then.
+        inProcessingDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse started processing the delivery, moving it to `inProcessing` (ISO 8601, UTC); `null` until then.
+        atWarehouseDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse accepted the delivery, moving it to `atWarehouse` (ISO 8601, UTC); `null` until then.
+        aggregatedContainerStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Tracking status of the delivery as a whole, combined from the tracking statuses of its containers; `null` when none of them is tracked.
+
+
+            - `pick_up`: waiting to be picked up by the carrier
+
+            - `in_transit`: on the way to the warehouse
+
+            - `out_for_delivery`: out for delivery to the warehouse
+
+            - `partially_delivered`: some containers were delivered, others not yet
+
+            - `delivered`: all containers were delivered
+
+            - `delayed`: delivery is delayed
+
+            - `failed_delivery`: the carrier failed to deliver'
+        customsMRNProvidedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the customs MRN was first provided (ISO 8601, UTC); `null` while there is none. The inbound deadline of an international delivery is not counted before this.
+        subStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Detail on the current status; `null` when there is none.
+
+
+            - `waitingOnMRN`: the delivery needs a customs MRN before the warehouse can inbound it; provide it in `customsMRN`'
+        originConfirmedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse last recorded where the goods came from (`warehouseOriginIsUK`) (ISO 8601, UTC); `null` when it has not.
+        deliveryContainers:
+          readOnly: true
+          description: Parcels or pallets the delivery arrives in, one per tracking number; at least one is required when announcing. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryContainer'
+        warehouseID:
+          type: string
+          format: uuid
+          writeOnly: true
+          description: ID of the warehouse receiving the delivery (UUID).
+        warehouse:
+          readOnly: true
+          description: 'Warehouse receiving the delivery: its ID and country code.'
+          allOf:
+          - $ref: '#/components/schemas/StorageWarehouse'
+        deliveryStandards:
+          readOnly: true
+          description: Results of the delivery standards the warehouse checked on arrival; empty until they are checked.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryStandard'
+        deviation:
+          type: boolean
+          readOnly: true
+        deliverDate:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          type: string
+          default: regular
+          enum:
+          - container
+          - regular
+          - unknown
+          description: 'Type of delivery. Defaults to `regular`.
+
+
+            - `container`: arriving in a shipping container; the expected dates must be equal, a business day, and at least 10 business days from now
+
+            - `regular`: every other delivery
+
+            - `unknown`: type not recorded'
+        acceptanceFee:
+          readOnly: true
+          description: Fee charged for accepting the delivery at the warehouse; `null` when none was charged.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        customsPaid:
+          readOnly: true
+          description: Customs charges the warehouse paid on your behalf when receiving the delivery; `null` when none were paid.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        damages:
+          type: string
+          readOnly: true
+          description: Description of the overall damage the warehouse found on the delivery; `null` when none was recorded.
+        deleted:
+          type: boolean
+          readOnly: true
+          description: Whether the delivery was cancelled.
+        deliveryCostsPaid:
+          readOnly: true
+          description: Delivery costs the warehouse paid on your behalf when receiving the delivery; `null` when none were paid.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        deliveryNotes:
+          type: string
+          readOnly: true
+          description: Other comments the warehouse recorded when accepting the delivery; `null` when there are none.
+        putawayFee:
+          readOnly: true
+          description: Fee charged for putting the stock of the delivery away into storage; `null` when none was charged.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        status:
+          type: string
+          enum:
+          - announced
+          - atWarehouse
+          - inProcessing
+          - completed
+          - deleted
+          readOnly: true
+          description: 'Current status of the delivery.
+
+
+            - `announced`: announced and not yet arrived
+
+            - `atWarehouse`: arrived and accepted by the warehouse
+
+            - `inProcessing`: being counted and put away
+
+            - `completed`: inbounded; the stock is available
+
+            - `deleted`: cancelled'
+        userID:
+          type: string
+          readOnly: true
+          description: ID of the user the delivery belongs to (UUID).
+        deliveredBoxes:
+          type: integer
+          readOnly: true
+          minimum: 0
+          description: Number of loose boxes (parcels) the warehouse counted on arrival; `null` until the delivery has been counted.
+        deliveredPallets:
+          type: integer
+          readOnly: true
+          minimum: 0
+          description: Number of full pallets the warehouse counted on arrival; `null` until the delivery has been counted.
+        containerSizeConfirmed:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          readOnly: true
+          description: 'Size of the shipping container, as confirmed by the warehouse on arrival. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedConfirmed:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the goods in the shipping container are on pallets, as confirmed by the warehouse on arrival. Only for `container` deliveries; `null` otherwise.
+        palletizationMinutes:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Time the warehouse spent putting the goods of the shipping container onto pallets, in minutes. Only for `container` deliveries; `null` otherwise.
+        meetsEUOrganicRequirements:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the delivery meets the EU organic requirements, as checked by the warehouse; `null` when it was not checked.
+        warehouseOriginIsUK:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the goods came from within the United Kingdom, as found by the warehouse on arrival. Only recorded for deliveries to a UK warehouse not declared international; `false` means an MRN is needed before inbounding. `null` when not recorded.
+        standardsCompliance:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'How far the delivery met the delivery standards checked by the warehouse on arrival.
+
+
+            - `compliant`: all standards were met
+
+            - `partially_compliant`: some standards were met
+
+            - `non_compliant`: no standard was met
+
+            - `compliance_not_checked`: the standards were not checked yet'
+        sortedBoxesCount:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Number of boxes the warehouse had to sort while processing the delivery; `null` until recorded.
+        sortedItemsCount:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Number of items the warehouse had to sort while processing the delivery; `null` until recorded.
+        deliveryItems:
+          readOnly: true
+          description: Products in the delivery and their announced amounts; at least one is required when announcing, and each product may appear only once. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryItem'
+        inboundingDeadline:
+          description: Date by which the warehouse is due to inbound the delivery, and how that date was set. Calculated by byrd; ignored when sent.
+          allOf:
+          - $ref: '#/components/schemas/InboundingDeadline'
+      required:
+      - expectedDeliveryDateFrom
+      - expectedDeliveryDateTo
+      - expressInbounding
+      - stocktaking
+      - warehouseID
+      title: Delivery
+    DeliveryCount:
+      type: object
+      properties:
+        count:
+          type: integer
+          readOnly: true
+          description: Number of deliveries matching the filters.
+      title: Delivery count
+    DeliveryDocumentInput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        deliveryID:
+          type: string
+          description: 'ID of the delivery the document is attached to (UUID). It must be a delivery that has not been deleted and that you may access: for a customer, one of their own deliveries. Any other ID fails with 404, as for a delivery that does not exist. Change it to move the document to another delivery.'
+        name:
+          type: string
+          description: File name of the document. Characters other than letters, digits, `-`, `_`, `(`, `)` and `.` are removed.
+        documentType:
+          type: string
+          enum:
+          - invoice
+          - delivery_note
+          - signed_delivery_note
+          - order
+          - packing_list
+          - customs
+          - other
+          description: 'Kind of document. Signed delivery notes are added by the warehouse and are read-only for you.
+
+
+            - `invoice`: invoice
+
+            - `delivery_note`: delivery note
+
+            - `signed_delivery_note`: delivery note signed on arrival
+
+            - `order`: purchase order
+
+            - `packing_list`: packing list
+
+            - `customs`: customs document
+
+            - `other`: any other document'
+        fileType:
+          type: string
+          enum:
+          - jpg
+          - jpeg
+          - png
+          - pdf
+          - csv
+          - txt
+          description: 'Format of the file. Cannot be changed after the document is created.
+
+
+            - `pdf`
+
+            - `jpg`
+
+            - `jpeg`
+
+            - `png`
+
+            - `csv`
+
+            - `txt`'
+        url:
+          type: string
+          description: HTTPS URL of the uploaded file. It must point to byrd's file storage and have no query parameters. Cannot be changed after the document is created.
+        readOnly:
+          type: boolean
+          readOnly: true
+          description: Whether the document is read-only for you, so you cannot update or delete it.
+      required:
+      - deliveryID
+      - documentType
+      - fileType
+      - name
+      - url
+      title: Delivery document input
+    DeliveryWithMetrics:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        customsMRN:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9]{2}GB[A-Z0-9]{14}\Z
+          description: 'UK customs Movement Reference Number (MRN) of the goods: 18 characters, two digits for the year, `GB`, then 14 uppercase letters or digits. Only allowed for deliveries to a warehouse in the United Kingdom; you can set it while the delivery is `announced` or `atWarehouse`, including with a partial update after arrival. `null` when not provided.'
+          example: 25GB1234567890ABCD
+        description:
+          type:
+          - string
+          - 'null'
+          description: Free-text summary of the contents of the delivery; `null` when not provided.
+        expectedDeliveryDateFrom:
+          type: string
+          format: date-time
+          description: Start of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must equal `expectedDeliveryDateTo`. Customers can only change it while the delivery is `announced`.
+        expectedDeliveryDateTo:
+          type: string
+          format: date-time
+          description: End of the window in which the delivery is expected to arrive at the warehouse (ISO 8601, UTC). For `container` deliveries it must be a business day at least 10 business days from now. Customers can only change it while the delivery is `announced`.
+        expressInbounding:
+          type: boolean
+          description: Whether express inbounding is requested. Always send `false`.
+        isInternational:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods cross a border into the warehouse's country. Only for deliveries to a warehouse in the United Kingdom, where it is required when announcing or fully updating the delivery. When `true`, `senderName` and `senderAddress` are required and the warehouse cannot inbound the delivery until `customsMRN` is provided. Customers can still declare it `true` with a partial update after the delivery has left `announced`, but not change it back once the goods have arrived. `null` when it does not apply.
+        referenceNumber:
+          type:
+          - string
+          - 'null'
+          description: Your own reference for the delivery, such as a purchase order number; `null` when not provided.
+        requiresCounting:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse counts every item on arrival; charges may apply. When `false`, stock is booked as announced and byrd is not liable for discrepancies. Defaults to `true`; cannot be `true` together with `requiresSampling`. Customers can only change it while the delivery is `announced`.
+        requiresSampling:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the warehouse checks a representative sample of the goods on arrival instead of counting every item. Defaults to `false`; cannot be `true` together with `requiresCounting`. Customers can only change it while the delivery is `announced`.
+        senderAddress:
+          type:
+          - string
+          - 'null'
+          description: Address the delivery is sent from; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        senderName:
+          type:
+          - string
+          - 'null'
+          description: Name of the sender of the delivery; required for international deliveries, otherwise `null` when not provided. Part of the customs declaration, so customers can still change it with a partial update after the delivery has left `announced`.
+        stocktaking:
+          type: boolean
+          description: Always send `true`.
+        unmixedDelivery:
+          type:
+          - boolean
+          - 'null'
+        containerSizeAnnounced:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          description: 'Size of the shipping container, as you announced it. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedAnnounced:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the goods in the shipping container are on pallets, as you announced it. Only for `container` deliveries; `null` otherwise.
+        deletedDate:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was cancelled (ISO 8601, UTC); `null` when it was not.
+        identifier:
+          type: string
+          readOnly: true
+          description: Short human-readable identifier of the delivery, shown in the dashboard and printed as a barcode on the delivery note.
+          example: TST-8VO4
+        statusUpdatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the status of the delivery last changed (ISO 8601, UTC).
+        inboundedDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the delivery was completed and its stock became available (ISO 8601, UTC); `null` until then.
+        inProcessingDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse started processing the delivery, moving it to `inProcessing` (ISO 8601, UTC); `null` until then.
+        atWarehouseDateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse accepted the delivery, moving it to `atWarehouse` (ISO 8601, UTC); `null` until then.
+        aggregatedContainerStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Tracking status of the delivery as a whole, combined from the tracking statuses of its containers; `null` when none of them is tracked.
+
+
+            - `pick_up`: waiting to be picked up by the carrier
+
+            - `in_transit`: on the way to the warehouse
+
+            - `out_for_delivery`: out for delivery to the warehouse
+
+            - `partially_delivered`: some containers were delivered, others not yet
+
+            - `delivered`: all containers were delivered
+
+            - `delayed`: delivery is delayed
+
+            - `failed_delivery`: the carrier failed to deliver'
+        customsMRNProvidedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the customs MRN was first provided (ISO 8601, UTC); `null` while there is none. The inbound deadline of an international delivery is not counted before this.
+        subStatus:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'Detail on the current status; `null` when there is none.
+
+
+            - `waitingOnMRN`: the delivery needs a customs MRN before the warehouse can inbound it; provide it in `customsMRN`'
+        originConfirmedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the warehouse last recorded where the goods came from (`warehouseOriginIsUK`) (ISO 8601, UTC); `null` when it has not.
+        deliveryContainers:
+          readOnly: true
+          description: Parcels or pallets the delivery arrives in, one per tracking number; at least one is required when announcing. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryContainer'
+        warehouseID:
+          type: string
+          format: uuid
+          writeOnly: true
+          description: ID of the warehouse receiving the delivery (UUID).
+        warehouse:
+          readOnly: true
+          description: 'Warehouse receiving the delivery: its ID and country code.'
+          allOf:
+          - $ref: '#/components/schemas/StorageWarehouse'
+        deliveryStandards:
+          readOnly: true
+          description: Results of the delivery standards the warehouse checked on arrival; empty until they are checked.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryStandard'
+        deviation:
+          type: boolean
+          readOnly: true
+        deliverDate:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          type: string
+          default: regular
+          enum:
+          - container
+          - regular
+          - unknown
+          description: 'Type of delivery. Defaults to `regular`.
+
+
+            - `container`: arriving in a shipping container; the expected dates must be equal, a business day, and at least 10 business days from now
+
+            - `regular`: every other delivery
+
+            - `unknown`: type not recorded'
+        acceptanceFee:
+          readOnly: true
+          description: Fee charged for accepting the delivery at the warehouse; `null` when none was charged.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        customsPaid:
+          readOnly: true
+          description: Customs charges the warehouse paid on your behalf when receiving the delivery; `null` when none were paid.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        damages:
+          type: string
+          readOnly: true
+          description: Description of the overall damage the warehouse found on the delivery; `null` when none was recorded.
+        deleted:
+          type: boolean
+          readOnly: true
+          description: Whether the delivery was cancelled.
+        deliveryCostsPaid:
+          readOnly: true
+          description: Delivery costs the warehouse paid on your behalf when receiving the delivery; `null` when none were paid.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        deliveryNotes:
+          type: string
+          readOnly: true
+          description: Other comments the warehouse recorded when accepting the delivery; `null` when there are none.
+        putawayFee:
+          readOnly: true
+          description: Fee charged for putting the stock of the delivery away into storage; `null` when none was charged.
+          allOf:
+          - $ref: '#/components/schemas/AcceptanceFee'
+        status:
+          type: string
+          enum:
+          - announced
+          - atWarehouse
+          - inProcessing
+          - completed
+          - deleted
+          readOnly: true
+          description: 'Current status of the delivery.
+
+
+            - `announced`: announced and not yet arrived
+
+            - `atWarehouse`: arrived and accepted by the warehouse
+
+            - `inProcessing`: being counted and put away
+
+            - `completed`: inbounded; the stock is available
+
+            - `deleted`: cancelled'
+        userID:
+          type: string
+          readOnly: true
+          description: ID of the user the delivery belongs to (UUID).
+        deliveredBoxes:
+          type: integer
+          readOnly: true
+          minimum: 0
+          description: Number of loose boxes (parcels) the warehouse counted on arrival; `null` until the delivery has been counted.
+        deliveredPallets:
+          type: integer
+          readOnly: true
+          minimum: 0
+          description: Number of full pallets the warehouse counted on arrival; `null` until the delivery has been counted.
+        containerSizeConfirmed:
+          type:
+          - string
+          - 'null'
+          enum:
+          - 20ft
+          - 40ft
+          - null
+          readOnly: true
+          description: 'Size of the shipping container, as confirmed by the warehouse on arrival. Only for `container` deliveries; `null` otherwise.
+
+
+            - `20ft`: 20-foot container
+
+            - `40ft`: 40-foot container'
+        isPalletizedConfirmed:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the goods in the shipping container are on pallets, as confirmed by the warehouse on arrival. Only for `container` deliveries; `null` otherwise.
+        palletizationMinutes:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Time the warehouse spent putting the goods of the shipping container onto pallets, in minutes. Only for `container` deliveries; `null` otherwise.
+        meetsEUOrganicRequirements:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the delivery meets the EU organic requirements, as checked by the warehouse; `null` when it was not checked.
+        warehouseOriginIsUK:
+          type:
+          - boolean
+          - 'null'
+          readOnly: true
+          description: Whether the goods came from within the United Kingdom, as found by the warehouse on arrival. Only recorded for deliveries to a UK warehouse not declared international; `false` means an MRN is needed before inbounding. `null` when not recorded.
+        standardsCompliance:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+          description: 'How far the delivery met the delivery standards checked by the warehouse on arrival.
+
+
+            - `compliant`: all standards were met
+
+            - `partially_compliant`: some standards were met
+
+            - `non_compliant`: no standard was met
+
+            - `compliance_not_checked`: the standards were not checked yet'
+        sortedBoxesCount:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Number of boxes the warehouse had to sort while processing the delivery; `null` until recorded.
+        sortedItemsCount:
+          type:
+          - integer
+          - 'null'
+          readOnly: true
+          minimum: 0
+          description: Number of items the warehouse had to sort while processing the delivery; `null` until recorded.
+        deliveryItems:
+          readOnly: true
+          description: Products in the delivery and their announced amounts; at least one is required when announcing, and each product may appear only once. A full update replaces them all.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryItem'
+        inboundingDeadline:
+          description: Date by which the warehouse is due to inbound the delivery, and how that date was set. Calculated by byrd; ignored when sent.
+          allOf:
+          - $ref: '#/components/schemas/InboundingDeadline'
+        totalItems:
+          type: string
+          readOnly: true
+          description: Total number of units announced across all items of the delivery.
+        totalSKUs:
+          type: string
+          readOnly: true
+          description: Number of different products announced in the delivery.
+        totalContainers:
+          type: string
+          readOnly: true
+          description: Number of containers (parcels or pallets) announced for the delivery.
+        newSKUCount:
+          type: string
+          readOnly: true
+          description: Number of items whose product was new to the warehouse when the delivery was announced.
+        totalDocuments:
+          type: string
+          readOnly: true
+          description: Number of documents attached to the delivery, by you or by the warehouse.
+        totalCustomerDocuments:
+          type: string
+          readOnly: true
+          description: Number of documents attached to the delivery by you.
+        containerType:
+          type: string
+          readOnly: true
+          description: 'Kind of containers the delivery arrives in; `null` when it has none.
+
+
+            - `pallet`: all containers are pallets or EUR-pallets
+
+            - `parcel`: all containers are parcels
+
+            - `mixed`: both pallets and parcels'
+      required:
+      - expectedDeliveryDateFrom
+      - expectedDeliveryDateTo
+      - expressInbounding
+      - stocktaking
+      - warehouseID
+      title: Delivery with metrics
+    DeliveryContainer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        sequenceNumber:
+          type: integer
+          minimum: 0
+          description: Position of the container within the delivery, used to order the containers; 0 or greater.
+        type:
+          type: string
+          enum:
+          - euroPallet
+          - pallet
+          - parcel
+          description: 'How the container arrives. Use the same type for all containers of a delivery.
+
+
+            - `parcel`: a parcel
+
+            - `pallet`: a pallet
+
+            - `euroPallet`: a EUR-pallet (Euro-pallet)'
+        exchangeablePallet:
+          type: boolean
+          description: Whether the delivery is on exchangeable EUR-pallets (Euro-pallets, EPAL), which the warehouse exchanges for empty ones with the carrier on arrival. Set it to `false` when the pallet type is unknown or different.
+        carrier:
+          type: string
+          enum:
+          - DHL
+          - DHL_Express
+          - DPD
+          - FedEx
+          - GLS
+          - Hellmann
+          - Hermes
+          - PostAT
+          - PostDE
+          - UPS
+          - amazon
+          - chronopost
+          - colissimo_fr
+          - db_schenker
+          - dpd_de
+          - dpd_gb
+          - fiege
+          - gls_global
+          - post_at
+          - post_de
+          - post_it
+          - post_nl
+          - royalmail_gb
+          - tnt
+          - dsv_global
+          - dachser_global
+          - maersk_global
+          - strecktransport_global
+          - nacex_es
+          - correosexpress_global
+          - brt_it
+          - seur_es
+          - fercam_global
+          - unknown
+          description: Carrier bringing the container to the warehouse. Use `unknown` for any carrier not listed and give its name in `unknownCarrierName`.
+        unknownCarrierName:
+          type:
+          - string
+          - 'null'
+          description: Name of the carrier when `carrier` is `unknown`; an empty string or `null` otherwise.
+        trackingNumber:
+          type:
+          - string
+          - 'null'
+          description: Tracking number of the container with its carrier, used to track it on its way to the warehouse; `null` when there is none. Must not be a URL.
+        trackingURL:
+          type:
+          - string
+          - 'null'
+          description: URL where the container can be tracked; `null` or empty when there is none.
+        arrived:
+          type: boolean
+          description: Whether the container has arrived at the warehouse, as recorded by the warehouse.
+        status:
+          type:
+          - string
+          - 'null'
+          enum:
+          - pick_up
+          - in_transit
+          - out_for_delivery
+          - delivered
+          - delayed
+          - failed_delivery
+          - null
+          readOnly: true
+          description: 'Tracking status of the container, updated from the carrier tracking of its `trackingNumber`; `null` until the first tracking update.
+
+
+            - `pick_up`: waiting to be picked up by the carrier
+
+            - `in_transit`: on the way to the warehouse
+
+            - `out_for_delivery`: out for delivery to the warehouse
+
+            - `delivered`: delivered to the warehouse
+
+            - `delayed`: delivery is delayed
+
+            - `failed_delivery`: the carrier failed to deliver'
+        deliveredAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          readOnly: true
+          description: When the carrier delivered the container to the warehouse, according to its tracking (ISO 8601, UTC); `null` until then.
+      required:
+      - carrier
+      - exchangeablePallet
+      - sequenceNumber
+      - trackingNumber
+      - trackingURL
+      - type
+      - unknownCarrierName
+      title: Delivery container
+  parameters:
+    PerPage:
+      name: per_page
+      in: query
+      description: Number of results per page
+      schema:
+        type: integer
+        default: 250
+        minimum: 1
+    SortOrder:
+      name: sort_order
+      in: query
+      description: The direction of result sorting
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    SortBy:
+      name: sort_by
+      in: query
+      description: The model field to sort results by
+      schema:
+        type: string
+    Fields:
+      name: fields
+      in: query
+      description: Model fields to search through; comma separated
+      schema:
+        type: array
+        items:
+          type: string
+        description: Fields are comma separated
+      explode: false
+      required: false
+    Page:
+      name: page
+      in: query
+      description: Result page to jump to, 0-indexed
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    Query:
+      name: q
+      in: query
+      description: The search term
+      schema:
+        type: string
+  responses:
+    Empty:
+      description: Empty response content
+    Error:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Generic error response
+    Undefined:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UndefinedResponse'
+      description: Generic success response
+  securitySchemes:
+    tokenAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authorization with previously obtained JSON Web Token
+x-provenance:
+  method: searched
+  source: https://developers.getbyrd.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developers.getbyrd.com/reference/authapiv2_get.md
+  - https://developers.getbyrd.com/reference/b2bconfigapi_get.md
+  - https://developers.getbyrd.com/reference/b2bconfigtemplateapi_get.md
+  - https://developers.getbyrd.com/reference/bundledetailsapi_delete.md
+  - https://developers.getbyrd.com/reference/bundledetailsapi_get.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_get.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_post.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_put.md
+  - https://developers.getbyrd.com/reference/dangerousgoodsunitlimitsapi_get.md
+  - https://developers.getbyrd.com/reference/deliveriesapi_get.md
+  - https://developers.getbyrd.com/reference/deliveriesapi_post.md
+  - https://developers.getbyrd.com/reference/deliveryapi_delete.md
+  - https://developers.getbyrd.com/reference/deliveryapi_get.md
+  - https://developers.getbyrd.com/reference/deliveryapi_patch.md
+  - https://developers.getbyrd.com/reference/deliveryapi_put.md
+  - https://developers.getbyrd.com/reference/deliverydocumentapi_delete.md
+  - https://developers.getbyrd.com/reference/deliverydocumentapi_patch.md
+  - https://developers.getbyrd.com/reference/deliverydocumentsapi_get.md
+  - https://developers.getbyrd.com/reference/deliverydocumentsapi_post.md
+  - https://developers.getbyrd.com/reference/deliveryitemapi_get.md
+  - https://developers.getbyrd.com/reference/deliverylistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/deliverylotsapi_get.md
+  - https://developers.getbyrd.com/reference/inventoryexportapi_get.md
+  - https://developers.getbyrd.com/reference/loginapiv2_post.md
+  - https://developers.getbyrd.com/reference/lotdetailapi_get.md
+  - https://developers.getbyrd.com/reference/lotdetailapi_patch.md
+  - https://developers.getbyrd.com/reference/lotlistapi_get.md
+  - https://developers.getbyrd.com/reference/lotlistapi_post.md
+  - https://developers.getbyrd.com/reference/picklistapiv3_get.md
+  - https://developers.getbyrd.com/reference/productapi_delete.md
+  - https://developers.getbyrd.com/reference/productapi_get.md
+  - https://developers.getbyrd.com/reference/productapi_patch.md
+  - https://developers.getbyrd.com/reference/productapi_put.md
+  - https://developers.getbyrd.com/reference/productsapi_get.md
+  - https://developers.getbyrd.com/reference/productsapi_post.md
+  - https://developers.getbyrd.com/reference/productserialnumbersapi_get.md
+  - https://developers.getbyrd.com/reference/productstatsapi_get.md
+  - https://developers.getbyrd.com/reference/productstockbywarehouseapi_get.md
+  - https://developers.getbyrd.com/reference/refreshtokenapi_post.md
+  - https://developers.getbyrd.com/reference/returnsexportapi_get.md
+  - https://developers.getbyrd.com/reference/returnshipmentannouncedapiv3_post.md
+  - https://developers.getbyrd.com/reference/returnshipmentdetailapi_get.md
+  - https://developers.getbyrd.com/reference/returnshipmentdocumentsapiv3_post.md
+  - https://developers.getbyrd.com/reference/returnshipmentlistapi_get.md
+  - https://developers.getbyrd.com/reference/schedulepickupapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentaddressvalidationapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_delete.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_patch.md
+  - https://developers.getbyrd.com/reference/shipmentbatchrecallapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentbatchreleaseapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentfileapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentexportapi_get.md
+  - https://developers.getbyrd.com/reference/shipmentlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentlistapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentlistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentpicklistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentrecallapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentreportapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentreservationlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentunitapiv3_get.md
+  - https://developers.getbyrd.com/reference/unitlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/unitlistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/userapiv2_patch.md
+  - https://developers.getbyrd.com/reference/userwarehouselinksapi_get.md
+  - https://developers.getbyrd.com/reference/warehouseapi_get.md
+  - https://developers.getbyrd.com/reference/warehousesapi_get.md
+  merge:
+    pages: 69
+    deduped: 601
+    conflicts_kept_first: 0

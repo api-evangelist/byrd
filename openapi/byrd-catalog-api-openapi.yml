@@ -1,0 +1,2801 @@
+openapi: 3.2.0
+info:
+  description: The byrd APIs for managing products, inbound deliveries, shipments and returns.
+  contact:
+    email: info@getbyrd.com
+    name: General company contact
+    url: https://getbyrd.com/kontakt/
+  license:
+    name: Copyright byrd technologies GmbH
+  termsOfService: https://getbyrd.com/agb/
+  version: '20260924'
+  title: byrd Catalog API
+servers:
+- description: Production server
+  url: https://api.getbyrd.com/
+security:
+- tokenAuth: []
+tags:
+- name: Catalog
+  description: Products and bundles, their lots, serial numbers and stock, and the dangerous goods limits that apply to them.
+paths:
+  /v2/warehouse/dangerous-goods-limits:
+    get:
+      operationId: dangerousgoodsunitlimitsapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DangerousGoodsLimits'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Returns the UN numbers byrd can ship and the maximum quantity of
+
+        each a single product may contain. Use them in the `dangerousGoods`
+
+        of your products.'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      summary: List the supported dangerous goods
+  /v2/warehouse/lots:
+    get:
+      operationId: lotlistapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Lot'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Returns the lots of your products with their stock levels, so a
+
+        product appears once per lot. Set `warehouse_details=true` to get
+
+        the stock of each lot per warehouse.'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: product_id
+        description: Only include lots of this product.
+        schema:
+          type: string
+          format: uuid
+        required: false
+      - in: query
+        name: activated
+        description: Only include lots that are (`true`) or are not (`false`) activated.
+        schema:
+          type: boolean
+        required: false
+      - in: query
+        name: warehouse_details
+        description: Whether to include the stock of each lot per warehouse in `warehouses`. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - $ref: '#/components/parameters/SortBy'
+      - $ref: '#/components/parameters/SortOrder'
+      - $ref: '#/components/parameters/Query'
+      - $ref: '#/components/parameters/Fields'
+      summary: List lots
+    post:
+      operationId: lotlistapi_post
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Lot'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Creates a lot (batch) for one of your physical products. The lot
+
+        number must be unique for the product.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lot'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      summary: Create a lot
+  /v2/warehouse/lots/{lot_id}:
+    get:
+      operationId: lotdetailapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Lot'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Returns one of your lots. Deleted lots, and lots of deleted
+
+        products, are not found.'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: lot_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the lot (UUID).
+      summary: Get a lot
+    patch:
+      operationId: lotdetailapi_patch
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Lot'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Changes only the fields you send. Set `activated` to `false` to stop
+
+        units of the lot from being shipped, and back to `true` to allow it
+
+        again.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LotUpdate'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: lot_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the lot (UUID).
+      summary: Update a lot
+  /v2/warehouse/products:
+    get:
+      operationId: productsapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                allOf:
+                - type: object
+                  required:
+                  - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Product'
+                - $ref: '#/components/schemas/PaginationFields'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Returns your products with their stock levels, paginated. Deleted
+
+        products and packaging materials are left out unless you ask for
+
+        them. See the Listing products guide.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: include_storages
+        description: Whether to include the `storages` holding the product. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: include_lots
+        description: Whether to include the `lots` of each product. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: include_deleted
+        description: Whether to include deleted products. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: include_non_deliverable
+        description: Whether to include products that cannot be delivered to a warehouse themselves, such as bundles. Defaults to `true`.
+        schema:
+          type: boolean
+          default: true
+        required: false
+      - in: query
+        name: include_packaging_material
+        description: Whether to include packaging materials. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: only
+        description: Fields to return, as a comma-separated list of field names or dotted paths to nested fields, for example `id,sku,packagingUnits`. All fields are returned when omitted.
+        schema:
+          type: array
+          items:
+            type: string
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: active
+        description: Only include products that are (`true`) or are not (`false`) active.
+        schema:
+          type: boolean
+        required: false
+      - in: query
+        name: bsku
+        description: Only include the product with this byrd SKU.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: productID
+        description: Only include products with this (deprecated) shop article ID.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: variantID
+        description: Only include products with this (deprecated) shop article variant ID.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: sku
+        description: Only include the product with exactly this SKU.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: skus
+        description: Only include the products with these comma-separated SKUs; combined with `ids`, products matching either list are included.
+        schema:
+          type: array
+          items:
+            type: string
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: ids
+        description: Only include the products with these comma-separated IDs; combined with `skus`, products matching either list are included.
+        schema:
+          type: array
+          items:
+            type: string
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: exclude_skus
+        description: Exclude the products with these comma-separated SKUs. Cannot be combined with `ids` or `skus`.
+        schema:
+          type: array
+          items:
+            type: string
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: exclude_ids
+        description: Exclude the products with these comma-separated IDs. Cannot be combined with `ids` or `skus`.
+        schema:
+          type: array
+          items:
+            type: string
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: shopID
+        description: Only include products linked to this shop.
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: shop_ids
+        description: Only include products linked to one of these comma-separated shop IDs.
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: userID
+        description: Only include products owned by this user.
+        schema:
+          type: string
+          format: uuid
+        required: false
+      - in: query
+        name: productType
+        description: Only include products of this type, for example `product` or `bundle`.
+        schema:
+          type: string
+          enum:
+          - product
+          - alias
+          - supplementary
+          - marketing
+          - branding
+          - packaging_material
+          - prepacked_product
+          - bundle
+        required: false
+      - in: query
+        name: organic
+        description: Only include products that are (`true`) or are not (`false`) organic.
+        schema:
+          type: boolean
+        required: false
+      - in: query
+        name: grs
+        description: Only include products that are (`true`) or are not (`false`) GRS compliant.
+        schema:
+          type: boolean
+        required: false
+      - in: query
+        name: lotsEnabled
+        description: Only include products with lot tracking enabled (`true`) or disabled (`false`).
+        schema:
+          type: boolean
+        required: false
+      - in: query
+        name: warehouse_ids
+        description: Only include products stocked in one of these comma-separated warehouse IDs; the stock levels then only count those warehouses.
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: change_requested
+        description: Only include products with at least one change request; only `true` is accepted.
+        schema:
+          type: boolean
+          enum:
+          - true
+        required: false
+      - in: query
+        name: change_request_status
+        description: 'Only include products with a change request in this status.
+
+
+          - `open`
+
+          - `accepted`
+
+          - `declined`'
+        schema:
+          type: string
+          enum:
+          - open
+          - accepted
+          - declined
+        required: false
+      - in: query
+        name: change_request_statuses
+        description: 'Only include products with a change request in one of these comma-separated statuses: `open`, `accepted`, `declined`.'
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - open
+            - accepted
+            - declined
+        required: false
+        explode: false
+        style: form
+      - in: query
+        name: isDangerousGoods
+        description: Only include products that do (`true`) or do not (`false`) have dangerous goods entries.
+        schema:
+          type: boolean
+        required: false
+      - in: query
+        name: physicalStockMin
+        description: Only include products with at least this physical stock; at least 0 and not above `physicalStockMax`.
+        schema:
+          type: integer
+          minimum: 0
+        required: false
+      - in: query
+        name: physicalStockMax
+        description: Only include products with at most this physical stock; at least 0.
+        schema:
+          type: integer
+          minimum: 0
+        required: false
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/SortBy'
+      - $ref: '#/components/parameters/SortOrder'
+      - $ref: '#/components/parameters/Query'
+      - $ref: '#/components/parameters/Fields'
+      summary: List your products
+    post:
+      operationId: productsapi_post
+      responses:
+        '201':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Creates a product, or a bundle when `productType` is `bundle`. The
+
+        SKU must match the one your sales channel sends on its order lines,
+
+        otherwise orders for it cannot be released.'
+      requestBody:
+        content:
+          application/vnd.byrd.customer+json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      x-byrd-roles:
+      - service
+      - customer
+      - customer_support
+      - warehouse_support
+      - admin
+      summary: Create a product
+  /v2/warehouse/products/{bundle_id}/bundles:
+    get:
+      operationId: bundlelistapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Bundle'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Returns each product the bundle is made of, with its quantity. Fails
+
+        when the product is not a bundle.'
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: bundle_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the bundle product (UUID).
+      summary: List the ingredients of a bundle
+    post:
+      operationId: bundlelistapi_post
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Bundle'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: Adds one of your products to the bundle with the given quantity.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bundle'
+      x-byrd-roles:
+      - admin
+      - service
+      - customer
+      parameters:
+      - name: bundle_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the bundle product (UUID).
+      summary: Add an ingredient to a bundle
+    put:
+      operationId: bundlelistapi_put
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Bundle'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: Replaces all ingredients of the bundle with the ones you send.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Bundle'
+      x-byrd-roles:
+      - admin
+      - service
+      - customer
+      parameters:
+      - name: bundle_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the bundle product (UUID).
+      summary: Set the ingredients of a bundle
+  /v2/warehouse/products/{bundle_id}/bundles/{ingredient_id}:
+    get:
+      operationId: bundledetailsapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Bundle'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: Returns the ingredient product and its quantity in the bundle.
+      x-byrd-roles:
+      - service
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: bundle_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the bundle product (UUID).
+      - name: ingredient_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the ingredient product in the bundle (UUID).
+      summary: Get an ingredient of a bundle
+    delete:
+      operationId: bundledetailsapi_delete
+      responses:
+        '204':
+          $ref: '#/components/responses/Empty'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'The ingredient product itself is not deleted. Fails with `400` when
+
+        `bundle_id` is not a bundle.'
+      x-byrd-roles:
+      - admin
+      - service
+      - customer
+      parameters:
+      - name: bundle_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the bundle product (UUID).
+      - name: ingredient_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the ingredient product in the bundle (UUID).
+      summary: Remove an ingredient from a bundle
+  /v2/warehouse/products/{product_id}:
+    get:
+      operationId: productapi_get
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Returns the details and stock levels of one of your products, also
+
+        when it was deleted.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: include_storages
+        description: Whether to include the `storages` holding the product. Defaults to `false`.
+        schema:
+          type: boolean
+          default: false
+        required: false
+      - in: query
+        name: only
+        description: Fields to return, as a comma-separated list of field names or dotted paths to nested fields, for example `id,sku,packagingUnits`. All fields are returned when omitted.
+        schema:
+          type: array
+          items:
+            type: string
+        required: false
+        explode: false
+        style: form
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the product (UUID).
+      summary: Get a product
+    put:
+      operationId: productapi_put
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Behaves exactly like `PATCH`: only the fields you send are changed.'
+      requestBody:
+        content:
+          application/vnd.byrd.customer+json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the product (UUID).
+      summary: Update a product
+    patch:
+      operationId: productapi_patch
+      responses:
+        '200':
+          content:
+            application/vnd.byrd.customer+json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Changes only the fields you send. Also used to answer the change
+
+        requests of the warehouse, through `changeRequests`.'
+      requestBody:
+        content:
+          application/vnd.byrd.customer+json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the product (UUID).
+      summary: Update a product
+    delete:
+      operationId: productapi_delete
+      responses:
+        '204':
+          $ref: '#/components/responses/Empty'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Only possible once no stock of the product is stored any more and
+
+        it is not an ingredient of a bundle. Deleted products are only
+
+        listed with `include_deleted=true`.'
+      x-byrd-roles:
+      - admin
+      - service
+      - customer
+      - customer_support
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the product (UUID).
+      summary: Delete a product
+  /v2/warehouse/products/{product_id}/serial-numbers:
+    get:
+      operationId: productserialnumbersapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  required:
+                  - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SerialNumberInventory'
+                - $ref: '#/components/schemas/PaginationFields'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Returns the serial numbers recorded for units of the product in
+
+        inventory, paginated. Use `outbounded` to tell units still in stock
+
+        from shipped ones, and `q` to search for a serial number.'
+      x-byrd-roles:
+      - customer
+      - service
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: outbounded
+        description: Only include serial numbers that have (`true`) or have not (`false`) been shipped out of the warehouse.
+        schema:
+          type: boolean
+        required: false
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Query'
+      - $ref: '#/components/parameters/Fields'
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the product (UUID).
+      summary: List the serial numbers of a product
+  /v2/warehouse/products/{product_id}/stats:
+    get:
+      operationId: productstatsapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductStats'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Returns when the product was last picked and last restocked, and
+
+        how many units are in deliveries not inbounded yet, optionally for
+
+        a single warehouse.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - in: query
+        name: warehouseID
+        description: Only count the stock movements and deliveries of this warehouse.
+        schema:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          default: null
+        required: false
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the product (UUID).
+      summary: Get stock statistics for a product
+  /v2/warehouse/products/{product_id}/stock-by-warehouse:
+    get:
+      operationId: productstockbywarehouseapi_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductStockByWarehouse'
+          description: Success response to a valid request
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      tags:
+      - Catalog
+      description: 'Returns the physical, reserved and unavailable stock of the product
+
+        in each warehouse that holds or reserves it.'
+      x-byrd-roles:
+      - service
+      - customer_support
+      - customer
+      - warehouse_support
+      - admin
+      - operator
+      - warehouse
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the product (UUID).
+      summary: Get a product's stock per warehouse
+components:
+  schemas:
+    DangerousGoodsLimits:
+      type: object
+      properties:
+        limits:
+          type: object
+          description: Dangerous goods byrd can ship, keyed by UN number. Each entry has the `UNNumber`, `description`, `dangerousGoodsClass`, `dangerousGoodsType`, `unit` and the `limit` a single product may contain.
+          additionalProperties:
+            type: object
+            additionalProperties: {}
+      title: Dangerous goods limits
+    PaginationFields:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: Current page of results, 0-indexed
+        per_page:
+          type: integer
+          description: Number of results per page
+        page_count:
+          type: integer
+          description: Number of result pages
+        total_count:
+          type: integer
+          description: Total number of results across all pages
+      title: Pagination fields
+    ProductChangeRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the change request (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        info:
+          type: string
+          enum:
+          - organic
+          - grs
+          - lotsEnabled
+          - serialNumberEnabled
+          - packagingUnitEnabled
+          - productType
+          - fragile
+          - isDangerousGoods
+          description: 'Product setting the warehouse asks you to change, because it does not match the product it received.
+
+
+            - `organic`
+
+            - `grs`
+
+            - `lotsEnabled`
+
+            - `serialNumberEnabled`
+
+            - `packagingUnitEnabled`
+
+            - `productType`: whether the product is a `prepacked_product`
+
+            - `fragile`
+
+            - `isDangerousGoods`'
+        status:
+          type: string
+          enum:
+          - accepted
+          - declined
+          description: 'Status of the change request. To answer one, send `accepted` or `declined` together with its `info`.
+
+
+            - `open`: waiting for your answer
+
+            - `accepted`: you accepted the change; the warehouse will apply it
+
+            - `declined`: you declined the change'
+      required:
+      - info
+      - status
+      title: Product change request
+    Lot:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the lot (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        productID:
+          type: string
+          format: uuid
+          description: ID of the product the lot belongs to (UUID); a physical product, not a bundle. It cannot be changed after the lot is created.
+        lotNumber:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: Lot (batch) number, 1 to 64 characters; unique per product.
+        expiryDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date the lot expires (ISO 8601 date); cannot be in the past. `null` when the lot does not expire.
+        notBefore:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: First moment units of the lot may be shipped (ISO 8601, UTC); must be before `notAfter`. `null` for no limit.
+        notAfter:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Last moment units of the lot may be shipped (ISO 8601, UTC); cannot be in the past. When you do not set it, it is derived from `expiryDate` if byrd has a minimum remaining shelf life configured for your products. `null` for no limit.
+        activated:
+          type: boolean
+          description: Whether units of the lot can be picked for shipments; stock of a deactivated lot is unavailable. Defaults to `true`.
+        physicalStock:
+          type: integer
+          readOnly: true
+          description: Units of the lot in byrd warehouses, including reserved and unavailable units.
+        reservedStock:
+          type: integer
+          readOnly: true
+          description: Units of the lot reserved for shipments released to a warehouse and not picked yet.
+        warehouses:
+          readOnly: true
+          description: Stock of the lot per warehouse, most stock first; only included with `warehouse_details=true`, otherwise `null`.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LotWarehouseDetails'
+      required:
+      - lotNumber
+      - productID
+      title: Lot
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - Authentication.AuthenticationRequired
+          - Authentication.ExpiredJWTToken
+          - Authentication.InvalidCredentials
+          - Authentication.InvalidJWTToken
+          - Authentication.LocalityRequired
+          - Authentication.MissingPermission
+          - Authentication.ReadOnly
+          - Authentication.RoleNotAllowed
+          - Authentication.UserLocked
+          - Exception.404
+          - Exception.500
+          - Request.InvalidPagination
+          - Request.InvalidQuery
+          - Request.InvalidSchema
+          - Request.NoInput
+          - Request.ResourceNotFound
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            description: Embedded instance of Error
+      title: Error
+    Bundle:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the link between the bundle and this ingredient (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        ingredient:
+          readOnly: true
+          description: Details of the ingredient product.
+          allOf:
+          - $ref: '#/components/schemas/Product'
+        ingredientID:
+          type: string
+          format: uuid
+          writeOnly: true
+          description: ID of the product to include in the bundle (UUID). It must be a regular product, a prepacked product, a packaging material or a branding item, and cannot be changed afterwards.
+        quantity:
+          type: integer
+          description: Number of units of the ingredient in one bundle.
+      required:
+      - ingredientID
+      - quantity
+      title: Bundle
+    StorageWarehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        countryCode:
+          type: string
+          readOnly: true
+          description: Country the warehouse is in (ISO 3166-1 alpha-2).
+          example: DE
+      title: Storage warehouse
+    ProductStorageLot:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the lot (UUID).
+        lotNumber:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: Lot (batch) number, 1 to 64 characters; unique per product.
+        expiryDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date the lot expires (ISO 8601 date); cannot be in the past. `null` when the lot does not expire.
+        notBefore:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: First moment units of the lot may be shipped (ISO 8601, UTC); must be before `notAfter`. `null` for no limit.
+        notAfter:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Last moment units of the lot may be shipped (ISO 8601, UTC); cannot be in the past. When you do not set it, it is derived from `expiryDate` if byrd has a minimum remaining shelf life configured for your products. `null` for no limit.
+        activated:
+          type: boolean
+          description: Whether units of the lot can be picked for shipments; stock of a deactivated lot is unavailable. Defaults to `true`.
+      required:
+      - lotNumber
+      title: Product storage lot
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the product (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        active:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the product can be shipped. Defaults to `true`.
+        barcode:
+          type:
+          - string
+          - 'null'
+          maxLength: 48
+          description: Value of the primary barcode printed on the product, at most 48 characters; mirrors the primary entry of `barcodes`. `null` when the product has no barcode.
+        barcodeType:
+          description: 'Symbology of `barcode`; required when `barcode` is set.
+
+
+            - `ean_13`: EAN-13
+
+            - `code_128`: Code 128
+
+            - `gs1_128`: GS1-128
+
+            - `qr_code`: QR code'
+          type:
+          - string
+          - 'null'
+          enum:
+          - ean_13
+          - code_128
+          - gs1_128
+          - qr_code
+          - null
+        barcodes:
+          description: All barcodes printed on the product, at most one of them primary. When you send both `barcode` and `barcodes`, `barcode` must match the primary entry.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Barcode'
+        customsTariffNumber:
+          type:
+          - string
+          - 'null'
+          pattern: ^([0-9]{6}|[0-9]{8}|[0-9]{10})$
+          description: 'Harmonised System (HS) tariff code of the product: 6, 8 or 10 digits. Required for shipments leaving the EU or the UK.'
+          example: '910121'
+        customsValue:
+          type:
+          - object
+          - 'null'
+          properties:
+            value:
+              type: number
+              description: Amount, as a string with two decimals separated by a dot.
+            currency:
+              type: string
+              pattern: ^[A-Z]{3}$
+              description: Currency (ISO 4217 code, e.g. `EUR`).
+            taxFactor:
+              type:
+              - number
+              - 'null'
+              description: Tax factor of the price, for example `1.19` for 19% VAT; `null` when not set.
+          required:
+          - currency
+          - value
+          description: Value declared to customs for the product when the shipment item has no price, for example for a free gift; `null` for none. Not the purchase price.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Free-text description of the product.
+        ean:
+          type:
+          - string
+          - 'null'
+          description: European Article Number (EAN) of the product, passed on as its GTIN in customs data.
+        isbn:
+          type:
+          - string
+          - 'null'
+          description: International Standard Book Number (ISBN) of the product, passed on as its GTIN in customs data when it has no EAN or UPC.
+        lotsEnabled:
+          type: boolean
+          description: Whether lots (batches) of the product are tracked when it is inbounded and shipped. Bundles cannot be lot tracked. Defaults to `false`.
+        packagingUnitEnabled:
+          type: boolean
+          description: Whether the product also comes in packaging units holding several units, which the warehouse can pick as a whole. Defaults to `false`.
+        serialNumberEnabled:
+          type: boolean
+          description: Whether serial numbers of the product are recorded when it is shipped. Defaults to `false`.
+        serialNumberRegex:
+          type:
+          - string
+          - 'null'
+          description: Regular expression the serial numbers recorded when shipping the product must match; `null` for no check.
+        inventorySerialNumberEnabled:
+          type: boolean
+          description: Whether serial numbers are also tracked in inventory, from inbounding onwards. Requires `serialNumberEnabled`. Defaults to `false`.
+        name:
+          type: string
+          minLength: 1
+          description: Name of the product; at least one character.
+        originCountryCode:
+          type:
+          - string
+          - 'null'
+          pattern: ^[A-Z]{2}$
+          description: Country the product was made in (ISO 3166-1 alpha-2); `UK` is stored as `GB`. Required for shipments leaving the EU or the UK.
+          example: DE
+        organic:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the product is organic and needs special storage and shipping conditions. Bundles cannot be organic. Defaults to `false`.
+        grs:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the product complies with the Global Recycled Standard (GRS) and needs specific storage conditions. Defaults to `false`.
+        fragile:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the product is fragile and needs special packaging. For a bundle it is derived from the ingredients and cannot be set. Defaults to `false`.
+        productID:
+          type:
+          - string
+          - 'null'
+          description: Deprecated. ID of the article in your shop system; required when `shopID` is set.
+        productType:
+          type:
+          - string
+          - 'null'
+          description: 'Type of the product. Defaults to `product`; `bundle`, `supplementary` and `packaging_material` cannot be changed afterwards.
+
+
+            - `product`: a regular physical product
+
+            - `bundle`: a group of other products sold under one SKU, see `bundleIngredients`
+
+            - `prepacked_product`: a product shipped in its own packaging
+
+            - `packaging_material`: packaging material, such as boxes or fillers
+
+            - `branding`: branded material packed into shipments, not counted as a product item
+
+            - `supplementary`: a product only shipped together with another product
+
+            - `alias`: another SKU for an existing product, sharing its stock
+
+            - `marketing`: marketing material'
+        purchasePrice:
+          type:
+          - object
+          - 'null'
+          properties:
+            value:
+              type: number
+              description: Amount, as a string with two decimals separated by a dot.
+            currency:
+              type: string
+              pattern: ^[A-Z]{3}$
+              description: Currency (ISO 4217 code, e.g. `EUR`).
+            taxFactor:
+              type:
+              - number
+              - 'null'
+              description: Tax factor of the price, for example `1.19` for 19% VAT; `null` when not set.
+          required:
+          - currency
+          - value
+          description: Purchase price of one unit, used to insure shipments. Use the purchase price, not the retail price; bundles cannot have one.
+        purchasePriceEvidenceURL:
+          type:
+          - string
+          - 'null'
+          description: HTTPS link to a document proving the purchase price, such as an invoice.
+        reorderPoint:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          description: Available stock level at or below which the product is reported as low on stock, for example in the daily notification email if you enabled it. Defaults to `0`.
+        retailPrice:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+          description: Retail price of one unit, for your reference; at least 0.
+        sku:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          description: Your stock keeping unit (SKU) for the product, unique among your products. It must match the SKU your sales channel sends on order lines.
+          example: AELMO-00005
+        upc:
+          type:
+          - string
+          - 'null'
+          description: Universal Product Code (UPC) of the product, passed on as its GTIN in customs data when it has no EAN.
+        variantID:
+          type:
+          - string
+          - 'null'
+          description: Deprecated. ID of the article variant in your shop system.
+        deleted:
+          type: boolean
+          readOnly: true
+          description: Whether the product was deleted.
+        deletedDate:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the product was deleted (ISO 8601); `null` if it was not.
+        physicalStock:
+          type: integer
+          readOnly: true
+          description: Units of the product in byrd warehouses, including reserved and unavailable units.
+        reservedStock:
+          type: integer
+          readOnly: true
+          description: Units reserved for shipments released to a warehouse and not picked yet.
+        availableStock:
+          type: integer
+          readOnly: true
+          description: 'Units available for new shipments: physical stock minus reserved and unavailable stock, never below 0. For a bundle, the number of complete bundles its ingredients allow.'
+        unavailableStock:
+          type: integer
+          readOnly: true
+          description: 'Units that cannot be shipped: damaged, in a deactivated storage, or in a lot that is deactivated, expired or outside its shipping window.'
+        stocksByWarehouse:
+          type: object
+          readOnly: true
+          additionalProperties:
+            type: object
+            properties:
+              available:
+                type: integer
+                description: Units in this warehouse that can be ordered.
+              physical:
+                type: integer
+                description: Units of the product in this warehouse, including reserved and unavailable units.
+              reserved:
+                type: integer
+                description: Units in this warehouse reserved for released shipments and not picked yet.
+              unavailable:
+                type: integer
+                description: Units in this warehouse that cannot be shipped, for example because they are damaged or in a deactivated storage or lot.
+          description: Stock levels per warehouse, keyed by warehouse ID, each with `available`, `physical`, `reserved` and `unavailable` units. Only warehouses holding or reserving the product are listed.
+        unreleasedReservations:
+          type: integer
+          readOnly: true
+          description: Units needed by your shipments that are not released to a warehouse yet; not included in `reservedStock`.
+        bundleIngredients:
+          writeOnly: true
+          description: 'Products a bundle is made of and how many units of each, as `ingredientID` and `quantity`; only for `productType` `bundle`. Replaces the current ingredients. Write-only: read them with the bundle endpoints.'
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Bundle'
+        user:
+          type: object
+          readOnly: true
+          description: 'Deprecated: use `userID`. Object with the `id` of the owner.'
+          additionalProperties: {}
+        userID:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: ID of the byrd user who owns the product (UUID). Products you create are always yours.
+        shop:
+          type:
+          - object
+          - 'null'
+          readOnly: true
+          description: 'Deprecated: use `shopID`. Object with the `id` of the shop.'
+          additionalProperties: {}
+        shopID:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: ID of the shop the product is linked to (UUID); `null` when it is not linked to a shop.
+        storages:
+          readOnly: true
+          description: Storages holding the product in byrd warehouses. Only included when requested with `include_storages=true`.
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductStorage'
+        lots:
+          readOnly: true
+          description: Lots (batches) of the product. Only included when listing products with `include_lots=true`.
+          type: array
+          items:
+            $ref: '#/components/schemas/LotIncludedInProduct'
+        packagingUnits:
+          maxItems: 1
+          description: 'Packaging unit of the product: a pack of several units with its own barcode. At most one; its barcode is required when you create the product and must differ from the product barcodes.'
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductPackagingUnit'
+        dangerousGoods:
+          description: 'Dangerous goods the product contains, one entry per UN number. Bundles cannot have any: add them to the ingredients instead.'
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ProductDangerousGoods'
+        dangerousGoodsMSDSURL:
+          type:
+          - string
+          - 'null'
+          description: HTTPS link to the material safety data sheet (MSDS) of the dangerous goods in the product.
+        isDangerousGoods:
+          type: boolean
+          readOnly: true
+          description: Whether the product contains dangerous goods; for a bundle, whether any of its ingredients does.
+        bsku:
+          type:
+          - string
+          - 'null'
+          default: null
+          readOnly: true
+          pattern: ^BSKU-([A-Z0-9]){10}$
+          description: Unique SKU byrd generates for the product, unrelated to your `sku`.
+          example: BSKU-ONXV1VAF04
+        skipBarcodePick:
+          type: boolean
+          readOnly: true
+          description: Whether the warehouse may skip scanning the product barcode when picking and packing. Set by byrd.
+        dimensions:
+          type:
+          - object
+          - 'null'
+          properties:
+            id:
+              type: string
+              format: uuid
+              readOnly: true
+              description: ID of the dimensions record (UUID).
+            createdAt:
+              type: string
+              format: date-time
+              readOnly: true
+              description: When the record was created (ISO 8601).
+            updatedAt:
+              type: string
+              format: date-time
+              readOnly: true
+              description: When the record was last changed (ISO 8601).
+            length:
+              type:
+              - number
+              - 'null'
+              minimum: 0.01
+              description: Length in cm; at least 0.01.
+            width:
+              type:
+              - number
+              - 'null'
+              minimum: 0.01
+              description: Width in cm; at least 0.01.
+            height:
+              type:
+              - number
+              - 'null'
+              minimum: 0.01
+              description: Height in cm; at least 0.01.
+            weight:
+              type:
+              - number
+              - 'null'
+              minimum: 0.001
+              description: Weight in kg; at least 0.001.
+            sizeGroup:
+              type:
+              - string
+              - 'null'
+              enum:
+              - S
+              - XS
+              - M
+              - L
+              - XL
+              - XXL
+              - CUSTOM
+              - PAL
+              - null
+              description: 'Size group used for charging, based on the sum of the shortest and the longest side.
+
+
+                - `XS`: flat items such as envelopes and polybags
+
+                - `S`: up to 35 cm
+
+                - `M`: 35 cm or more
+
+                - `L`: 65 cm or more
+
+                - `XL`: 95 cm or more
+
+                - `XXL`: 115 cm or more
+
+                - `CUSTOM`: custom size, mostly for items with a variable height
+
+                - `PAL`: pallets'
+            isHeightVariable:
+              type: boolean
+              description: Whether the height can vary, for example for soft or compressible items. Defaults to `false`.
+            createdBy:
+              readOnly: true
+              description: 'Who provided the dimensions.
+
+
+                - `CUSTOMER`: you
+
+                - `PARTNER`: the warehouse, which measured the product'
+              type: string
+              enum:
+              - CUSTOMER
+              - PARTNER
+            scannerIdentifier:
+              type:
+              - string
+              - 'null'
+              readOnly: true
+              description: Identifier of the scanner the warehouse measured the dimensions with; `null` when they were not scanned.
+          description: Size and weight of one unit of the product. The weight is needed for shipments leaving the EU or the UK; a `prepacked_product` needs all dimensions and a `sizeGroup`.
+        changeRequests:
+          description: Changes the warehouse asks you to make to the product settings, one per `info`; `null` when there are none. Answer them by sending this list back with a `status` of `accepted` or `declined`.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ProductChangeRequest'
+        dimensionsPhotoURLs:
+          type:
+          - array
+          - 'null'
+          readOnly: true
+          description: Links to the photos the warehouse took when it measured the product; `null` when there are none.
+          items:
+            type: string
+      required:
+      - name
+      title: Product
+    Barcode:
+      type: object
+      properties:
+        value:
+          type: string
+          minLength: 1
+          maxLength: 48
+          description: Value encoded in the barcode, 1 to 48 characters; which characters are allowed depends on `barcodeType`.
+        barcodeType:
+          description: 'Symbology of the barcode; required when `value` is set.
+
+
+            - `ean_13`: EAN-13
+
+            - `code_128`: Code 128
+
+            - `gs1_128`: GS1-128
+
+            - `qr_code`: QR code'
+          type: string
+          enum:
+          - ean_13
+          - code_128
+          - gs1_128
+          - qr_code
+        isPrimary:
+          type: boolean
+          description: Whether this is the primary barcode of the product, mirrored in its `barcode` and `barcodeType` fields. At most one barcode can be primary. Defaults to `false`.
+      required:
+      - value
+      title: Barcode
+    LotIncludedInProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the lot (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        productID:
+          type: string
+          format: uuid
+          description: ID of the product the lot belongs to (UUID); a physical product, not a bundle. It cannot be changed after the lot is created.
+        lotNumber:
+          type: string
+          description: Lot (batch) number, 1 to 64 characters; unique per product.
+        expiryDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date the lot expires (ISO 8601 date); cannot be in the past. `null` when the lot does not expire.
+        notBefore:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: First moment units of the lot may be shipped (ISO 8601, UTC); must be before `notAfter`. `null` for no limit.
+        notAfter:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Last moment units of the lot may be shipped (ISO 8601, UTC); cannot be in the past. When you do not set it, it is derived from `expiryDate` if byrd has a minimum remaining shelf life configured for your products. `null` for no limit.
+        activated:
+          type: boolean
+          description: Whether units of the lot can be picked for shipments; stock of a deactivated lot is unavailable. Defaults to `true`.
+      required:
+      - lotNumber
+      - productID
+      title: Lot included in product
+    StorageProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the product (UUID).
+        name:
+          type: string
+          minLength: 1
+          description: Name of the product; at least one character.
+        sku:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          description: Your stock keeping unit (SKU) for the product, unique among your products. It must match the SKU your sales channel sends on order lines.
+          example: AELMO-00005
+        bsku:
+          type:
+          - string
+          - 'null'
+          default: null
+          readOnly: true
+          pattern: ^BSKU-([A-Z0-9]){10}$
+          description: Unique SKU byrd generates for the product, unrelated to your `sku`.
+          example: BSKU-ONXV1VAF04
+        ean:
+          type:
+          - string
+          - 'null'
+          description: European Article Number (EAN) of the product, passed on as its GTIN in customs data.
+        fragile:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the product is fragile and needs special packaging. For a bundle it is derived from the ingredients and cannot be set. Defaults to `false`.
+        barcode:
+          type:
+          - string
+          - 'null'
+          maxLength: 48
+          description: Value of the primary barcode printed on the product, at most 48 characters; mirrors the primary entry of `barcodes`. `null` when the product has no barcode.
+        barcodes:
+          description: All barcodes printed on the product, at most one of them primary. When you send both `barcode` and `barcodes`, `barcode` must match the primary entry.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Barcode'
+        skipBarcodePick:
+          type: boolean
+          readOnly: true
+          description: Whether the warehouse may skip scanning the product barcode when picking and packing. Set by byrd.
+        organic:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the product is organic and needs special storage and shipping conditions. Bundles cannot be organic. Defaults to `false`.
+        grs:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the product complies with the Global Recycled Standard (GRS) and needs specific storage conditions. Defaults to `false`.
+        packagingUnitEnabled:
+          type: boolean
+          description: Whether the product also comes in packaging units holding several units, which the warehouse can pick as a whole. Defaults to `false`.
+        packagingUnits:
+          maxItems: 1
+          description: 'Packaging unit of the product: a pack of several units with its own barcode. At most one; its barcode is required when you create the product and must differ from the product barcodes.'
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductPackagingUnit'
+        serialNumberEnabled:
+          type: boolean
+          description: Whether serial numbers of the product are recorded when it is shipped. Defaults to `false`.
+      required:
+      - name
+      title: Storage product
+    Warehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        code:
+          type: string
+          description: Unique three-letter code of the warehouse.
+          example: TST
+        displayName:
+          type: string
+          description: Name of the warehouse as shown in the byrd dashboard, usually based on its location.
+        name:
+          type: string
+          description: Name of the warehouse.
+        legalName:
+          type: string
+          readOnly: true
+          description: Legal name of the company operating the warehouse; `null` when not set.
+        countryCode:
+          type: string
+          readOnly: true
+          description: Country the warehouse is in (ISO 3166-1 alpha-2).
+          example: DE
+        deliveryAddress:
+          readOnly: true
+          description: Address of the warehouse, where deliveries of your stock are sent.
+          allOf:
+          - $ref: '#/components/schemas/DeliveryAddress'
+        disallowedShipmentOptions:
+          type: string
+          readOnly: true
+          description: Shipment options the warehouse does not support, such as `express` or `pickup_point`; a shipment with one of these options cannot be fulfilled from this warehouse. `null` when every option is supported.
+        openingHours:
+          type: string
+          readOnly: true
+          description: Opening hours of the warehouse, keyed by ISO weekday number (`1` = Monday to `7` = Sunday). Each weekday holds a list of time ranges `[[start_hour, start_minute], [end_hour, end_minute]]`, earliest first. `null` when no opening hours are set.
+      required:
+      - code
+      - displayName
+      - name
+      title: Warehouse
+    LotWarehouseDetails:
+      type: object
+      properties:
+        physicalStock:
+          type: integer
+          readOnly: true
+          description: Units of the lot in this warehouse, including reserved and unavailable units.
+        reservedStock:
+          type: integer
+          readOnly: true
+          description: Units of the lot in this warehouse reserved for shipments and not picked yet.
+        warehouse:
+          readOnly: true
+          description: Warehouse holding the stock. Its fields (`id`, `code`, `name`, `legalName`, `displayName`, `countryCode`) are returned directly in this object, not nested.
+          allOf:
+          - $ref: '#/components/schemas/LotWarehouseDetailsWarehouse'
+      title: Lot warehouse details
+    ProductDangerousGoods:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the dangerous goods entry (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        UNNumber:
+          type: string
+          description: Four-digit UN number of the dangerous good. The supported numbers and their limits are listed by the dangerous goods limits endpoint.
+          example: '3481'
+        quantity:
+          type: number
+          description: Amount of this dangerous good in one unit of the product, in the `unit` of its UN number; at most its `limit`. List a UN number once and add up the amounts if the product contains it several times.
+        productID:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the product containing the dangerous goods (UUID).
+        dangerousGoodsClass:
+          type: string
+          readOnly: true
+          description: Dangerous goods class of the UN number, for example `9` for lithium batteries.
+        unit:
+          readOnly: true
+          description: 'Unit `quantity` and `limit` are given in.
+
+
+            - `wh`: watt-hours
+
+            - `g`: grams
+
+            - `l`: litres'
+          type: string
+          enum:
+          - wh
+          - g
+          - l
+        limit:
+          type: integer
+          readOnly: true
+          description: Maximum `quantity` of this UN number a single product may contain, in `unit`.
+        dangerousGoodsType:
+          readOnly: true
+          description: 'Shipping regulation the limits of the UN number come from.
+
+
+            - `SV188`: ADR special provision 188 (small lithium cells and batteries)
+
+            - `LQ`: limited quantities'
+          type: string
+          enum:
+          - SV188
+          - LQ
+        description:
+          type: string
+          readOnly: true
+          description: Human-readable name of the UN number.
+      required:
+      - UNNumber
+      - quantity
+      title: Product dangerous goods
+    SerialNumberInventory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the serial number record (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        serialNumber:
+          type: string
+          description: Serial number of the unit.
+        warehouseID:
+          type: string
+          format: uuid
+          description: ID of the warehouse the unit was inbounded at (UUID).
+        productID:
+          type: string
+          format: uuid
+          description: ID of the product the serial number belongs to (UUID).
+        inboundedAt:
+          type: string
+          format: date-time
+          description: When the serial number was inbounded at the warehouse (ISO 8601).
+      required:
+      - inboundedAt
+      - productID
+      - serialNumber
+      - warehouseID
+      title: Serial number inventory
+    ProductPackagingUnit:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          minimum: 2
+          description: Number of selling units the packaging unit holds; at least 2.
+        active:
+          type: boolean
+          description: Whether the packaging unit can be used to ship the product. Defaults to `true`.
+        barcodeType:
+          description: 'Type of the packaging unit''s barcode; required when a barcode value is given.
+
+
+            - `ean_13`
+
+            - `code_128`
+
+            - `gs1_128`
+
+            - `qr_code`'
+          type: string
+          enum:
+          - ean_13
+          - code_128
+          - gs1_128
+          - qr_code
+        barcodeValue:
+          type:
+          - string
+          - 'null'
+          maxLength: 48
+          description: Barcode printed on the packaging unit; at most 48 characters.
+        shippable:
+          type: boolean
+          description: Whether the packaging unit is prepacked and can be shipped as it is, without extra packaging. Defaults to `false`.
+        dimensions:
+          type:
+          - object
+          - 'null'
+          properties:
+            id:
+              type: string
+              format: uuid
+              readOnly: true
+              description: ID of the dimensions record (UUID).
+            createdAt:
+              type: string
+              format: date-time
+              readOnly: true
+              description: When the record was created (ISO 8601).
+            updatedAt:
+              type: string
+              format: date-time
+              readOnly: true
+              description: When the record was last changed (ISO 8601).
+            length:
+              type:
+              - number
+              - 'null'
+              minimum: 0.01
+              description: Length in cm; at least 0.01.
+            width:
+              type:
+              - number
+              - 'null'
+              minimum: 0.01
+              description: Width in cm; at least 0.01.
+            height:
+              type:
+              - number
+              - 'null'
+              minimum: 0.01
+              description: Height in cm; at least 0.01.
+            weight:
+              type:
+              - number
+              - 'null'
+              minimum: 0.001
+              description: Weight in kg; at least 0.001.
+            sizeGroup:
+              type:
+              - string
+              - 'null'
+              enum:
+              - S
+              - XS
+              - M
+              - L
+              - XL
+              - XXL
+              - CUSTOM
+              - PAL
+              - null
+              description: 'Size group used for charging, based on the sum of the shortest and the longest side.
+
+
+                - `XS`: flat items such as envelopes and polybags
+
+                - `S`: up to 35 cm
+
+                - `M`: 35 cm or more
+
+                - `L`: 65 cm or more
+
+                - `XL`: 95 cm or more
+
+                - `XXL`: 115 cm or more
+
+                - `CUSTOM`: custom size, mostly for items with a variable height
+
+                - `PAL`: pallets'
+            isHeightVariable:
+              type: boolean
+              description: Whether the height can vary, for example for soft or compressible items. Defaults to `false`.
+            createdBy:
+              readOnly: true
+              description: 'Who provided the dimensions.
+
+
+                - `CUSTOMER`: you
+
+                - `PARTNER`: the warehouse, which measured the product'
+              type: string
+              enum:
+              - CUSTOMER
+              - PARTNER
+            scannerIdentifier:
+              type:
+              - string
+              - 'null'
+              readOnly: true
+              description: Identifier of the scanner the warehouse measured the dimensions with; `null` when they were not scanned.
+          description: Dimensions of the packaging unit itself, as measured by the warehouse; `null` until measured.
+      required:
+      - quantity
+      title: Product packaging unit
+    DeliveryAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the address (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        adminArea:
+          type: string
+          description: State, province or region.
+        subAdminArea:
+          type: string
+          description: County or district within the state.
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: Country (ISO 3166-1 alpha-2), for example `DE`.
+        countryName:
+          type: string
+          description: Name of the country.
+        locality:
+          type: string
+          description: City.
+        subLocality:
+          type: string
+          description: District or neighbourhood within the city.
+        postalCode:
+          type: string
+          description: Postal code. For countries with numeric postal codes, anything but digits is removed, such as a `DE-` prefix.
+        thoroughfare:
+          type: string
+          description: Name of the street, without the house number.
+        subThoroughfare:
+          type: string
+          description: House number.
+        subSubThoroughfare:
+          type: string
+          description: Additional address details, such as building or floor.
+        latitude:
+          type:
+          - number
+          - 'null'
+          description: Latitude of the address in decimal degrees; `null` if unknown.
+        longitude:
+          type:
+          - number
+          - 'null'
+          description: Longitude of the address in decimal degrees; `null` if unknown.
+        phone:
+          type:
+          - string
+          - 'null'
+          description: Phone number, with the country code where possible, for example `+49 1234567890`. For a recipient, it is given to the carrier, and characters other than digits and `+` are removed.
+      required:
+      - adminArea
+      - countryCode
+      - locality
+      - postalCode
+      - subAdminArea
+      - subLocality
+      - subSubThoroughfare
+      - subThoroughfare
+      - thoroughfare
+      title: Delivery address
+    LotWarehouseDetailsWarehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        code:
+          type: string
+          description: Unique three-letter code of the warehouse.
+          example: TST
+        name:
+          type: string
+          description: Name of the warehouse.
+        legalName:
+          type: string
+          readOnly: true
+          description: Legal name of the company operating the warehouse; `null` when not set.
+        displayName:
+          type: string
+          description: Name of the warehouse as shown in the byrd dashboard, usually based on its location.
+        countryCode:
+          type: string
+          readOnly: true
+          description: Country the warehouse is in (ISO 3166-1 alpha-2).
+          example: DE
+      required:
+      - code
+      - displayName
+      - name
+      title: Lot warehouse details warehouse
+    ProductStockByWarehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the record (UUID).
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        warehouse:
+          description: Warehouse the stock levels are for.
+          allOf:
+          - $ref: '#/components/schemas/Warehouse'
+        physicalStock:
+          type: integer
+          description: Units of the product in this warehouse, including reserved and unavailable units.
+        reservedStock:
+          type: integer
+          description: Units in this warehouse reserved for released shipments and not picked yet.
+        unavailableStock:
+          type: integer
+          description: Units in this warehouse that cannot be shipped, for example because they are damaged or in a deactivated storage or lot.
+      title: Product stock by warehouse
+    ProductStorage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the storage (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        reservedStock:
+          type: integer
+          readOnly: true
+          description: Units in the storage reserved for shipments and not picked yet.
+        product:
+          readOnly: true
+          description: Product stored in the storage.
+          allOf:
+          - $ref: '#/components/schemas/StorageProduct'
+        warehouse:
+          readOnly: true
+          description: Warehouse the storage is in.
+          allOf:
+          - $ref: '#/components/schemas/StorageWarehouse'
+        locationID:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the storage location (shelf or pallet place) in the warehouse (UUID).
+        user:
+          type: object
+          readOnly: true
+          description: Object with the `id` of the user who owns the stock.
+          additionalProperties: {}
+        lot:
+          readOnly: true
+          description: Lot stored in the storage; `null` for products without lots.
+          allOf:
+          - $ref: '#/components/schemas/ProductStorageLot'
+        deleted:
+          type: boolean
+          readOnly: true
+          description: Whether the storage was deleted.
+        blockedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the storage was blocked (ISO 8601); `null` when it is not blocked.
+        blockReason:
+          type: string
+          readOnly: true
+          description: 'Why the warehouse blocked the storage; `null` when it is not blocked.
+
+
+            - `inaccurate_stock`: the recorded stock is wrong
+
+            - `stock_count`: the stock is being counted
+
+            - `special_arrangement`: set aside by special arrangement
+
+            - `insufficient_stock`: not enough stock to pick'
+        activated:
+          type: boolean
+          default: true
+          readOnly: true
+          description: Whether the storage can be picked from; stock in a deactivated storage is unavailable.
+        bsid:
+          type:
+          - string
+          - 'null'
+          default: null
+          readOnly: true
+          pattern: ^BSID-([A-Z0-9]){10}$
+          description: 'Unique storage identifier byrd generates: `BSID-` followed by 10 letters or digits.'
+        pu:
+          type:
+          - integer
+          - 'null'
+          default: null
+          readOnly: true
+        shelfIdentifier:
+          type: string
+          readOnly: true
+          description: Label of the storage location in the warehouse, such as a shelf code.
+        stock:
+          type: integer
+          default: 0
+          readOnly: true
+          description: Units of the product in the storage.
+        stockCounted:
+          type: boolean
+          readOnly: true
+        type:
+          type: integer
+          readOnly: true
+          description: 'Type of the storage location.
+
+
+            - `0`: store (legacy)
+
+            - `10`: pallet
+
+            - `20`: shelf'
+      title: Product storage
+    LotUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the lot (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        productID:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the product the lot belongs to (UUID); a physical product, not a bundle. It cannot be changed after the lot is created.
+        lotNumber:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: Lot (batch) number, 1 to 64 characters; unique per product.
+        expiryDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Date the lot expires (ISO 8601 date); cannot be in the past. `null` when the lot does not expire.
+        notBefore:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: First moment units of the lot may be shipped (ISO 8601, UTC); must be before `notAfter`. `null` for no limit.
+        notAfter:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Last moment units of the lot may be shipped (ISO 8601, UTC); cannot be in the past. When you do not set it, it is derived from `expiryDate` if byrd has a minimum remaining shelf life configured for your products. `null` for no limit.
+        activated:
+          type: boolean
+          description: Whether units of the lot can be picked for shipments; stock of a deactivated lot is unavailable. Defaults to `true`.
+        physicalStock:
+          type: integer
+          readOnly: true
+          description: Units of the lot in byrd warehouses, including reserved and unavailable units.
+        reservedStock:
+          type: integer
+          readOnly: true
+          description: Units of the lot reserved for shipments released to a warehouse and not picked yet.
+        warehouses:
+          readOnly: true
+          description: Stock of the lot per warehouse, most stock first; only included with `warehouse_details=true`, otherwise `null`.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/LotWarehouseDetails'
+      required:
+      - lotNumber
+      title: Lot update
+    ProductStats:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the product (UUID).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was created (ISO 8601).
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When the record was last changed (ISO 8601).
+        lastPick:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When a unit of the product was last picked for a shipment (ISO 8601); `null` if never.
+        lastRestock:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When stock of the product was last inbounded from a delivery (ISO 8601); `null` if never.
+        preInboundedStock:
+          type: integer
+          default: 0
+          description: Units in deliveries that are announced, at the warehouse or being processed, and not inbounded yet.
+      title: Product stats
+  parameters:
+    PerPage:
+      name: per_page
+      in: query
+      description: Number of results per page
+      schema:
+        type: integer
+        default: 250
+        minimum: 1
+    SortOrder:
+      name: sort_order
+      in: query
+      description: The direction of result sorting
+      schema:
+        type: string
+        enum:
+        - asc
+        - desc
+    SortBy:
+      name: sort_by
+      in: query
+      description: The model field to sort results by
+      schema:
+        type: string
+    Fields:
+      name: fields
+      in: query
+      description: Model fields to search through; comma separated
+      schema:
+        type: array
+        items:
+          type: string
+        description: Fields are comma separated
+      explode: false
+      required: false
+    Page:
+      name: page
+      in: query
+      description: Result page to jump to, 0-indexed
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    Query:
+      name: q
+      in: query
+      description: The search term
+      schema:
+        type: string
+  responses:
+    Empty:
+      description: Empty response content
+    Error:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Generic error response
+  securitySchemes:
+    tokenAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authorization with previously obtained JSON Web Token
+x-provenance:
+  method: searched
+  source: https://developers.getbyrd.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://developers.getbyrd.com/reference/authapiv2_get.md
+  - https://developers.getbyrd.com/reference/b2bconfigapi_get.md
+  - https://developers.getbyrd.com/reference/b2bconfigtemplateapi_get.md
+  - https://developers.getbyrd.com/reference/bundledetailsapi_delete.md
+  - https://developers.getbyrd.com/reference/bundledetailsapi_get.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_get.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_post.md
+  - https://developers.getbyrd.com/reference/bundlelistapi_put.md
+  - https://developers.getbyrd.com/reference/dangerousgoodsunitlimitsapi_get.md
+  - https://developers.getbyrd.com/reference/deliveriesapi_get.md
+  - https://developers.getbyrd.com/reference/deliveriesapi_post.md
+  - https://developers.getbyrd.com/reference/deliveryapi_delete.md
+  - https://developers.getbyrd.com/reference/deliveryapi_get.md
+  - https://developers.getbyrd.com/reference/deliveryapi_patch.md
+  - https://developers.getbyrd.com/reference/deliveryapi_put.md
+  - https://developers.getbyrd.com/reference/deliverydocumentapi_delete.md
+  - https://developers.getbyrd.com/reference/deliverydocumentapi_patch.md
+  - https://developers.getbyrd.com/reference/deliverydocumentsapi_get.md
+  - https://developers.getbyrd.com/reference/deliverydocumentsapi_post.md
+  - https://developers.getbyrd.com/reference/deliveryitemapi_get.md
+  - https://developers.getbyrd.com/reference/deliverylistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/deliverylotsapi_get.md
+  - https://developers.getbyrd.com/reference/inventoryexportapi_get.md
+  - https://developers.getbyrd.com/reference/loginapiv2_post.md
+  - https://developers.getbyrd.com/reference/lotdetailapi_get.md
+  - https://developers.getbyrd.com/reference/lotdetailapi_patch.md
+  - https://developers.getbyrd.com/reference/lotlistapi_get.md
+  - https://developers.getbyrd.com/reference/lotlistapi_post.md
+  - https://developers.getbyrd.com/reference/picklistapiv3_get.md
+  - https://developers.getbyrd.com/reference/productapi_delete.md
+  - https://developers.getbyrd.com/reference/productapi_get.md
+  - https://developers.getbyrd.com/reference/productapi_patch.md
+  - https://developers.getbyrd.com/reference/productapi_put.md
+  - https://developers.getbyrd.com/reference/productsapi_get.md
+  - https://developers.getbyrd.com/reference/productsapi_post.md
+  - https://developers.getbyrd.com/reference/productserialnumbersapi_get.md
+  - https://developers.getbyrd.com/reference/productstatsapi_get.md
+  - https://developers.getbyrd.com/reference/productstockbywarehouseapi_get.md
+  - https://developers.getbyrd.com/reference/refreshtokenapi_post.md
+  - https://developers.getbyrd.com/reference/returnsexportapi_get.md
+  - https://developers.getbyrd.com/reference/returnshipmentannouncedapiv3_post.md
+  - https://developers.getbyrd.com/reference/returnshipmentdetailapi_get.md
+  - https://developers.getbyrd.com/reference/returnshipmentdocumentsapiv3_post.md
+  - https://developers.getbyrd.com/reference/returnshipmentlistapi_get.md
+  - https://developers.getbyrd.com/reference/schedulepickupapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentaddressvalidationapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_delete.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentapiv3_patch.md
+  - https://developers.getbyrd.com/reference/shipmentbatchrecallapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentbatchreleaseapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentfileapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentdocumentsbatchapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentexportapi_get.md
+  - https://developers.getbyrd.com/reference/shipmentlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentlistapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentlistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentpicklistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentrecallapiv3_post.md
+  - https://developers.getbyrd.com/reference/shipmentreportapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentreservationlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/shipmentunitapiv3_get.md
+  - https://developers.getbyrd.com/reference/unitlistapiv3_get.md
+  - https://developers.getbyrd.com/reference/unitlistcountapiv3_get.md
+  - https://developers.getbyrd.com/reference/userapiv2_patch.md
+  - https://developers.getbyrd.com/reference/userwarehouselinksapi_get.md
+  - https://developers.getbyrd.com/reference/warehouseapi_get.md
+  - https://developers.getbyrd.com/reference/warehousesapi_get.md
+  merge:
+    pages: 69
+    deduped: 601
+    conflicts_kept_first: 0
